@@ -3,9 +3,11 @@
     <div class="modal-container">
       <div class="modal-header">
         <h3>{{ title }}</h3>
+        <button @click="redirectToCreateMoeim" class="close-button">X</button>
       </div>
       <div class="modal-body">
-        <slot name="content"></slot>
+        <p>모임 관리를 시작하세요!</p>
+        <slot></slot>
       </div>
       <div class="modal-footer">
         <slot name="footer"></slot>
@@ -19,9 +21,15 @@ export default {
   name: "Modal",
   props: {
     isVisible: { type: Boolean, required: true },
-    title: { type: String, default: "알림" },
+    title: { type: String, default: "" },
   },
   emits: ["close"],
+  methods: {
+    redirectToCreateMoeim() {
+      this.$emit("close");
+      this.$router.push("/create-moeim"); // "모임 생성" 페이지로 이동
+    },
+  },
 };
 </script>
 
@@ -45,36 +53,43 @@ export default {
   border-radius: 12px;
   width: 400px;
   max-width: 90%;
-  text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.modal-header h3 {
-  color: #7f56d9;
-  margin: 0 0 10px 0;
+.modal-header {
+  display: flex;
+  justify-content: center; /* 헤더를 가운데 정렬 */
+  align-items: center;    /* 세로 중앙 정렬 */
+  position: relative;
 }
 
-.modal-body {
-  margin: 20px 0;
+.modal-header h3 {
+  font-weight: bold;
+  font-size: 20px;
+  color: #6a48b0;
+}
+
+.close-button {
+  position: absolute;
+  right: 0; /* 닫기 버튼 위치 조정 */
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.modal-body p {
+  color: #414651;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
   margin-top: 20px;
-}
-
-button {
-  background-color: #7f56d9;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: bold;
-  width: 100%;
-}
-
-button:hover {
-  background-color: #6a48b0;
 }
 </style>
