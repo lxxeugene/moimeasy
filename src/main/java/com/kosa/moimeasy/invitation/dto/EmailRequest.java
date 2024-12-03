@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.invitation;
+package com.kosa.moimeasy.invitation.dto;
 
 import lombok.Getter;
 import lombok.Setter;

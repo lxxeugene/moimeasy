@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.User;
+package com.kosa.moimeasy.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

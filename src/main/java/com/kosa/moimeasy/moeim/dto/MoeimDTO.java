@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.moeim;
+package com.kosa.moimeasy.moeim.dto;
 
 import lombok.*;
 

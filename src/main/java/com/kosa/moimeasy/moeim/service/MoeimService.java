@@ -1,9 +1,12 @@
-package com.kosa.moimeasy.moeim;
+package com.kosa.moimeasy.moeim.service;
 
+import com.kosa.moimeasy.moeim.dto.MoeimDTO;
+import com.kosa.moimeasy.moeim.entity.Moeim;
+import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kosa.moimeasy.User.UserRepository;
+import com.kosa.moimeasy.user.repository.UserRepository;
 
 import java.util.Random;
 
