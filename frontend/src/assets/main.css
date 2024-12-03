@@ -1,11 +1,14 @@
 @import "./base.css";
 
+.app-layout {
+  display: flex;
+}
 .sidebar {
-  float: left;
+  flex: 0.6;
 }
 
 .contents-wrapper {
-  float: right;
+  flex: 3;
 }
 
 /* 
