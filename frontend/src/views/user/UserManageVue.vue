@@ -46,6 +46,7 @@
   
   <style scoped>
   .member-container {
+    width: 400px;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;

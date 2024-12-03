@@ -1,14 +1,14 @@
 
 import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/Home.vue";
-import Login from "@/views/Login.vue";
-import Signup from "@/views/Signup.vue";
-import MoeimSelect from "@/views/MoeimSelect.vue";
-import CreateMoeim from "@/views/CreateMoeim.vue";
-import EnterMoeim from "@/views/EnterMoeim.vue";
+import Home from "@/views/HomeVue.vue";
+import Login from "@/views/login/LoginVue.vue";
+import Signup from "@/views/login/SignupVue.vue";
+import MoeimSelect from "@/views/moeim/MoeimSelectVue.vue";
+import CreateMoeim from "@/views/moeim/CreateMoeimVue.vue";
+import EnterMoeim from "@/views/moeim/EnterMoeimVue.vue";
 import Schedule from "@/views/schedule/Schedule.vue";
-import UserManage from "@/views/UserManage.vue";
-import InviteUser from "@/views/InviteUser.vue";
+import UserManage from "@/views/user/UserManageVue.vue";
+import InviteUser from "@/views/user/InviteUserVue.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },

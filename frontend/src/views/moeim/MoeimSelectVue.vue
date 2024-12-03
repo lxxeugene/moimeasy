@@ -27,6 +27,7 @@
   <style scoped>
   /* 컨테이너 스타일 */
   .authority-container {
+    width: 400px;
     min-width: 400px;
     margin: 50px auto;
     padding: 20px;
