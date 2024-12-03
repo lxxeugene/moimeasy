@@ -144,7 +144,6 @@ input {
   width: 100%;
   background-color: white;
   color: #414651;
-
   padding: 10px;
   border-radius: 5px;
   font-size: 16px;

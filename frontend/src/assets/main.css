@@ -4,6 +4,10 @@
   float: left;
 }
 
+.contents-wrapper {
+  float: right;
+}
+
 /* 
 #app {
   max-width: 1280px;

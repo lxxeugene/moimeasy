@@ -1,8 +1,10 @@
 <template>
   <div class="app-layout">
     <SideBar class="sidebar" />
-    <Header class="header" />
-    <router-view />
+    <div class="contents-wrapper">
+      <Header class="header" />
+      <router-view />
+    </div>
   </div>
 </template>
 
