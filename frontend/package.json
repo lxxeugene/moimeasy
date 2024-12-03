@@ -10,13 +10,9 @@
   },
   "dependencies": {
     "axios": "^1.7.8",
-<<<<<<< HEAD
-    "jsonwebtoken": "^9.0.2",
-=======
     "@primevue/themes": "^4.2.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.4",
->>>>>>> ede563e042c79a78af875cb13a8b9a2686daf67a
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
