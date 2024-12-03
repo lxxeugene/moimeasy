@@ -69,6 +69,7 @@ export default {
 
 <style scoped>
 .moeim-enter-container {
+  width: 400px;
   min-width: 400px;
   margin: 50px auto;
   padding: 20px;
