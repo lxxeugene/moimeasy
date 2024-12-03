@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.Invitation;
+package com.kosa.moimeasy.invitation;
 
 import jakarta.persistence.*;
 import lombok.Getter;

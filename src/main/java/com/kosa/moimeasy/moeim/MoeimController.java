@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.Moeim;
+package com.kosa.moimeasy.moeim;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

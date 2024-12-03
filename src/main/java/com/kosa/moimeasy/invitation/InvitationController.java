@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.Invitation;
+package com.kosa.moimeasy.invitation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
