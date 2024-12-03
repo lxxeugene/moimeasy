@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.User;
+package com.kosa.moimeasy.user.dto;
 
 import lombok.*;
 

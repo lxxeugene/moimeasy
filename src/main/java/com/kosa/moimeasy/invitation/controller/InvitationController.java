@@ -1,5 +1,7 @@
-package com.kosa.moimeasy.Invitation;
+package com.kosa.moimeasy.invitation.controller;
 
+import com.kosa.moimeasy.invitation.service.InvitationService;
+import com.kosa.moimeasy.invitation.dto.EmailRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

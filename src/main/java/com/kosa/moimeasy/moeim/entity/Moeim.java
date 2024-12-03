@@ -1,8 +1,8 @@
-package com.kosa.moimeasy.Moeim;
+package com.kosa.moimeasy.moeim.entity;
 
 import java.time.LocalDateTime;
 
-import com.kosa.moimeasy.User.User;
+import com.kosa.moimeasy.user.entity.User;
 
 import jakarta.persistence.*;
 import lombok.Getter;

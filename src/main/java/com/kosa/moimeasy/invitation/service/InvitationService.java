@@ -1,9 +1,12 @@
-package com.kosa.moimeasy.Invitation;
+package com.kosa.moimeasy.invitation.service;
 
-import com.kosa.moimeasy.Invitation.Invitation.InvitationStatus;
-import com.kosa.moimeasy.Moeim.Moeim;
-import com.kosa.moimeasy.Moeim.MoeimRepository;
-import com.kosa.moimeasy.User.UserRepository;
+import com.kosa.moimeasy.invitation.entity.Invitation;
+import com.kosa.moimeasy.invitation.entity.Invitation.InvitationStatus;
+import com.kosa.moimeasy.invitation.dto.EmailRequest;
+import com.kosa.moimeasy.invitation.repository.InvitationRepository;
+import com.kosa.moimeasy.moeim.entity.Moeim;
+import com.kosa.moimeasy.moeim.repository.MoeimRepository;
+import com.kosa.moimeasy.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

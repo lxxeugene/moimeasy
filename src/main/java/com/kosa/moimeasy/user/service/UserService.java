@@ -1,5 +1,8 @@
-package com.kosa.moimeasy.User;
+package com.kosa.moimeasy.user.service;
 
+import com.kosa.moimeasy.user.dto.UserDTO;
+import com.kosa.moimeasy.user.entity.User;
+import com.kosa.moimeasy.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
