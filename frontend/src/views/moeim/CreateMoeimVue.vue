@@ -60,7 +60,8 @@ export default {
 
 <style scoped>
 .moeim-create-container {
-  min-width: 400px;
+  width: 800px;
+  min-width: 800px;
   margin: 50px auto;
   padding: 20px;
   border: 1px solid #ddd;
