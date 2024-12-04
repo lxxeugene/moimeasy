@@ -71,10 +71,10 @@ import OutlineIcon from "@/assets/outlineIcon.svg?url";
 import EditIcon from "@/assets/editIcon.svg?url";
 import Notebook from "@/assets/notebook.svg?url";
 import GraphIcon from "@/assets/graphIcon.svg?url";
-import { ref, defineEmits } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
-const emits = defineEmits(["draw-event"]);
-
+import { useUIStore } from "@/stores/uiStore";
+const uiStore = useUIStore();
 const router = useRouter();
 
 const items = ref([
@@ -161,15 +161,13 @@ const items = ref([
 ]);
 
 const onVisible = () => {
-  emits("draw-event");
+  console.log("Menu Command Triggered"); // 이 로그가 출력되는지 확인
+  uiStore.toggleSidebar();
+  console.log("Sidebar visible state:", uiStore.visible);
 };
 </script>
 
 <style scoped>
-.nav-bar {
-  /* display: none; */
-}
-
 .nav-bar,
 .nav-bar * {
   box-sizing: border-box;

@@ -10,7 +10,8 @@ import Aura from "@primevue/themes/aura";
 import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 import DialogService from "primevue/dialogservice";
-
+import { createPinia } from "pinia";
+const pinia = createPinia();
 const app = createApp(App);
 app.component("Header", Header);
 app.component("SideBar", SideBar);
@@ -27,4 +28,5 @@ app.use(PrimeVue, {
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
+app.use(pinia);
 app.use(router).mount("#app");

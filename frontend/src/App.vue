@@ -1,10 +1,18 @@
 <template>
   <div class="app-layout">
-    <SideBar
-      class="sidebar"
-      :class="{ 'slide-out': !visible }"
-      @draw-event="handleDrawEvent"
+    <!-- 사이드바 -->
+    <SideBar class="sidebar" />
+    <!-- 스피드다이얼 -->
+    <SpeedDial
+      v-if="uiStore.visible"
+      :model="items"
+      :radius="80"
+      type="semi-circle"
+      direction="right"
+      buttonClass="btn-color"
+      style="position: absolute; top: calc(50% - 2rem); left: 0"
     />
+    <!-- 메인 컨텐츠 -->
     <div class="contents-wrapper">
       <Header class="header" />
       <router-view />
@@ -14,40 +22,93 @@
 
 <script setup>
 import { ref } from "vue";
-const visible = ref(true);
+import { useToast } from "primevue/usetoast";
+import { useRouter } from "vue-router";
+import { useUIStore } from "@/stores/uiStore";
+const uiStore = useUIStore();
 
-const handleDrawEvent = () => {
-  visible.value = !visible.value;
-};
+const toast = useToast();
+const router = useRouter();
+
+const items = ref([
+  {
+    label: "Add",
+    icon: "pi pi-pencil",
+    command: () => {
+      toast.add({
+        severity: "info",
+        summary: "Add",
+        detail: "Data Added",
+        life: 3000,
+      });
+    },
+  },
+  {
+    label: "Update",
+    icon: "pi pi-refresh",
+    command: () => {
+      toast.add({
+        severity: "success",
+        summary: "Update",
+        detail: "Data Updated",
+        life: 3000,
+      });
+    },
+  },
+  {
+    label: "Menu",
+    icon: "pi pi-bars",
+    command: () => {
+      console.log("Menu Command Triggered"); // 이 로그가 출력되는지 확인
+      uiStore.toggleSidebar();
+      console.log("Sidebar visible state:", uiStore.visible);
+    },
+  },
+  {
+    label: "Delete",
+    icon: "pi pi-trash",
+    command: () => {
+      toast.add({
+        severity: "error",
+        summary: "Delete",
+        detail: "Data Deleted",
+        life: 3000,
+      });
+    },
+  },
+
+  {
+    label: "Vue Website",
+    icon: "pi pi-external-link",
+    command: () => {
+      window.location.href = "https://vuejs.org/";
+    },
+  },
+]);
 </script>
+
 <style>
-.app-layout {
-  display: flex;
-}
-.sidebar {
-  flex: 0.58;
-}
-
-.contents-wrapper {
-  flex: 3;
-}
-
 .slide-out {
-  animation: slideOut 1.5s forwards; /* 1.5초 동안 애니메이션 실행 */
+  animation: slideOut 1.5s forwards;
 }
 
 @keyframes slideOut {
   0% {
-    opacity: 1; /* 완전히 보임 */
-    transform: translateX(0); /* 원래 위치 */
+    opacity: 1;
+    transform: translateX(0);
   }
   100% {
-    opacity: 0; /* 사라짐 */
-    transform: translateX(-100%); /* 화면 왼쪽으로 이동 */
+    opacity: 0;
+    transform: translateX(-100%);
   }
 }
 
 .hidden {
-  display: none; /* 애니메이션이 끝난 후 숨기기 */
+  display: none; /* 애니메이션 종료 후 숨기기 */
+}
+/* Speed Dial 버튼 색상  */
+.btn-color {
+  background: var(--main-color) !important;
+  border: none !important;
 }
 </style>
