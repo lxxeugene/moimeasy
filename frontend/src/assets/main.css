@@ -1,16 +1,5 @@
 @import "./base.css";
 
-.app-layout {
-  display: flex;
-}
-.sidebar {
-  flex: 0.58;
-}
-
-.contents-wrapper {
-  flex: 3;
-}
-
 :root {
   --main-color: #7f56d9; /* 주요 색상 */
   --secondary-color: #ebeef0; /* 보조 색상 */

@@ -1,7 +1,7 @@
 <template>
   <div class="nav-bar">
     <div class="nav-logo">
-      <div class="logo-container" v-if="visible">
+      <div class="logo-container" @click="onVisible">
         <div class="logo-background">
           <!-- vite-svg-loader 사용 -->
           <BlurIcon class="logo-icon" fill="#7f56d9" />
@@ -71,10 +71,10 @@ import OutlineIcon from "@/assets/outlineIcon.svg?url";
 import EditIcon from "@/assets/editIcon.svg?url";
 import Notebook from "@/assets/notebook.svg?url";
 import GraphIcon from "@/assets/graphIcon.svg?url";
-import { ref } from "vue";
+import { ref, defineEmits } from "vue";
 import { useRouter } from "vue-router";
+const emits = defineEmits(["draw-event"]);
 
-const visible = ref(true);
 const router = useRouter();
 
 const items = ref([
@@ -159,6 +159,10 @@ const items = ref([
     ],
   },
 ]);
+
+const onVisible = () => {
+  emits("draw-event");
+};
 </script>
 
 <style scoped>
@@ -208,12 +212,18 @@ const items = ref([
   position: absolute;
   left: 0px;
   top: 0px;
+  transition: all 0.2s;
 }
 .logo-background:hover {
   cursor: pointer;
   border: none;
-  /* background-color: #bb86f1; */
   box-shadow: 0 4px 15px rgba(129, 85, 165, 0.3); /* 블러 그림자 효과 */
+}
+.logo-background:active {
+  cursor: pointer;
+  border: none;
+  background-color: #f8f3fb;
+  box-shadow: 0 4px 15px rgba(62, 32, 84, 0.3); /* 블러 그림자 효과 */
 }
 
 .logo-icon {

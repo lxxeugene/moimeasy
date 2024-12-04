@@ -10,6 +10,7 @@ import UserManage from "@/views/user/UserManageVue.vue";
 import InviteUser from "@/views/user/InviteUserVue.vue";
 import PayList from "@/views/PayList.vue";
 import BoardView from "@/views/board/BoardView.vue";
+import Draw from "@/views/schedule/Draw.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -23,6 +24,7 @@ const routes = [
   { path: "/invite-user", name: "InviteUser", component: InviteUser },
   { path: "/pay-list", name: "PayList", component: PayList },
   { path: "/board", name: "Board", component: BoardView },
+  { path: "/draw", name: "draw", component: Draw },
 ];
 
 const router = createRouter({
