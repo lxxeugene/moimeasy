@@ -3,8 +3,8 @@ import "./assets/main.css";
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import Header from "./components/Header.vue";
-import SideBar from "./components/SideBar.vue";
+import Header from "./components/layouts/Header.vue";
+import SideBar from "./components/layouts/SideBar.vue";
 import PrimeVue from "primevue/config"; // PrimeVue 추가
 import Aura from "@primevue/themes/aura";
 import ToastService from "primevue/toastservice";

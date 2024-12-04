@@ -1,16 +1,7 @@
 <template>
   <div class="nav-bar">
-    <div class="nav-logo">
-      <div class="logo-container" @click="onVisible">
-        <div class="logo-background">
-          <!-- vite-svg-loader 사용 -->
-          <BlurIcon class="logo-icon" fill="#7f56d9" />
-        </div>
-      </div>
-      <div class="logo-text-container">
-        <div class="logo-text">MoeimEasy</div>
-      </div>
-    </div>
+    <!-- 사이드바 로고 -->
+    <NavLogo />
     <!-- 사이드바 메뉴  -->
     <div class="main-menu-container">
       <div class="main-menu-header">
@@ -65,18 +56,15 @@
 </template>
 
 <script setup>
-import BlurIcon from "@/assets/blurIcon.svg";
 import UsersIcon from "@/assets/usersIcon.svg?url";
 import OutlineIcon from "@/assets/outlineIcon.svg?url";
 import EditIcon from "@/assets/editIcon.svg?url";
 import Notebook from "@/assets/notebook.svg?url";
 import GraphIcon from "@/assets/graphIcon.svg?url";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useUIStore } from "@/stores/uiStore";
-const uiStore = useUIStore();
-const router = useRouter();
+import NavLogo from "./NavLogo.vue";
 
+//사이드바 메뉴구성 아이템
 const items = ref([
   {
     label: "Dashboard",
@@ -159,12 +147,6 @@ const items = ref([
     ],
   },
 ]);
-
-const onVisible = () => {
-  console.log("Menu Command Triggered"); // 이 로그가 출력되는지 확인
-  uiStore.toggleSidebar();
-  console.log("Sidebar visible state:", uiStore.visible);
-};
 </script>
 
 <style scoped>
@@ -175,6 +157,7 @@ const onVisible = () => {
 
 .nav-bar {
   background: #ffffff;
+  width: 264px;
   width: 264px;
   height: 100vh;
   position: relative;
@@ -260,7 +243,7 @@ const onVisible = () => {
   align-items: flex-start;
   justify-content: flex-start;
   position: relative;
-  left: 24px;
+  left: 8px;
   top: 122px;
 }
 
@@ -397,6 +380,7 @@ const onVisible = () => {
 
 .more-settings {
   border-top: 1px solid #9d9d9d;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 14px;

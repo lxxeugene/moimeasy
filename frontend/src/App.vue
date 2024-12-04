@@ -101,7 +101,7 @@ const items = ref([
 }
 
 .sidebar.expanded {
-  flex: 0.58; /* 펼쳐진 상태 */
+  flex: 0.52; /* 펼쳐진 상태 */
 }
 
 .contents-wrapper {

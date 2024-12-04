@@ -362,7 +362,7 @@ const getSeverity = (status) => {
 
 .board-wrapper {
   margin: 10px 10px;
-  width: 1300px;
+  width: 100%;
   height: auto;
 }
 
