@@ -7,6 +7,9 @@ import Header from "./components/Header.vue";
 import SideBar from "./components/SideBar.vue";
 import PrimeVue from "primevue/config"; // PrimeVue 추가
 import Aura from "@primevue/themes/aura";
+import ToastService from "primevue/toastservice";
+import ConfirmationService from "primevue/confirmationservice";
+import DialogService from "primevue/dialogservice";
 
 const app = createApp(App);
 app.component("Header", Header);
@@ -21,4 +24,7 @@ app.use(PrimeVue, {
     },
   },
 });
+app.use(ConfirmationService);
+app.use(ToastService);
+app.use(DialogService);
 app.use(router).mount("#app");

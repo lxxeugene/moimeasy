@@ -2,8 +2,36 @@
   <div class="header-wrapper">
     <div class="header-box">
       <div class="header-box1">
-        <img src="@/assets/arrowIcon.svg?url" alt="Arrow Icon" height="12px" />
-        <p>DashBoard</p>
+        <!-- 브래드크럼 설정 -->
+        <!-- <img src="@/assets/arrowIcon.svg?url" alt="Arrow Icon" height="12px" />
+        <p>DashBoard</p> -->
+        <div class="card breadcrumb-wrapper">
+          <Breadcrumb :home="home" :model="items">
+            <template #item="{ item, props }">
+              <router-link
+                v-if="item.route"
+                v-slot="{ href, navigate }"
+                :to="item.route"
+                custom
+              >
+                <a :href="href" v-bind="props.action" @click="navigate">
+                  <span :class="[item.icon, 'text-color']" />
+                  <span class="text-primary font-semibold">{{
+                    item.label
+                  }}</span>
+                </a>
+              </router-link>
+              <a
+                v-else
+                :href="item.url"
+                :target="item.target"
+                v-bind="props.action"
+              >
+                <span class="text-dark">{{ item.label }}</span>
+              </a>
+            </template>
+          </Breadcrumb>
+        </div>
       </div>
       <div class="header-box2">
         <div class="search-bar-box">
@@ -15,7 +43,10 @@
             class="search-icon"
           />
         </div>
-        <div class="notifications-box">
+
+        <!-- 알림메시지  -->
+        <Toast position="bottom-right" />
+        <div class="notifications-box" @click="showSecondary">
           <!-- <img
             src="@/assets/notifications.svg?url"
             alt="notifications Icon"
@@ -36,6 +67,36 @@
 
 <script setup>
 import OverlayBadge from "primevue/overlaybadge";
+import Breadcrumb from "primevue/breadcrumb";
+import { ref } from "vue";
+import { useToast } from "primevue/usetoast";
+import Toast from "primevue/toast";
+
+const toast = useToast();
+
+const home = ref({
+  icon: "pi pi-home",
+  route: "/",
+});
+const items = ref([
+  { label: "일정관리", route: "/schedule" },
+  { label: "일정조회", route: "/inputtext" },
+]);
+
+const showSecondary = () => {
+  toast.add({
+    severity: "secondary",
+    summary: "[일정 등록]",
+    detail: " 우리 모임의 새 일정이 등록되었습니다.",
+    life: 3000,
+  });
+  toast.add({
+    severity: "secondary",
+    summary: "[쪽지]",
+    detail: "운영자로 부터 쪽지가 도착했습니다.",
+    life: 3000,
+  });
+};
 </script>
 
 <style scoped>
@@ -108,5 +169,17 @@ import OverlayBadge from "primevue/overlaybadge";
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.breadcrumb-wrapper {
+  display: flex;
+  align-items: center;
+}
+.font-semibold {
+  font-size: 14px;
+  margin-top: 2px;
+}
+.text-dark {
+  color: red;
 }
 </style>
