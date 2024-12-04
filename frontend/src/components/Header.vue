@@ -16,11 +16,14 @@
           />
         </div>
         <div class="notifications-box">
-          <img
+          <!-- <img
             src="@/assets/notifications.svg?url"
             alt="notifications Icon"
             height="28px"
-          />
+          /> -->
+          <OverlayBadge value="2" severity="danger">
+            <i class="pi pi-bell" style="font-size: 24px" />
+          </OverlayBadge>
         </div>
         <div class="profile-box">
           <img src="@/assets/Avatar.svg?url" alt="Avatar Icon" height="32px" />
@@ -31,7 +34,9 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import OverlayBadge from "primevue/overlaybadge";
+</script>
 
 <style scoped>
 .header-wrapper {

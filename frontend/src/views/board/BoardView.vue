@@ -357,7 +357,7 @@ const getSeverity = (status) => {
 <style scoped>
 .filter-header {
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
 }
 
 .board-wrapper {
