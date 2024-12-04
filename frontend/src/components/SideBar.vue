@@ -1,54 +1,52 @@
 <template>
   <div class="nav-bar">
     <div class="nav-logo">
-      <div class="logo-container">
-        <div class="logo-background"></div>
-        <!-- vite-svg-loader 사용 -->
-        <BlurIcon class="logo-icon" fill="#7f56d9" />
+      <div class="logo-container" v-if="visible">
+        <div class="logo-background">
+          <!-- vite-svg-loader 사용 -->
+          <BlurIcon class="logo-icon" fill="#7f56d9" />
+        </div>
       </div>
       <div class="logo-text-container">
         <div class="logo-text">MoeimEasy</div>
       </div>
     </div>
+    <!-- 사이드바 메뉴  -->
     <div class="main-menu-container">
       <div class="main-menu-header">
         <div class="main-menu-title">MAIN MENU</div>
       </div>
-      <div class="menu-tabs">
-        <div class="menu-item-active">
-          <div class="menu-item-text-container">
-            <img class="icon-dashboard" src="@/assets/outlineIcon.svg?url" />
-            <div class="menu-item-text">Dashboard</div>
-          </div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-text-container">
-            <img class="icon-cart" src="@/assets/usersIcon.svg?url" />
-            <div class="menu-item-text">회원관리</div>
-          </div>
-        </div>
-        <div class="menu-item">
-          <div class="menu-item-text-container">
-            <img class="icon-edit" src="@/assets/editIcon.svg?url" />
-            <div class="menu-item-text">일정관리</div>
-          </div>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-item">
-            <div class="menu-item-text-container">
-              <img class="icon-notebook" src="@/assets/notebook.svg?url" />
-              <div class="menu-item-text">회비관리</div>
-            </div>
-          </div>
-          <div class="dropdown-item">
-            <div class="menu-item-text-container">
-              <img class="icon-graph" src="@/assets/graphIcon.svg?url" />
-              <div class="menu-item-text">통계</div>
-            </div>
-          </div>
-        </div>
+      <div class="card flex justify-center">
+        <PanelMenu :model="items" class="pannel-item">
+          <template #item="{ item }">
+            <!-- 대쉬보드 메뉴 -->
+            <router-link
+              v-if="item.route"
+              v-slot="{ href, navigate }"
+              :to="item.route"
+              custom
+            >
+              <a v-ripple class="dropmenu-item" :href="href" @click="navigate">
+                <img class="icon-dashboard" :src="item.icon" width="15px" />
+                <span class="menu-title">{{ item.label }}</span>
+              </a>
+            </router-link>
+            <!-- 기타 메뉴 -->
+            <a
+              v-else
+              v-ripple
+              class="dropmenu-item"
+              :href="item.url"
+              :target="item.target"
+            >
+              <img class="icon-dashboard" :src="item.icon" width="15px" />
+              <span class="menu-title">{{ item.label }}</span>
+            </a>
+          </template>
+        </PanelMenu>
       </div>
     </div>
+    <!-- 사이드바 메뉴 끝 -->
     <div class="bottom-menu-container">
       <div class="more-settings">
         <div class="settings-group">
@@ -68,9 +66,106 @@
 
 <script setup>
 import BlurIcon from "@/assets/blurIcon.svg";
+import UsersIcon from "@/assets/usersIcon.svg?url";
+import OutlineIcon from "@/assets/outlineIcon.svg?url";
+import EditIcon from "@/assets/editIcon.svg?url";
+import Notebook from "@/assets/notebook.svg?url";
+import GraphIcon from "@/assets/graphIcon.svg?url";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const visible = ref(true);
+const router = useRouter();
+
+const items = ref([
+  {
+    label: "Dashboard",
+    icon: OutlineIcon,
+    items: [
+      {
+        label: "Dash-1",
+        icon: OutlineIcon,
+        route: "/theming/styled",
+      },
+      {
+        label: "Dash-2",
+        icon: OutlineIcon,
+        route: "/theming/unstyled",
+      },
+    ],
+  },
+  {
+    label: "회원관리",
+    icon: UsersIcon,
+    items: [
+      {
+        label: "회원관리-1",
+        icon: UsersIcon,
+        url: "https://vuejs.org/", // 외부 링크는 url을 사용
+      },
+      {
+        label: "회원관리-2",
+        icon: UsersIcon,
+        route: "/login", // 내부 링크는 route를 사용
+      },
+    ],
+  },
+  {
+    label: "일정관리",
+    icon: EditIcon,
+    items: [
+      {
+        label: "일정조회",
+        icon: EditIcon,
+        route: "/schedule",
+      },
+      {
+        label: "모임게시판",
+        icon: EditIcon,
+        route: "/board",
+      },
+    ],
+  },
+  {
+    label: "회비관리",
+    icon: Notebook,
+    items: [
+      {
+        label: "회비관리-1",
+        icon: Notebook,
+        url: "https://vuejs.org/",
+      },
+      {
+        label: "회비관리-2",
+        icon: Notebook,
+        url: "https://vuejs.org/",
+      },
+    ],
+  },
+  {
+    label: "통계",
+    icon: GraphIcon,
+    items: [
+      {
+        label: "통계-1",
+        icon: GraphIcon,
+        url: "https://vuejs.org/",
+      },
+      {
+        label: "통계-2",
+        icon: GraphIcon,
+        url: "https://vuejs.org/",
+      },
+    ],
+  },
+]);
 </script>
 
 <style scoped>
+.nav-bar {
+  /* display: none; */
+}
+
 .nav-bar,
 .nav-bar * {
   box-sizing: border-box;
@@ -106,12 +201,19 @@ import BlurIcon from "@/assets/blurIcon.svg";
 .logo-background {
   background: #ffffff;
   border-radius: 6px;
-  border: 0.75px solid #e8e8e8;
+  /* border: 0.75px solid #e8e8e8; */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   width: 42px;
   height: 42px;
   position: absolute;
   left: 0px;
   top: 0px;
+}
+.logo-background:hover {
+  cursor: pointer;
+  border: none;
+  /* background-color: #bb86f1; */
+  box-shadow: 0 4px 15px rgba(129, 85, 165, 0.3); /* 블러 그림자 효과 */
 }
 
 .logo-icon {
@@ -149,7 +251,7 @@ import BlurIcon from "@/assets/blurIcon.svg";
   gap: 14px;
   align-items: flex-start;
   justify-content: flex-start;
-  position: absolute;
+  position: relative;
   left: 24px;
   top: 122px;
 }
@@ -257,7 +359,7 @@ import BlurIcon from "@/assets/blurIcon.svg";
   position: relative;
 }
 
-.dropdown-item {
+.menu-item {
   border-radius: 8px;
   padding: 19px 8px 19px 24px;
   display: flex;
@@ -330,5 +432,47 @@ import BlurIcon from "@/assets/blurIcon.svg";
   display: flex;
   align-items: center;
   justify-content: flex-start;
+}
+
+.dropmenu-item {
+  display: flex; /* Flexbox 사용 */
+  align-items: center; /* 수직 중앙 정렬 */
+  gap: 10px;
+  border-radius: 8px;
+  padding: 8px 8px 8px 24px;
+  width: 130px;
+  border: none;
+  height: 53px;
+  cursor: pointer; /* 포인터 커서 */
+  color: #181616;
+  text-align: left;
+  font-family: "Poppins-Medium", sans-serif;
+  font-size: 16px;
+  line-height: 16px;
+  font-weight: 500;
+  padding: 0.5rem 1rem; /* px-4, py-2에 해당 */
+}
+
+.pannel-item {
+  width: 100%; /* 기본적으로 전체 너비 */
+}
+
+@media (min-width: 768px) {
+  /* md 브레이크포인트: 768px 이상 */
+  .pannel-item {
+    width: 13rem;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .pannel-item {
+    color: #ffffff; /* 다크 모드에서 텍스트 색상 (surface-0의 예) */
+  }
+}
+
+.p-panelmenu-panel {
+  border: none !important;
+}
+.menu-title {
+  width: 75px;
 }
 </style>
