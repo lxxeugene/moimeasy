@@ -9,6 +9,7 @@ import Schedule from "@/views/schedule/ScheduleView.vue";
 import UserManage from "@/views/user/UserManageVue.vue";
 import InviteUser from "@/views/user/InviteUserVue.vue";
 import PayList from "@/views/PayList.vue";
+import BoardView from "@/views/board/BoardView.vue";
 
 const routes = [
   { path: "/", name: "Home", component: Home },
@@ -21,6 +22,7 @@ const routes = [
   { path: "/user-manage", name: "UserManage", component: UserManage },
   { path: "/invite-user", name: "InviteUser", component: InviteUser },
   { path: "/pay-list", name: "PayList", component: PayList },
+  { path: "/board", name: "Board", component: BoardView },
 ];
 
 const router = createRouter({

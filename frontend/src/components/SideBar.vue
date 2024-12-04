@@ -132,7 +132,7 @@ import BlurIcon from "@/assets/blurIcon.svg";
 }
 
 .logo-text {
-  color: #7f56d9;
+  color: var(--main-color);
   text-align: left;
   font-family: "Poppins-Medium", sans-serif;
   font-size: 20px;

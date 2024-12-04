@@ -4,11 +4,18 @@
   display: flex;
 }
 .sidebar {
-  flex: 0.6;
+  flex: 0.58;
 }
 
 .contents-wrapper {
   flex: 3;
+}
+
+:root {
+  --main-color: #7f56d9; /* 주요 색상 */
+  --secondary-color: #ebeef0; /* 보조 색상 */
+  --font-size: 16px; /* 기본 글꼴 크기 */
+  --padding: 10px; /* 패딩 값 */
 }
 
 /* 
