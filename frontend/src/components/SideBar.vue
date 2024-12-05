@@ -35,10 +35,12 @@
         </div>
         <div class="dropdown-menu">
           <div class="dropdown-item">
-            <div class="menu-item-text-container">
-              <img class="icon-notebook" src="@/assets/notebook.svg?url" />
-              <div class="menu-item-text">회비관리</div>
-            </div>
+            <router-link to="/pay-list" class="menu-item-link">
+              <div class="menu-item-text-container">
+                <img class="icon-notebook" src="@/assets/notebook.svg?url" />
+                <div class="menu-item-text">회비관리</div>
+              </div>
+            </router-link>
           </div>
           <div class="dropdown-item">
             <div class="menu-item-text-container">

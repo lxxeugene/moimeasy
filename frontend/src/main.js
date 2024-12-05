@@ -15,6 +15,6 @@ app.use(PrimeVue, {theme: {preset: Aura, options:{
             prefix: 'p',
             darkModeSelector: 'system',
             cssLayer: false
-        }
-    }});
+        }}
+    });
 app.use(router).mount("#app");
