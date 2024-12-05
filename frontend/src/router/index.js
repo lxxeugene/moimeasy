@@ -12,6 +12,10 @@ import InviteUser from '@/views/user/InviteUserView.vue';
 import InvitationList from '@/views/user/InvitationListView.vue'; // 초대 목록 추가
 import PayList from '@/views/PayList.vue';
 import WebSocket from '@/views/WebSocketView.vue';
+import BoardView from '@/views/board/BoardView.vue';
+import Draw from '@/views/schedule/Draw.vue';
+import TradeList from '@/views/pay/TradeList.vue';
+import Category from '@/views/pay/Category.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -35,6 +39,11 @@ const routes = [
   }, // 초대 목록 추가
   { path: '/pay-list', name: 'PayList', component: PayList },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
+  { path: '/board', name: 'Board', component: BoardView },
+  { path: '/draw', name: 'draw', component: Draw },
+  { path: '/pay-list', name: 'PayList', component: PayList },
+  { path: '/trade-list', name: 'TradeList', component: TradeList },
+  { path: '/category', name: 'Category', component: Category },
 ];
 
 const router = createRouter({
