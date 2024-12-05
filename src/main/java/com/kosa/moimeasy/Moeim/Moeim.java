@@ -19,7 +19,7 @@ public class Moeim {
 
     @ManyToOne
     @JoinColumn(name = "USER_ID", nullable = false)
-    private User user;
+    private User user; // User 타입으로 변경
 
     @Column(nullable = false, length = 100)
     private String moeimName;

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class InvitationService {
@@ -27,26 +28,35 @@ public class InvitationService {
     @Autowired
     private MoeimRepository moeimRepository;
 
-    public String sendInvitation(Long userId, EmailRequest request) {
+    public void sendInvitation(Long userId, EmailRequest request, String htmlContent) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId는 null일 수 없습니다.");
+        }
+
+        // 로그인된 사용자의 moeimId 가져오기
+        Long moeimId = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."))
+            .getMoeimId();
+
+        if (moeimId == null) {
+            throw new IllegalArgumentException("사용자의 moeimId가 null입니다.");
+        }
+
+        // moeimId로 모임 코드 조회
+        String moeimCode = moeimRepository.findById(moeimId)
+            .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."))
+            .getMoeimCode();
+
         try {
-            // 로그인된 회원의 moeimId 및 moeimCode 가져오기
-            Long moeimId = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."))
-                    .getMoeimId();
-
-            Moeim moeim = moeimRepository.findById(moeimId)
-                    .orElseThrow(() -> new IllegalArgumentException("모임을 찾을 수 없습니다."));
-
-            String moeimCode = moeim.getMoeimCode();
-
             // 이메일 전송
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
 
-            helper.setTo(request.getEmail());
-            helper.setSubject("Moeimeasy 초대");
-            helper.setText(request.getMessage() + "\n\n모임 코드: " + moeimCode, true); // HTML 허용
-            helper.setFrom("moeimeasy@gmail.com", "MoeimEasy Team");
+            String finalHtmlContent = htmlContent + "<p>모임 코드: " + moeimCode + "</p>";
+        helper.setTo(request.getEmail());
+        helper.setSubject("MoeimEasy 초대");
+        helper.setText(finalHtmlContent, true);  // HTML 콘텐츠 설정
+        helper.setFrom("moeimeasy@gmail.com", "MoeimEasy Team");
 
             mailSender.send(mimeMessage);
 
@@ -58,10 +68,13 @@ public class InvitationService {
             invitation.setCreatedAt(LocalDateTime.now());
             invitationRepository.save(invitation);
 
-            return "초대장이 성공적으로 전송되었습니다!";
+            
         } catch (Exception e) {
-            e.printStackTrace();
-            return "이메일 전송 실패: " + e.getMessage();
+            throw new RuntimeException("이메일 전송 실패: " + e.getMessage());
         }
+    }
+
+    public List<Invitation> getAllInvitations() {
+        return invitationRepository.findAll();
     }
 }
