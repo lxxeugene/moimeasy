@@ -39,6 +39,13 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    'ws-connect': {
+      // WebSocket 프록시 경로 설정
+      target: 'http://localhost:8088', // Spring Boot WebSocket 서버 주소와 포트
+      ws: true, // WebSocket 지원 설정
+      changeOrigin: true,
+      secure: false,
+    },
   },
   define: {
     global: {},

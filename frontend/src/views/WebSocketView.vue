@@ -28,21 +28,25 @@ const newMessage = ref('');
 let stompClient;
 
 const connectWebSocket = () => {
-  const socket = new SockJS('http://localhost:8088/ws');
+  // Spring Boot의 WebSocket 엔드포인트로 연결 설정
+  const socket = new SockJS('http://localhost:8088/ws-connect');
   stompClient = Stomp.over(socket);
+  stompClient.debug = (str) => {
+    console.log('STOMP debug: ', str); // 디버깅용 로그
+  };
 
   stompClient.connect(
     {},
     (frame) => {
       console.log('Connected: ' + frame);
-      stompClient.subscribe('/topic/messages', (message) => {
-        console.log('Received message: ', message.body); // 수신 메시지 로그
+      // 백엔드에서 브로커로부터 메시지를 구독
+      stompClient.subscribe('/subscribe/chat', (message) => {
         const receivedMessage = JSON.parse(message.body);
         messages.value.push({ id: Date.now(), text: receivedMessage.content });
       });
     },
     (error) => {
-      console.error('WebSocket 연결 실패: ', error); // 연결 실패 로그 추가
+      console.error('WebSocket 연결 실패: ', error);
     }
   );
 };
@@ -55,8 +59,9 @@ const sendMessage = () => {
       content: newMessage.value,
       messageType: 'CHAT',
     };
+    // 메시지 전송 경로에 맞춰 메시지를 전송
     stompClient.send(
-      '/app/chat.sendMessage',
+      '/publish/chat.sendMessage',
       JSON.stringify(messagePayload),
       {}
     );
