@@ -1,5 +1,9 @@
 package com.kosa.moimeasy.user.dto;
 
+import java.time.LocalDateTime;
+
+import com.kosa.moimeasy.user.entity.User;
+
 import lombok.*;
 
 @Getter
@@ -8,14 +12,27 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserDTO {
-    private Long userid;         // 사용자 ID (응답용)
-    private String userName; // 사용자 이름 (요청 및 응답용)
-    private String password; // 비밀번호 (요청용, 응답에는 포함하지 않는 것이 보안상 안전)
-    private String address;  // 주소 (요청 및 응답용)
-    private String email;    // 이메일 (요청 및 응답용)
-    private String phone;    // 전화번호 (요청 및 응답용)
-    private String nickname; // 닉네임 (요청 및 응답용)
-    private Long moeimId;    // 모임 ID (요청 및 응답용)
-    private String role;     // 역할 (응답용)
+    private Long userId;         
+    private String userName; 
+    private String password; 
+    private String address;  
+    private String email;    
+    private String phone;    
+    private String nickname; 
+    private LocalDateTime createAt;
+    private Long moeimId;    
+    private String role;     
+
+    public UserDTO(User user) {
+        this.userId = user.getUserId();
+        this.userName = user.getUserName();
+        this.email = user.getEmail();
+        this.phone = user.getPhone();
+        this.nickname = user.getNickname();
+        this.address = user.getAddress();
+        this.createAt = user.getCreateAt();
+        this.moeimId = user.getMoeimId();
+        this.role = user.getRole() != null ? user.getRole().name() : null;
+    }
 }
 

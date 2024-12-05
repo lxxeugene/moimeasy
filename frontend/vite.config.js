@@ -1,10 +1,12 @@
-import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import vueDevTools from "vite-plugin-vue-devtools";
-import svgLoader from "vite-svg-loader";
-import Components from "unplugin-vue-components/vite";
-import { PrimeVueResolver } from "unplugin-vue-components/resolvers";
+import { fileURLToPath, URL } from 'node:url';
+
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vueDevTools from 'vite-plugin-vue-devtools';
+import svgLoader from 'vite-svg-loader';
+import { fileURLToPath, URL } from 'node:url';
+import Components from 'unplugin-vue-components/vite';
+import { PrimeVueResolver } from 'unplugin-vue-components/resolvers';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -19,24 +21,49 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
 
   // 빌드 출력 디렉토리 설정
   build: {
-    outDir: "../src/main/resources/static", // Spring Boot의 정적 리소스 폴더로 설정
+    outDir: '../src/main/resources/static', // Spring Boot의 정적 리소스 폴더로 설정
     emptyOutDir: true, // 기존 빌드 결과 삭제
   },
 
-  // 개발 서버 설정
+  // // 개발 서버 설정
+  // server: {
+  //   port: 3000, // 개발 서버 포트 설정
+  //   proxy: {
+  //     "/api": {
+  //       // 프록시 경로 설정
+  //       target: "http://localhost", // Spring Boot 서버 주소
+  //       changeOrigin: true,
+  //       rewrite: (path) => path.replace(/^\/api/, ""), // 경로 재작성 (필요에 따라 수정)
+  //     },
+  //   },
+  // },
   server: {
-    port: 3000, // 개발 서버 포트 설정
+    port: 3000,
     proxy: {
-      "/api": {
-        target: "http://localhost", // Spring Boot 서버 주소
+      '/api': {
+        target: 'http://localhost:8088', // Spring Boot 주소와 포트
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""), // 경로 재작성
+
+        '/api': {
+          target: 'http://localhost', // Spring Boot 서버 주소
+          rewrite: (path) => path.replace(/^\/api/, ''), // 경로 재작성
+        },
+        'ws-connect': {
+          // WebSocket 프록시 경로 설정
+          target: 'http://localhost:8088', // Spring Boot WebSocket 서버 주소와 포트
+          ws: true, // WebSocket 지원 설정
+          secure: false,
+        },
+      },
+
+      define: {
+        global: {},
       },
     },
   },
