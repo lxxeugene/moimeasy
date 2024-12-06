@@ -3,6 +3,7 @@ package com.kosa.moimeasy.user.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -61,4 +62,17 @@ public class User {
     public enum Role {
         user,admin
     }
+
+//    @Column(name = "PROFILE_URL")
+//    private String profileUrl;
+//
+//    // 다대다 관계 설정
+//    @ManyToMany
+//    @JoinTable(
+//            name = "USER_MOEIM",
+//            joinColumns = @JoinColumn(name = "USER_ID"),
+//            inverseJoinColumns = @JoinColumn(name = "MOEIM_ID")
+//    )
+//    private Set<Moeim> moeims = new HashSet<>();
+
 }

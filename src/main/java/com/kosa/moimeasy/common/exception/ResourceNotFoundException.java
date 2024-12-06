@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.exception;
+package com.kosa.moimeasy.common.exception;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.http.HttpStatus;

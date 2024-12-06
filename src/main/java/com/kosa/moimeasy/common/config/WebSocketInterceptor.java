@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.config;
+package com.kosa.moimeasy.common.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;

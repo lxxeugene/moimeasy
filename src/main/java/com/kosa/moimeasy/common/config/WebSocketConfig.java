@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.config;
+package com.kosa.moimeasy.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
