@@ -6,6 +6,7 @@ import com.kosa.moimeasy.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -13,6 +14,15 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    public List<User> findAllUsers() {
+        return userRepository.findAll(); 
+    }
+
+    public List<User> findByMoeimId(Long moeimId) {
+        return userRepository.findByMoeimId(moeimId); 
+    }
+    
 
     public User createUser(UserDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -42,7 +52,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> getUserById(Long userId) {
+    public Optional<User> findById(Long userId) {
         return userRepository.findById(userId);
     }
 

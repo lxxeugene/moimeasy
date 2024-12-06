@@ -69,7 +69,7 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    // JWT 토큰에서 userId 추출
+    // JWT 토큰에서 memberId 추출
     public Long getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(getSecretKey())
@@ -102,6 +102,5 @@ public class JwtTokenProvider {
         }
         return false;
     }
-
 
 }

@@ -47,7 +47,7 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public UserInfoDTO userInfo(AccessTokenDTO accessToken) {
-        Long userId = tokenProvider.getUserIdFromJWT(accessToken.getAccessToken());
+        Long userId = Long.valueOf(tokenProvider.getEmailFromJWT(accessToken.getAccessToken()));
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setUserId(userId);
 
