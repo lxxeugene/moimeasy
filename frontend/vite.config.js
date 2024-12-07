@@ -8,14 +8,7 @@ import { PrimeVueResolver } from 'unplugin-vue-components/resolvers';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    Components({
-      resolvers: [PrimeVueResolver()], // PrimeVue 컴포넌트 자동 등록
-    }),
-    vueDevTools(),
-    svgLoader(),
-  ],
+  plugins: [vue(), vueDevTools(), svgLoader()],
 
   resolve: {
     alias: {
