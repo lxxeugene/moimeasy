@@ -38,7 +38,7 @@
       </div>
     </div>
     <!-- 사이드바 메뉴 끝 -->
-    <div class="bottom-menu-container">
+    <!-- <div class="bottom-menu-container">
       <div class="more-settings">
         <div class="settings-group">
           <div class="settings-item">
@@ -51,7 +51,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -150,7 +150,7 @@ const items = ref([
 ]);
 </script>
 
-<style scoped>
+<style>
 .nav-bar,
 .nav-bar * {
   box-sizing: border-box;
@@ -240,7 +240,7 @@ const items = ref([
 .main-menu-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
   align-items: flex-start;
   justify-content: flex-start;
   position: relative;
@@ -463,7 +463,10 @@ const items = ref([
 }
 
 .p-panelmenu-panel {
-  border: none !important;
+  /* border: none !important; */
+  padding: 0px;
+  cursor: pointer;
+  width: 190px;
 }
 .menu-title {
   width: 75px;

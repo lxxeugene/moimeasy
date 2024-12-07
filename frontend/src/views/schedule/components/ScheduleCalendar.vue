@@ -49,7 +49,7 @@ export default defineComponent({
         selectMirror: true, // 날짜 선택 시 미러 효과 활성화
         dayMaxEvents: true, // 하루 최대 이벤트 수 표시
         weekends: true, // 주말 표시 여부
-        locale: 'ko', // 언어 설정: 한국어
+        // locale: 'ko', // 언어 설정: 한국어
         dayCellContent: (info) => {
           return info.date.getDate(); //'일' 텍스트제거 후 날짜의 '일(day)숫자'만 반환
         },
@@ -131,7 +131,7 @@ export default defineComponent({
 
 .demo-app-main {
   flex-grow: 1;
-  padding: 3em;
+  padding: 2em;
 }
 
 .fc {
@@ -144,8 +144,9 @@ export default defineComponent({
 }
 /* 헤더 좌측  */
 .fc-toolbar-chunk:nth-of-type(1) {
+  width: 200px;
   .fc-button {
-    border: 1px solid #e9e9e9;
+    border: 1px solid #e9e9e9 !important;
     color: #787a7b !important; /* 텍스트 색상 */
   }
 }
@@ -155,17 +156,36 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
 }
+
 /* 헤더 우측  */
 .fc-toolbar-chunk:nth-of-type(3) {
   /*버튼 커스텀 */
   .fc-button {
     background-color: #fafbfd !important;
-    border: 1px solid #d4d4d4 !important;
     color: #000000; /* 텍스트 색상 */
     cursor: pointer;
   }
+  .fc-button:nth-of-type(1) {
+    border: 1px solid #d4d4d4 !important;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+  .fc-button:nth-of-type(2) {
+    border: 1px solid #d4d4d4 !important;
+  }
+  .fc-button:nth-of-type(3) {
+    border: 1px solid #d4d4d4 !important;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
   .fc-button:hover {
-    background-color: #f1e6fa !important;
+    background-color: #f1f4f9 !important;
+  }
+  .fc-button:focus {
+    background-color: #5a8dff !important;
+    color: #ffff !important;
+    border: 1px solid #5a8dff !important;
   }
 }
 
@@ -177,10 +197,39 @@ export default defineComponent({
   cursor: pointer;
 }
 .fc-button:hover {
-  background-color: #f1e6fa !important;
+  background-color: #f1f4f9 !important;
+}
+.fc-button:focus {
+  box-shadow: none !important;
 }
 
-.fc-button:hover {
-  background-color: #0056b3; /* 더 진한 파란색 */
+/* 테이블 헤더 셀 */
+.fc-col-header-cell {
+  height: 30px;
+  background: #f1f4f9;
+  border: none !important;
+}
+
+.fc-col-header-cell:nth-of-type(1) {
+  border-top-left-radius: 10px;
+}
+.fc-col-header-cell:nth-of-type(7) {
+  border-top-right-radius: 10px;
+}
+
+.fc-col-header-cell > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 30px;
+  font-weight: 500;
+}
+/* 날짜 패딩효과 */
+.fc-daygrid-day-number {
+  padding: 10px !important;
+}
+.fc-theme-standard .fc-scrollgrid {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 </style>
