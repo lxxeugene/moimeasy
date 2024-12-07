@@ -106,12 +106,12 @@ const items = ref([
       {
         label: '일정조회',
         icon: EditIcon,
-        route: '/schedule',
+        route: '/schedule/calendar',
       },
       {
         label: '모임게시판',
         icon: EditIcon,
-        route: '/board',
+        route: '/schedule/board',
       },
     ],
   },
