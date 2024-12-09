@@ -38,7 +38,7 @@ export default defineComponent({
         ],
         headerToolbar: {
           // 캘린더 상단 헤더 설정
-          left: 'today', // 왼쪽에 이전/다음/오늘 버튼
+          left: 'today ', // 왼쪽에 이전/다음/오늘 버튼
           center: 'prev title next', // 중앙에 제목 표시
           right: 'timeGridDay,timeGridWeek,dayGridMonth', // 오른쪽에 보기 전환 버튼
         },
@@ -56,7 +56,14 @@ export default defineComponent({
         select: this.handleDateSelect, // 날짜 선택 이벤트 핸들러
         eventClick: this.handleEventClick, // 이벤트 클릭 핸들러
         eventsSet: this.handleEvents, // 이벤트 변경 시 호출되는 핸들러
-
+        customButtons: {
+          myCustomButton: {
+            text: '일정추가',
+            click: () => {
+              alert('Custom button clicked!');
+            },
+          },
+        },
         /* 원격 데이터베이스와 동기화하려면 아래 이벤트를 사용할 수 있습니다:
         eventAdd: // 이벤트 추가 시 호출
         eventChange: // 이벤트 변경 시 호출
@@ -231,5 +238,27 @@ export default defineComponent({
 .fc-theme-standard .fc-scrollgrid {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+}
+
+/* 기본 이벤트 스타일 */
+.fc-event {
+  background-color: #4caf50; /* 녹색 배경 */
+  color: white; /* 흰색 텍스트 */
+  border: 1px solid #388e3c;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+/* 마우스 호버 이벤트 */
+.fc-event:hover {
+  background-color: #388e3c; /* 더 진한 녹색 */
+  cursor: pointer;
+}
+
+/* 중요 이벤트 */
+.important-event {
+  background-color: #f44336; /* 빨간색 배경 */
+  border-color: #d32f2f;
+  color: white;
 }
 </style>
