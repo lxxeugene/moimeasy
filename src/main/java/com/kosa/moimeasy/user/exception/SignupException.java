@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.user.excepsion;
+package com.kosa.moimeasy.user.exception;
 
 public class SignupException extends RuntimeException {
 
