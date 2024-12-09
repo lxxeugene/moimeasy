@@ -1,3 +1,4 @@
+
 package com.kosa.moimeasy.security.provider;
 
 
@@ -31,13 +32,13 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    public String generateAccessToken(String email, String role) {
+    public String generateAccessToken(Long userId, String role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
-                .setSubject(email)
+                .setSubject(String.valueOf(userId)) // userId를 String으로 변환하여 설정
                 .claim("role", role)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
@@ -46,13 +47,13 @@ public class JwtTokenProvider {
     }
 
     // Refresh Token 생성
-    public String generateRefreshToken(String email) {
+    public String generateRefreshToken(Long userId) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshTokenExpiration);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
-                .setSubject(email)
+                .setSubject(String.valueOf(userId)) // userId를 String으로 변환하여 설정
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -69,10 +70,10 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    // JWT 토큰에서 memberId 추출
+    // JWT 토큰에서 userId 추출
     public Long getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(getSecretKey())
+                .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
 

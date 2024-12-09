@@ -4,7 +4,7 @@ import com.kosa.moimeasy.security.dto.AccessTokenDTO;
 import com.kosa.moimeasy.user.dto.LoginDTO;
 import com.kosa.moimeasy.user.dto.UserInfoDTO;
 import com.kosa.moimeasy.security.dto.TokenResponseDTO;
-import com.kosa.moimeasy.user.excepsion.LoginException;
+import com.kosa.moimeasy.user.exception.LoginException;
 
 public interface LoginService {
     TokenResponseDTO authenticate(LoginDTO loginDTO) throws LoginException;

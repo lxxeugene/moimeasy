@@ -6,7 +6,7 @@ import com.kosa.moimeasy.security.dto.TokenResponseDTO;
 import com.kosa.moimeasy.user.dto.LoginDTO;
 import com.kosa.moimeasy.security.entity.RefreshTokenRedis;
 import com.kosa.moimeasy.user.entity.User;
-import com.kosa.moimeasy.user.excepsion.LoginException;
+import com.kosa.moimeasy.user.exception.LoginException;
 import com.kosa.moimeasy.security.repository.MemberRepository;
 import com.kosa.moimeasy.security.repository.RefreshTokenRepository;
 import com.kosa.moimeasy.security.repository.RoleRepository;
@@ -80,8 +80,8 @@ public class LoginServiceImpl implements LoginService {
                     .orElseThrow(() -> new LoginException("사용자를 찾을 수 없습니다."));
 
             // Access Token 및 Refresh Token 생성
-            String accessToken = tokenProvider.generateAccessToken(String.valueOf(user.getUserId()), user.getRole().getRoleName());
-            String refreshToken = tokenProvider.generateRefreshToken(String.valueOf(user.getUserId()));
+            String accessToken = tokenProvider.generateAccessToken(user.getUserId(), user.getRole().getRoleName());
+            String refreshToken = tokenProvider.generateRefreshToken(user.getUserId());
 
             // Refresh Token 저장 (Redis, 사용자당 단일 토큰)
             RefreshTokenRedis tokenEntity = RefreshTokenRedis.builder()
@@ -123,10 +123,10 @@ public class LoginServiceImpl implements LoginService {
                 .orElseThrow(() -> new LoginException("사용자를 찾을 수 없습니다."));
 
         // 새로운 Access Token 생성
-        String newAccessToken = tokenProvider.generateAccessToken(String.valueOf(user.getUserId()), user.getRole().getRoleName());
+        String newAccessToken = tokenProvider.generateAccessToken(user.getUserId(), user.getRole().getRoleName());
 
         // 새로운 Refresh Token 생성
-        String newRefreshToken = tokenProvider.generateRefreshToken(String.valueOf(user.getUserId()));
+        String newRefreshToken = tokenProvider.generateRefreshToken(user.getUserId());
 
         // 기존 Refresh Token 삭제
         refreshTokenRepository.deleteById(userId);

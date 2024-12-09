@@ -1,6 +1,9 @@
 package com.kosa.moimeasy;
 
 //import com.kosa.moimeasy.api.signup.SignupException;
+import com.kosa.moimeasy.user.exception.DuplicateEmailException;
+import com.kosa.moimeasy.user.exception.DuplicateNicknameException;
+import com.kosa.moimeasy.user.exception.SignupException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,25 +23,24 @@ public class GlobalExceptionHandler{
             HttpStatus.UNAUTHORIZED);
 
   }
-//  @ExceptionHandler(SignupException.class)
-//  public ResponseEntity<String>
-//  handleSignupException(SignupException ex) {
-//    return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-//  }
-//
-//
-//  @ExceptionHandler(DuplicateEmailException.class)
-//  public ResponseEntity<String>
-//  handleDuplicateEmailException(DuplicateEmailException ex) {
-//    return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
-//  }
-//
-//  @ExceptionHandler(DuplicateNicknameException.class)
-//  public ResponseEntity<String>
-//  handleDuplicateNicknameException(DuplicateNicknameException ex) {
-//    return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
-//  }
+  @ExceptionHandler(SignupException.class)
+  public ResponseEntity<String>
+  handleSignupException(SignupException ex) {
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+  }
 
+
+  @ExceptionHandler(DuplicateEmailException.class)
+  public ResponseEntity<String>
+  handleDuplicateEmailException(DuplicateEmailException ex) {
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+  }
+
+  @ExceptionHandler(DuplicateNicknameException.class)
+  public ResponseEntity<String>
+  handleDuplicateNicknameException(DuplicateNicknameException ex) {
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+  }
 
   // JWT 관련 예외 처리
    @ExceptionHandler(JwtException.class)
