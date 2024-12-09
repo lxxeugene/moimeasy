@@ -5,15 +5,12 @@ import Signup from '@/views/login/SignupView.vue';
 import MoeimSelect from '@/views/moeim/MoeimSelectView.vue';
 import CreateMoeim from '@/views/moeim/CreateMoeimView.vue';
 import EnterMoeim from '@/views/moeim/EnterMoeimView.vue';
-import Schedule from '@/views/schedule/ScheduleView.vue';
 import UserManage from '@/views/user/UserManageView.vue';
 import UserProfile from '@/views/user/UserProfileView.vue';
 import InviteUser from '@/views/user/InviteUserView.vue';
 import InvitationList from '@/views/user/InvitationListView.vue'; // 초대 목록 추가
 import PayList from '@/views/pay/PayList.vue';
 import WebSocket from '@/views/chat/WebSocketView.vue';
-import BoardView from '@/views/board/BoardView.vue';
-import Draw from '@/views/schedule/Draw.vue';
 import TradeList from '@/views/pay/TradeList.vue';
 import Category from '@/views/pay/Category.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
@@ -40,7 +37,6 @@ const routes = [
   }, // 초대 목록 추가
   { path: '/pay-list', name: 'PayList', component: PayList },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
-  { path: '/draw', name: 'draw', component: Draw },
   { path: '/trade-list', name: 'TradeList', component: TradeList },
   { path: '/category', name: 'Category', component: Category },
   { path: '/chat-room-list', name: 'ChatRoomList', component: ChatRoomList },

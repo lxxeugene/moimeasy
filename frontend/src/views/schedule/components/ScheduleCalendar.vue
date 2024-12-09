@@ -22,6 +22,11 @@ import dayGridPlugin from '@fullcalendar/daygrid'; // 월간 보기 플러그인
 import timeGridPlugin from '@fullcalendar/timegrid'; // 주간 및 일별 보기 플러그인
 import interactionPlugin from '@fullcalendar/interaction'; // 상호작용(클릭 및 드래그) 플러그인
 import { INITIAL_EVENTS, createEventId } from '@/utils/event-utils'; // 초기 이벤트 및 ID 생성 유틸리티->제거예정
+import googleCalendarPlugin from '@fullcalendar/google-calendar';
+
+// 구글 캘린더 API 키와 캘린더 ID
+const googleCalendarApiKey = import.meta.env.VITE_GOOGLE_API_KEY; // 구글 API 키
+const googleCalendarId = 'ko.south_korea#holiday@group.v.calendar.google.com'; // 구글 캘린더 ID
 
 export default defineComponent({
   components: {
@@ -35,10 +40,11 @@ export default defineComponent({
           dayGridPlugin, // 월간 보기 플러그인
           timeGridPlugin, // 주간 및 일별 보기 플러그인
           interactionPlugin, // 날짜 클릭 및 드래그를 위한 플러그인
+          googleCalendarPlugin, // 구글 캘린더플러그인
         ],
         headerToolbar: {
           // 캘린더 상단 헤더 설정
-          left: 'today ', // 왼쪽에 이전/다음/오늘 버튼
+          left: 'today myCustomButton', // 왼쪽에 이전/다음/오늘 버튼
           center: 'prev title next', // 중앙에 제목 표시
           right: 'timeGridDay,timeGridWeek,dayGridMonth', // 오른쪽에 보기 전환 버튼
         },
@@ -49,18 +55,33 @@ export default defineComponent({
         selectMirror: true, // 날짜 선택 시 미러 효과 활성화
         dayMaxEvents: true, // 하루 최대 이벤트 수 표시
         weekends: true, // 주말 표시 여부
-        // locale: 'ko', // 언어 설정: 한국어
+        locale: 'ko', // 언어 설정: 한국어
+        googleCalendarApiKey: googleCalendarApiKey,
         dayCellContent: (info) => {
           return info.date.getDate(); //'일' 텍스트제거 후 날짜의 '일(day)숫자'만 반환
         },
         select: this.handleDateSelect, // 날짜 선택 이벤트 핸들러
         eventClick: this.handleEventClick, // 이벤트 클릭 핸들러
         eventsSet: this.handleEvents, // 이벤트 변경 시 호출되는 핸들러
+        // 구글 캘린더 연동 공휴일 가져오기
+        eventSources: [
+          {
+            googleCalendarId: googleCalendarId,
+            className: 'holiday-event',
+          },
+        ],
+
         customButtons: {
           myCustomButton: {
-            text: '일정추가',
+            text: 'Add Event',
             click: () => {
-              alert('Custom button clicked!');
+              const calendarApi = this.calendarRef.getApi(); // 캘린더 API 가져오기
+              calendarApi.addEvent({
+                title: 'New Event',
+                start: new Date(),
+                allDay: true,
+              });
+              alert('새 이벤트가 추가되었습니다!');
             },
           },
         },
@@ -242,17 +263,32 @@ export default defineComponent({
 
 /* 기본 이벤트 스타일 */
 .fc-event {
-  background-color: #4caf50; /* 녹색 배경 */
-  color: white; /* 흰색 텍스트 */
-  border: 1px solid #388e3c;
-  border-radius: 4px;
+  background-color: #ebe2fd;
+  color: #7551e9;
+  font-weight: 600;
+  border-left: 4px solid #7551e9;
+  border-radius: 0px;
+  margin: 0;
   padding: 5px;
+  cursor: pointer;
+}
+
+/*올 데이 이벤트 */
+.fc-h-event {
+  border: none;
+  background-color: #e4f8f1;
+  border-left: 4px solid #74cdab !important;
+  i {
+    color: #74cdab;
+    font-weight: 600;
+  }
 }
 
 /* 마우스 호버 이벤트 */
 .fc-event:hover {
-  background-color: #388e3c; /* 더 진한 녹색 */
-  cursor: pointer;
+  /* background-color: #256428;  */
+  /* 더 진한 녹색 */
+  /* cursor: pointer; */
 }
 
 /* 중요 이벤트 */
@@ -260,5 +296,28 @@ export default defineComponent({
   background-color: #f44336; /* 빨간색 배경 */
   border-color: #d32f2f;
   color: white;
+}
+
+/* .holiday-event {
+  background-color: #fff4e7;
+
+  border: none;
+  border-left: 4px solid #ffb85c !important;
+  i {
+    color: #ffb85c;
+  }
+} */
+.holiday-event {
+  background-color: #ffe2e6;
+
+  border: none;
+  border-left: 4px solid #fd7385 !important;
+  i {
+    color: #fd7385;
+  }
+}
+
+.fc-direction-ltr {
+  margin: 0 !important;
 }
 </style>
