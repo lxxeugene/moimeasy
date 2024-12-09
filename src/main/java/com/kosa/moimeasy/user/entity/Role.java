@@ -1,6 +1,9 @@
 package com.kosa.moimeasy.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.*;
 
 import java.util.Set;
@@ -25,3 +28,4 @@ public class Role {
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<User> users; // User 엔티티와의 관계
 }
+

@@ -50,6 +50,7 @@ public class User {
 
     @PrePersist
     public void prePersist() {
+        this.createAt = LocalDateTime.now();
         if(this.createAt == null){
             this.createAt = LocalDateTime.now();
         }else {
@@ -62,6 +63,7 @@ public class User {
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
     }
+}
 
 
 //    public enum Role {
@@ -81,4 +83,4 @@ public class User {
 //    private Set<Moeim> moeims = new HashSet<>();
 
 
-}
+
