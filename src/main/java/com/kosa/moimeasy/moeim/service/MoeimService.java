@@ -5,15 +5,12 @@ import com.kosa.moimeasy.invitation.repository.InvitationRepository;
 import com.kosa.moimeasy.moeim.dto.MoeimDTO;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
-import com.kosa.moimeasy.user.entity.Role;
-import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.security.repository.RoleRepository;
+import com.kosa.moimeasy.user.entity.Role;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 import java.util.Random;
 
