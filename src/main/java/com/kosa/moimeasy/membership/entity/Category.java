@@ -6,18 +6,21 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-public class Category {
+public class Category { // 카테고리
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CATEGORY_ID")
-    private Long categoryId;
+    @Column(name = "category_id")
+    private Long id;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "category_type", nullable = false)
     private CategoryType type;
 
     public enum CategoryType {
-        TYPE1,
-        TYPE2
+        food,
+        drink,
+        rent,
+        etc
     }
 }

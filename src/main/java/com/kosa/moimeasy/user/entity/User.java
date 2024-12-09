@@ -1,10 +1,13 @@
 package com.kosa.moimeasy.user.entity;
 
+import com.kosa.moimeasy.membership.entity.UserAccount;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -63,12 +66,17 @@ public class User {
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "user")
+    private List<UserAccount> userAccounts = new ArrayList<>();
 }
 
 
 //    public enum Role {
 //        user,admin
 //    }
+
+
 
 //    @Column(name = "PROFILE_URL")
 //    private String profileUrl;
