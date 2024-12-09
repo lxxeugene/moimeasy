@@ -1,4 +1,35 @@
 <template>
+  <!-- 다이얼로그  영역 -->
+  <Button label="Show" @click="visible = true" />
+
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="일정 추가"
+    :style="{ width: '25rem' }"
+  >
+    <span class="add-dialog-subtitle">새 일정의 타이틀을 입력하세요</span>
+    <div class="add-dialog-inputbox">
+      <label for="username" class="add-dialog-inputbox-label">일정명</label>
+      <InputText id="username" class="add-dialog-input" autocomplete="off" />
+    </div>
+    <template #footer>
+      <Button
+        label="취소"
+        text
+        severity="secondary"
+        @click="visible = false"
+        autofocus
+      />
+      <Button
+        label="추가"
+        outlined
+        severity="secondary"
+        @click="visible = false"
+        autofocus
+      />
+    </template>
+  </Dialog>
   <div class="demo-app">
     <!-- 메인 캘린더 영역 -->
     <div class="demo-app-main">
@@ -16,13 +47,15 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { ref, defineComponent } from 'vue';
 import FullCalendar from '@fullcalendar/vue3'; // FullCalendar Vue3 컴포넌트
 import dayGridPlugin from '@fullcalendar/daygrid'; // 월간 보기 플러그인
 import timeGridPlugin from '@fullcalendar/timegrid'; // 주간 및 일별 보기 플러그인
 import interactionPlugin from '@fullcalendar/interaction'; // 상호작용(클릭 및 드래그) 플러그인
 import { INITIAL_EVENTS, createEventId } from '@/utils/event-utils'; // 초기 이벤트 및 ID 생성 유틸리티->제거예정
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
+import Avatar from 'primevue/avatar';
+import Dialog from 'primevue/dialog';
 
 // 구글 캘린더 API 키와 캘린더 ID
 const googleCalendarApiKey = import.meta.env.VITE_GOOGLE_API_KEY; // 구글 API 키
@@ -31,9 +64,12 @@ const googleCalendarId = 'ko.south_korea#holiday@group.v.calendar.google.com'; /
 export default defineComponent({
   components: {
     FullCalendar, // FullCalendar 컴포넌트 등록
+    Avatar,
+    Dialog,
   },
   data() {
     return {
+      visible: false, // Dialog 표시 여부
       // FullCalendar 설정 옵션
       calendarOptions: {
         plugins: [
@@ -55,7 +91,7 @@ export default defineComponent({
         selectMirror: true, // 날짜 선택 시 미러 효과 활성화
         dayMaxEvents: true, // 하루 최대 이벤트 수 표시
         weekends: true, // 주말 표시 여부
-        locale: 'ko', // 언어 설정: 한국어
+        // locale: 'ko', // 언어 설정: 한국어
         googleCalendarApiKey: googleCalendarApiKey,
         dayCellContent: (info) => {
           return info.date.getDate(); //'일' 텍스트제거 후 날짜의 '일(day)숫자'만 반환
@@ -134,7 +170,10 @@ export default defineComponent({
 
 <style>
 /* 스타일 정의 */
-
+:root {
+  --fc-today-bg-color: rgba(226, 225, 226, 0.3); /* 오늘 날짜 배경색 */
+  --fc-highlight-color: #e4f8f1;
+}
 .demo-app {
   display: flex;
   min-height: 100%;
@@ -208,12 +247,12 @@ export default defineComponent({
   }
 
   .fc-button:hover {
-    background-color: #f1f4f9 !important;
+    background-color: #f0ecfb !important;
   }
   .fc-button:focus {
-    background-color: #5a8dff !important;
+    background-color: #735bf3 !important;
     color: #ffff !important;
-    border: 1px solid #5a8dff !important;
+    border: 1px solid #735bf3 !important;
   }
 }
 
@@ -234,7 +273,7 @@ export default defineComponent({
 /* 테이블 헤더 셀 */
 .fc-col-header-cell {
   height: 30px;
-  background: #f1f4f9;
+  background: #f2eefb;
   border: none !important;
 }
 
@@ -298,7 +337,7 @@ export default defineComponent({
   color: white;
 }
 
-/* .holiday-event {
+.holiday-event {
   background-color: #fff4e7;
 
   border: none;
@@ -306,8 +345,8 @@ export default defineComponent({
   i {
     color: #ffb85c;
   }
-} */
-.holiday-event {
+}
+/* .holiday-event {
   background-color: #ffe2e6;
 
   border: none;
@@ -315,9 +354,26 @@ export default defineComponent({
   i {
     color: #fd7385;
   }
-}
+} */
 
 .fc-direction-ltr {
   margin: 0 !important;
+}
+
+.add-dialog-subtitle {
+  color: 18px;
+}
+.add-dialog-inputbox {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.add-dialog-inputbox-label {
+  font-weight: bold;
+}
+.add-dialog-input {
+  flex: 1 1 auto;
 }
 </style>
