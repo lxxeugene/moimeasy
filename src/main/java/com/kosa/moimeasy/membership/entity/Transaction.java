@@ -5,6 +5,7 @@ import com.kosa.moimeasy.moeim.entity.Moeim;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.mapping.ToOne;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,29 +18,30 @@ public class Transaction extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long TransactionId;
+    @Column(name = "transaction_id")
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "MOEIM_ID", nullable = false)
-    private Moeim moeim;
+    @ManyToOne(optional = false) // (모임 계좌와 거래내역은 N:1 관계)
+    @JoinColumn(name = "moiem_account_id", nullable = false)
+    private MoeimAccount moeimAccount;
 
-    @ManyToOne
-    @JoinColumn(name = "Pay_Id", nullable = false)
-    private Pay pay;
+    @OneToOne // 회비와 거래내역은 1대1 매핑
+    @JoinColumn(name = "fee_id", nullable = false)
+    private Fee fee;
 
-    @ManyToOne
-    @JoinColumn(name = "Account_Id", nullable = false)
-    private Account account;
-
-    @Column(nullable = false)
+    @Column(name = "transaction_money", nullable = false)
     private Double money;
 
-    // 지출 : 0, 수입 1
-    @Column(nullable = false)
-    private boolean type;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transaction_type", nullable = false)
+    private TransactionType type;
 
-    @ManyToOne
-    @JoinColumn(name = "CATEGORY_ID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    private enum TransactionType{
+        income, // 수입
+        expense // 지출
+    }
 }
