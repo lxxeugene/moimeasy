@@ -66,6 +66,9 @@ public class User {
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
     }
+
+    @OneToMany(mappedBy = "user")
+    private List<UserAccount> userAccounts = new ArrayList<>();
 }
 
 
@@ -73,8 +76,7 @@ public class User {
 //        user,admin
 //    }
 
-    @OneToMany(mappedBy = "user")
-    private List<UserAccount> userAccounts = new ArrayList<>();
+
 
 //    @Column(name = "PROFILE_URL")
 //    private String profileUrl;
