@@ -66,40 +66,40 @@
 </template>
 
 <script setup>
-import OverlayBadge from "primevue/overlaybadge";
-import Breadcrumb from "primevue/breadcrumb";
-import { ref } from "vue";
-import { useToast } from "primevue/usetoast";
-import Toast from "primevue/toast";
+import OverlayBadge from 'primevue/overlaybadge';
+import Breadcrumb from 'primevue/breadcrumb';
+import { ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
 
 const toast = useToast();
 
 const home = ref({
-  icon: "pi pi-home",
-  route: "/",
+  icon: 'pi pi-home',
+  route: '/',
 });
 const items = ref([
-  { label: "일정관리", route: "/schedule" },
-  { label: "일정조회", route: "/inputtext" },
+  { label: '일정관리', route: '/schedule' },
+  { label: '일정조회', route: '/inputtext' },
 ]);
 
 const showSecondary = () => {
   toast.add({
-    severity: "secondary",
-    summary: "[일정 등록]",
-    detail: " 우리 모임의 새 일정이 등록되었습니다.",
+    severity: 'secondary',
+    summary: '[일정 등록]',
+    detail: ' 우리 모임의 새 일정이 등록되었습니다.',
     life: 3000,
   });
   toast.add({
-    severity: "secondary",
-    summary: "[쪽지]",
-    detail: "운영자로 부터 쪽지가 도착했습니다.",
+    severity: 'secondary',
+    summary: '[쪽지]',
+    detail: '운영자로 부터 쪽지가 도착했습니다.',
     life: 3000,
   });
 };
 </script>
 
-<style scoped>
+<style>
 .header-wrapper {
   width: 100%;
   height: 78px;
@@ -181,5 +181,9 @@ const showSecondary = () => {
 }
 .text-dark {
   color: red;
+}
+
+.p-breadcrumb {
+  min-width: 232px;
 }
 </style>
