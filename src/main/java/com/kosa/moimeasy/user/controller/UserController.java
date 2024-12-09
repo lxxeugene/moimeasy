@@ -5,10 +5,11 @@ import com.kosa.moimeasy.user.entity.Role;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.service.RoleService;
 import com.kosa.moimeasy.user.service.UserService;
-import com.kosa.moimeasy.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.kosa.moimeasy.common.exception.ResourceNotFoundException;
 
 import java.util.List;
 

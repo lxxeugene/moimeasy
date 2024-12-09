@@ -26,7 +26,6 @@ const routes = [
   { path: '/moeim-select', name: 'MoeimSelect', component: MoeimSelect },
   { path: '/create-moeim', name: 'CreateMoeim', component: CreateMoeim },
   { path: '/enter-moeim', name: 'EnterMoeim', component: EnterMoeim },
-  { path: '/schedule', name: 'Schedule', component: Schedule },
   { path: '/user-manage', name: 'UserManage', component: UserManage },
   {
     path: '/user-profile/:userId',
@@ -41,12 +40,24 @@ const routes = [
   }, // 초대 목록 추가
   { path: '/pay-list', name: 'PayList', component: PayList },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
-  { path: '/board', name: 'Board', component: BoardView },
   { path: '/draw', name: 'draw', component: Draw },
   { path: '/trade-list', name: 'TradeList', component: TradeList },
   { path: '/category', name: 'Category', component: Category },
   { path: '/chat-room-list', name: 'ChatRoomList', component: ChatRoomList },
   { path: '/chat/:roomId', name: 'ChatView', component: ChatView },
+  {
+    path: '/schedule',
+    children: [
+      {
+        path: 'calendar',
+        component: () => import('@/views/schedule/ScheduleView.vue'),
+      },
+      {
+        path: 'board',
+        component: () => import('@/views/board/BoardView.vue'),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({

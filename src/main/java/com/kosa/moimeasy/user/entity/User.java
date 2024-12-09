@@ -51,6 +51,12 @@ public class User {
     @PrePersist
     public void prePersist() {
         this.createAt = LocalDateTime.now();
+        if(this.createAt == null){
+            this.createAt = LocalDateTime.now();
+        }else {
+            this.createAt = createAt;
+        }
+
     }
 
     @PreUpdate
@@ -58,3 +64,23 @@ public class User {
         this.updateAt = LocalDateTime.now();
     }
 }
+
+
+//    public enum Role {
+//        user,admin
+//    }
+
+//    @Column(name = "PROFILE_URL")
+//    private String profileUrl;
+//
+//    // 다대다 관계 설정
+//    @ManyToMany
+//    @JoinTable(
+//            name = "USER_MOEIM",
+//            joinColumns = @JoinColumn(name = "USER_ID"),
+//            inverseJoinColumns = @JoinColumn(name = "MOEIM_ID")
+//    )
+//    private Set<Moeim> moeims = new HashSet<>();
+
+
+

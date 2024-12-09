@@ -8,11 +8,13 @@ import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.user.entity.Role;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.RoleRepository;
+import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
 import java.util.Random;
 
 @Service
@@ -33,7 +35,7 @@ public class MoeimService {
     public Moeim createMoeim(MoeimDTO request) {
         // 1. 사용자 조회
         User user = userRepository.findById(request.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         // 2. Role 조회
         Role adminRole = roleRepository.findById(1) // 관리자 역할 ID를 하드코딩 대신 설정 값으로 가져오는 것을 추천
@@ -50,6 +52,7 @@ public class MoeimService {
         // 4. 사용자 업데이트 (모임 ID, 역할 변경)
         user.setMoeimId(savedMoeim.getMoeimId());
         user.setRole(adminRole); // 관리자 역할 설정
+        user.setRole(user.getRole()); // Enum 값을 설정 /
         userRepository.save(user);
 
         return savedMoeim;
@@ -104,4 +107,6 @@ public class MoeimService {
         }
         return moeimCode.toString();
     }
+
+    
 }
