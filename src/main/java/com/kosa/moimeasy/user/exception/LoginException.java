@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.user.excepsion;
+package com.kosa.moimeasy.user.exception;
 
 public class LoginException extends RuntimeException {
     public LoginException(String message)

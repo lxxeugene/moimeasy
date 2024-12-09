@@ -32,7 +32,7 @@ public class UserDTO {
         this.address = user.getAddress();
         this.createAt = user.getCreateAt();
         this.moeimId = user.getMoeimId();
-        this.role = user.getRole() != null ? user.getRole().name() : null;
+        this.role = user.getRole() != null ? user.getRole().getRoleName() : null;
     }
 }
 
