@@ -1,31 +1,35 @@
 <template>
-  <!-- 다이얼로그  영역 -->
-  <Button label="Show" @click="visible = true" />
-
+  <!-- 다이얼로그 영역 -->
   <Dialog
     v-model:visible="visible"
     modal
     header="일정 추가"
     :style="{ width: '25rem' }"
+    @hide="rejectDialog"
   >
     <span class="add-dialog-subtitle">새 일정의 타이틀을 입력하세요</span>
     <div class="add-dialog-inputbox">
-      <label for="username" class="add-dialog-inputbox-label">일정명</label>
-      <InputText id="username" class="add-dialog-input" autocomplete="off" />
+      <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
+      <InputText
+        id="eventTitle"
+        class="add-dialog-input"
+        autocomplete="off"
+        v-model="newEventTitle"
+      />
     </div>
     <template #footer>
       <Button
         label="취소"
         text
         severity="secondary"
-        @click="visible = false"
+        @click="rejectDialog"
         autofocus
       />
       <Button
         label="추가"
         outlined
         severity="secondary"
-        @click="visible = false"
+        @click="resolveDialog"
         autofocus
       />
     </template>
@@ -47,7 +51,7 @@
 </template>
 
 <script>
-import { ref, defineComponent } from 'vue';
+import { defineComponent } from 'vue';
 import FullCalendar from '@fullcalendar/vue3'; // FullCalendar Vue3 컴포넌트
 import dayGridPlugin from '@fullcalendar/daygrid'; // 월간 보기 플러그인
 import timeGridPlugin from '@fullcalendar/timegrid'; // 주간 및 일별 보기 플러그인
@@ -70,6 +74,9 @@ export default defineComponent({
   data() {
     return {
       visible: false, // Dialog 표시 여부
+      newEventTitle: '', // 다이얼로그 입력값
+      resolvePromise: null, // Promise resolve 함수
+      rejectPromise: null, // Promise reject 함수
       // FullCalendar 설정 옵션
       calendarOptions: {
         plugins: [
@@ -84,6 +91,12 @@ export default defineComponent({
           center: 'prev title next', // 중앙에 제목 표시
           right: 'timeGridDay,timeGridWeek,dayGridMonth', // 오른쪽에 보기 전환 버튼
         },
+        buttonText: {
+          today: 'Today', // 'today' 버튼의 텍스트를 변경
+          month: 'Month', // 'month' 버튼의 텍스트를 변경
+          week: 'Week', // 'week' 버튼의 텍스트를 변경
+          day: 'Day', // 'day' 버튼의 텍스트를 변경
+        },
         initialView: 'dayGridMonth', // 초기 보기: 월간 보기
         initialEvents: INITIAL_EVENTS, // 초기 이벤트 설정
         editable: true, // 이벤트 수정 가능 여부
@@ -91,7 +104,7 @@ export default defineComponent({
         selectMirror: true, // 날짜 선택 시 미러 효과 활성화
         dayMaxEvents: true, // 하루 최대 이벤트 수 표시
         weekends: true, // 주말 표시 여부
-        // locale: 'ko', // 언어 설정: 한국어
+        locale: 'ko', // 언어 설정: 한국어
         googleCalendarApiKey: googleCalendarApiKey,
         dayCellContent: (info) => {
           return info.date.getDate(); //'일' 텍스트제거 후 날짜의 '일(day)숫자'만 반환
@@ -109,13 +122,14 @@ export default defineComponent({
 
         customButtons: {
           myCustomButton: {
-            text: 'Add Event',
+            text: 'Add',
             click: () => {
               const calendarApi = this.calendarRef.getApi(); // 캘린더 API 가져오기
               calendarApi.addEvent({
                 title: 'New Event',
                 start: new Date(),
-                allDay: true,
+                end: new Date(),
+                // allDay: true,
               });
               alert('새 이벤트가 추가되었습니다!');
             },
@@ -131,29 +145,58 @@ export default defineComponent({
     };
   },
   methods: {
+    async handleDateSelect(selectInfo) {
+      try {
+        // 다이얼로그를 띄우고 입력값을 기다림
+        const title = await this.openDialog();
+        if (title) {
+          const calendarApi = selectInfo.view.calendar;
+          calendarApi.addEvent({
+            id: createEventId(), // 유니크 ID 생성
+            title, //다이얼로그 입력 타이틀
+            start: selectInfo.startStr, // 시작 날짜
+            end: selectInfo.endStr, // 종료 날짜
+            allDay: selectInfo.allDay, // 하루 종일 여부
+          });
+        }
+      } catch (error) {
+        console.log('다이얼로그에서 입력 취소:', error);
+      } finally {
+        selectInfo.view.calendar.unselect(); // 선택 해제
+      }
+    },
+    openDialog() {
+      this.visible = true;
+      this.newEventTitle = ''; // 입력 초기화
+      return new Promise((resolve, reject) => {
+        this.resolvePromise = resolve;
+        this.rejectPromise = reject;
+      });
+    },
+    resolveDialog() {
+      if (this.newEventTitle.trim()) {
+        this.resolvePromise(this.newEventTitle.trim()); // 입력값 반환
+        console.log('반환타이틀', this.newEventTitle.trim());
+      } else {
+        this.resolvePromise(null); // 빈 값 반환
+      }
+      this.closeDialog();
+    },
+    rejectDialog() {
+      this.rejectPromise('취소됨');
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.visible = false;
+      this.newEventTitle = '';
+    },
     // 주말 표시 여부를 토글하는 메서드
     handleWeekendsToggle() {
       this.calendarOptions.weekends = !this.calendarOptions.weekends; // 주말 표시 여부 변경
     },
-    // 날짜 선택 이벤트 핸들러
-    handleDateSelect(selectInfo) {
-      let title = prompt('새 이벤트의 제목을 입력하세요'); // 사용자 입력 요청
-      let calendarApi = selectInfo.view.calendar; // 캘린더 API 가져오기
-
-      calendarApi.unselect(); // 선택된 날짜 해제
-
-      if (title) {
-        calendarApi.addEvent({
-          id: createEventId(), // 유니크 ID 생성
-          title,
-          start: selectInfo.startStr, // 시작 날짜
-          end: selectInfo.endStr, // 종료 날짜
-          allDay: selectInfo.allDay, // 하루 종일 여부
-        });
-      }
-    },
     // 이벤트 클릭 시 호출되는 핸들러
     handleEventClick(clickInfo) {
+      console.log(clickInfo); // clickInfo 객체 확인
       if (
         confirm(`이벤트 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`)
       ) {
@@ -162,12 +205,12 @@ export default defineComponent({
     },
     // 이벤트 변경 시 호출되는 핸들러
     handleEvents(events) {
+      console.log(events); // clickInfo 객체 확인
       this.currentEvents = events; // 현재 이벤트를 업데이트
     },
   },
 });
 </script>
-
 <style>
 /* 스타일 정의 */
 :root {
@@ -229,7 +272,7 @@ export default defineComponent({
   /*버튼 커스텀 */
   .fc-button {
     background-color: #fafbfd !important;
-    color: #000000; /* 텍스트 색상 */
+    color: #787a7b !important; /* 텍스트 색상 */
     cursor: pointer;
   }
   .fc-button:nth-of-type(1) {
