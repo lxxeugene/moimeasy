@@ -245,34 +245,45 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { CustomerService } from "@/service/CustomerService";
-import { FilterMatchMode, FilterOperator } from "@primevue/core/api";
-import DatePicker from "primevue/datepicker";
-import Select from "primevue/select";
-import "primeicons/primeicons.css";
+import { ref, onMounted } from 'vue';
+import { CustomerService } from '@/service/CustomerService';
+import { FilterMatchMode, FilterOperator } from '@primevue/core/api';
+import DatePicker from 'primevue/datepicker';
+import Select from 'primevue/select';
+import 'primeicons/primeicons.css';
+import InputNumber from 'primevue/inputnumber';
+import Tag from 'primevue/tag';
+import ProgressBar from 'primevue/progressbar';
+import Slider from 'primevue/slider';
+import Checkbox from 'primevue/checkbox';
+import DataTable from 'primevue/datatable';
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
+import Column from 'primevue/column'; // 테이블용 컬럼
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
 
 const customers = ref();
 const filters = ref();
 const representatives = ref([
-  { name: "Amy Elsner", image: "amyelsner.png" },
-  { name: "Anna Fali", image: "annafali.png" },
-  { name: "Asiya Javayant", image: "asiyajavayant.png" },
-  { name: "Bernardo Dominic", image: "bernardodominic.png" },
-  { name: "Elwin Sharvill", image: "elwinsharvill.png" },
-  { name: "Ioni Bowcher", image: "ionibowcher.png" },
-  { name: "Ivan Magalhaes", image: "ivanmagalhaes.png" },
-  { name: "Onyama Limba", image: "onyamalimba.png" },
-  { name: "Stephen Shaw", image: "stephenshaw.png" },
-  { name: "XuXue Feng", image: "xuxuefeng.png" },
+  { name: 'Amy Elsner', image: 'amyelsner.png' },
+  { name: 'Anna Fali', image: 'annafali.png' },
+  { name: 'Asiya Javayant', image: 'asiyajavayant.png' },
+  { name: 'Bernardo Dominic', image: 'bernardodominic.png' },
+  { name: 'Elwin Sharvill', image: 'elwinsharvill.png' },
+  { name: 'Ioni Bowcher', image: 'ionibowcher.png' },
+  { name: 'Ivan Magalhaes', image: 'ivanmagalhaes.png' },
+  { name: 'Onyama Limba', image: 'onyamalimba.png' },
+  { name: 'Stephen Shaw', image: 'stephenshaw.png' },
+  { name: 'XuXue Feng', image: 'xuxuefeng.png' },
 ]);
 const statuses = ref([
-  "unqualified",
-  "qualified",
-  "new",
-  "negotiation",
-  "renewal",
-  "proposal",
+  'unqualified',
+  'qualified',
+  'new',
+  'negotiation',
+  'renewal',
+  'proposal',
 ]);
 const loading = ref(true);
 
@@ -290,7 +301,7 @@ const initFilters = () => {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
-    "country.name": {
+    'country.name': {
       operator: FilterOperator.AND,
       constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
     },
@@ -315,14 +326,14 @@ const initFilters = () => {
 initFilters();
 
 const formatDate = (value) => {
-  return value.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  return value.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
 };
 const formatCurrency = (value) => {
-  return value.toLocaleString("en-US", { style: "currency", currency: "USD" });
+  return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 };
 const clearFilter = () => {
   initFilters();
@@ -336,19 +347,19 @@ const getCustomers = (data) => {
 };
 const getSeverity = (status) => {
   switch (status) {
-    case "unqualified":
-      return "danger";
+    case 'unqualified':
+      return 'danger';
 
-    case "qualified":
-      return "success";
+    case 'qualified':
+      return 'success';
 
-    case "new":
-      return "info";
+    case 'new':
+      return 'info';
 
-    case "negotiation":
-      return "warn";
+    case 'negotiation':
+      return 'warn';
 
-    case "renewal":
+    case 'renewal':
       return null;
   }
 };

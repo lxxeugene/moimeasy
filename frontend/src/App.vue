@@ -26,64 +26,68 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useToast } from "primevue/usetoast";
-import { useRouter } from "vue-router";
-import { useUIStore } from "@/stores/uiStore";
+import { ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
+import { useRouter } from 'vue-router';
+import { useUIStore } from '@/stores/uiStore';
+import SpeedDial from 'primevue/speeddial';
+import PanelMenu from 'primevue/panelmenu';
+import Ripple from 'primevue/ripple';
 const uiStore = useUIStore();
 const toast = useToast();
+//스피드 다이얼 메뉴 설정
 const items = ref([
   {
-    label: "Add",
-    icon: "pi pi-pencil",
+    label: 'Add',
+    icon: 'pi pi-pencil',
     command: () => {
       toast.add({
-        severity: "info",
-        summary: "Add",
-        detail: "Data Added",
+        severity: 'info',
+        summary: 'Add',
+        detail: 'Data Added',
         life: 3000,
       });
     },
   },
   {
-    label: "Update",
-    icon: "pi pi-refresh",
+    label: 'Update',
+    icon: 'pi pi-refresh',
     command: () => {
       toast.add({
-        severity: "success",
-        summary: "Update",
-        detail: "Data Updated",
+        severity: 'success',
+        summary: 'Update',
+        detail: 'Data Updated',
         life: 3000,
       });
     },
   },
   {
-    label: "Menu",
-    icon: "pi pi-bars",
+    label: 'Menu',
+    icon: 'pi pi-bars',
     command: () => {
-      console.log("Menu Command Triggered"); // 이 로그가 출력되는지 확인
+      console.log('Menu Command Triggered'); // 이 로그가 출력되는지 확인
       uiStore.toggleSidebar();
-      console.log("Sidebar visible state:", uiStore.visible);
+      console.log('Sidebar visible state:', uiStore.visible);
     },
   },
   {
-    label: "Delete",
-    icon: "pi pi-trash",
+    label: 'Delete',
+    icon: 'pi pi-trash',
     command: () => {
       toast.add({
-        severity: "error",
-        summary: "Delete",
-        detail: "Data Deleted",
+        severity: 'error',
+        summary: 'Delete',
+        detail: 'Data Deleted',
         life: 3000,
       });
     },
   },
 
   {
-    label: "Vue Website",
-    icon: "pi pi-external-link",
+    label: 'Vue Website',
+    icon: 'pi pi-external-link',
     command: () => {
-      window.location.href = "https://vuejs.org/";
+      window.location.href = 'https://vuejs.org/';
     },
   },
 ]);

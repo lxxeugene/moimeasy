@@ -12,10 +12,12 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long userId;
 
     @Column(nullable = false, length = 100)
@@ -33,14 +35,14 @@ public class User {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "CREATE_AT", nullable = false, updatable = false)
+    @Column(name = "create_at", nullable = false, updatable = false)
     private LocalDateTime createAt;
 
-    @Column(name = "UPDATE_AT")
+    @Column(name = "update_at")
     private LocalDateTime updateAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "ENUM('admin', 'user') DEFAULT 'user'")
+    @ManyToOne(fetch = FetchType.LAZY) // Role과의 관계 설정
+    @JoinColumn(name = "role_id", nullable = false) // 외래 키 매핑
     private Role role;
 
     @Column(length = 25)
@@ -52,19 +54,24 @@ public class User {
     @PrePersist
     public void prePersist() {
         this.createAt = LocalDateTime.now();
-        if (this.role == null) {
-            this.role = Role.user;
+        if(this.createAt == null){
+            this.createAt = LocalDateTime.now();
+        }else {
+            this.createAt = createAt;
         }
+
     }
 
     @PreUpdate
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
     }
+}
 
-    public enum Role {
-        user,admin
-    }
+
+//    public enum Role {
+//        user,admin
+//    }
 
     @OneToMany(mappedBy = "user")
     private List<UserAccount> userAccounts = new ArrayList<>();
@@ -81,4 +88,5 @@ public class User {
 //    )
 //    private Set<Moeim> moeims = new HashSet<>();
 
-}
+
+

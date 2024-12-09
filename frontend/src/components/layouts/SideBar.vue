@@ -38,7 +38,7 @@
       </div>
     </div>
     <!-- 사이드바 메뉴 끝 -->
-    <div class="bottom-menu-container">
+    <!-- <div class="bottom-menu-container">
       <div class="more-settings">
         <div class="settings-group">
           <div class="settings-item">
@@ -51,105 +51,106 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import UsersIcon from "@/assets/usersIcon.svg?url";
-import OutlineIcon from "@/assets/outlineIcon.svg?url";
-import EditIcon from "@/assets/editIcon.svg?url";
-import Notebook from "@/assets/notebook.svg?url";
-import GraphIcon from "@/assets/graphIcon.svg?url";
-import { ref } from "vue";
-import NavLogo from "./NavLogo.vue";
+import UsersIcon from '@/assets/usersIcon.svg?url';
+import OutlineIcon from '@/assets/outlineIcon.svg?url';
+import EditIcon from '@/assets/editIcon.svg?url';
+import Notebook from '@/assets/notebook.svg?url';
+import GraphIcon from '@/assets/graphIcon.svg?url';
+import PanelMenu from 'primevue/panelmenu';
+import { ref } from 'vue';
+import NavLogo from './NavLogo.vue';
 
 //사이드바 메뉴구성 아이템
 const items = ref([
   {
-    label: "Dashboard",
+    label: 'Dashboard',
     icon: OutlineIcon,
     items: [
       {
-        label: "Dash-1",
+        label: 'Dash-1',
         icon: OutlineIcon,
-        route: "/theming/styled",
+        route: '/theming/styled',
       },
       {
-        label: "Dash-2",
+        label: 'Dash-2',
         icon: OutlineIcon,
-        route: "/theming/unstyled",
+        route: '/theming/unstyled',
       },
     ],
   },
   {
-    label: "회원관리",
+    label: '회원관리',
     icon: UsersIcon,
     items: [
       {
-        label: "회원관리-1",
+        label: '회원관리-1',
         icon: UsersIcon,
-        url: "https://vuejs.org/", // 외부 링크는 url을 사용
+        url: 'https://vuejs.org/', // 외부 링크는 url을 사용
       },
       {
-        label: "회원관리-2",
+        label: '회원관리-2',
         icon: UsersIcon,
-        route: "/login", // 내부 링크는 route를 사용
+        route: '/login', // 내부 링크는 route를 사용
       },
     ],
   },
   {
-    label: "일정관리",
+    label: '일정관리',
     icon: EditIcon,
     items: [
       {
-        label: "일정조회",
+        label: '일정조회',
         icon: EditIcon,
-        route: "/schedule",
+        route: '/schedule/calendar',
       },
       {
-        label: "모임게시판",
+        label: '모임게시판',
         icon: EditIcon,
-        route: "/board",
+        route: '/schedule/board',
       },
     ],
   },
   {
-    label: "회비관리",
+    label: '회비관리',
     icon: Notebook,
     items: [
       {
-        label: "회비관리-1",
+        label: '회비관리-1',
         icon: Notebook,
-        url: "https://vuejs.org/",
+        url: 'https://vuejs.org/',
       },
       {
-        label: "회비관리-2",
+        label: '회비관리-2',
         icon: Notebook,
-        url: "https://vuejs.org/",
+        url: 'https://vuejs.org/',
       },
     ],
   },
   {
-    label: "통계",
+    label: '통계',
     icon: GraphIcon,
     items: [
       {
-        label: "통계-1",
+        label: '통계-1',
         icon: GraphIcon,
-        url: "https://vuejs.org/",
+        url: 'https://vuejs.org/',
       },
       {
-        label: "통계-2",
+        label: '통계-2',
         icon: GraphIcon,
-        url: "https://vuejs.org/",
+        url: 'https://vuejs.org/',
       },
     ],
   },
 ]);
 </script>
 
-<style scoped>
+<style>
 .nav-bar,
 .nav-bar * {
   box-sizing: border-box;
@@ -227,7 +228,7 @@ const items = ref([
 .logo-text {
   color: var(--main-color);
   text-align: left;
-  font-family: "Poppins-Medium", sans-serif;
+  font-family: 'Poppins-Medium', sans-serif;
   font-size: 20px;
   line-height: 24px;
   font-weight: 500;
@@ -239,7 +240,7 @@ const items = ref([
 .main-menu-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
   align-items: flex-start;
   justify-content: flex-start;
   position: relative;
@@ -258,7 +259,7 @@ const items = ref([
 .main-menu-title {
   color: #969696;
   text-align: left;
-  font-family: "Poppins-Regular", sans-serif;
+  font-family: 'Poppins-Regular', sans-serif;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.04em;
@@ -330,7 +331,7 @@ const items = ref([
 .menu-item-text {
   color: #181616;
   text-align: left;
-  font-family: "Poppins-Medium", sans-serif;
+  font-family: 'Poppins-Medium', sans-serif;
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
@@ -416,7 +417,7 @@ const items = ref([
 .settings-text {
   color: #181616;
   text-align: left;
-  font-family: "Poppins-Medium", sans-serif;
+  font-family: 'Poppins-Medium', sans-serif;
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
@@ -438,7 +439,7 @@ const items = ref([
   cursor: pointer; /* 포인터 커서 */
   color: #181616;
   text-align: left;
-  font-family: "Poppins-Medium", sans-serif;
+  font-family: 'Poppins-Medium', sans-serif;
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
@@ -462,7 +463,10 @@ const items = ref([
 }
 
 .p-panelmenu-panel {
-  border: none !important;
+  /* border: none !important; */
+  padding: 0px;
+  cursor: pointer;
+  width: 190px;
 }
 .menu-title {
   width: 75px;
