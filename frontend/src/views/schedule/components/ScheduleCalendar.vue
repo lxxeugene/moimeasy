@@ -1,4 +1,39 @@
 <template>
+  <!-- 다이얼로그 영역 -->
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="일정 추가"
+    :style="{ width: '25rem' }"
+    @hide="rejectDialog"
+  >
+    <span class="add-dialog-subtitle">새 일정의 타이틀을 입력하세요</span>
+    <div class="add-dialog-inputbox">
+      <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
+      <InputText
+        id="eventTitle"
+        class="add-dialog-input"
+        autocomplete="off"
+        v-model="newEventTitle"
+      />
+    </div>
+    <template #footer>
+      <Button
+        label="취소"
+        text
+        severity="secondary"
+        @click="rejectDialog"
+        autofocus
+      />
+      <Button
+        label="추가"
+        outlined
+        severity="secondary"
+        @click="resolveDialog"
+        autofocus
+      />
+    </template>
+  </Dialog>
   <div class="demo-app">
     <!-- 메인 캘린더 영역 -->
     <div class="demo-app-main">
@@ -16,31 +51,53 @@
 </template>
 
 <script>
+import '@/views/schedule/components/ScheduleCalendar.style.css';
 import { defineComponent } from 'vue';
 import FullCalendar from '@fullcalendar/vue3'; // FullCalendar Vue3 컴포넌트
 import dayGridPlugin from '@fullcalendar/daygrid'; // 월간 보기 플러그인
 import timeGridPlugin from '@fullcalendar/timegrid'; // 주간 및 일별 보기 플러그인
 import interactionPlugin from '@fullcalendar/interaction'; // 상호작용(클릭 및 드래그) 플러그인
 import { INITIAL_EVENTS, createEventId } from '@/utils/event-utils'; // 초기 이벤트 및 ID 생성 유틸리티->제거예정
+import googleCalendarPlugin from '@fullcalendar/google-calendar';
+import Avatar from 'primevue/avatar';
+import Dialog from 'primevue/dialog';
+import axios from 'axios';
+
+// 구글 캘린더 API 키와 캘린더 ID
+const googleCalendarApiKey = import.meta.env.VITE_GOOGLE_API_KEY; // 구글 API 키
+const googleCalendarId = 'ko.south_korea#holiday@group.v.calendar.google.com'; // 구글 캘린더 ID
 
 export default defineComponent({
   components: {
     FullCalendar, // FullCalendar 컴포넌트 등록
+    Avatar,
+    Dialog,
   },
   data() {
     return {
+      visible: false, // Dialog 표시 여부
+      newEventTitle: '', // 다이얼로그 입력값
+      resolvePromise: null, // Promise resolve 함수
+      rejectPromise: null, // Promise reject 함수
       // FullCalendar 설정 옵션
       calendarOptions: {
         plugins: [
           dayGridPlugin, // 월간 보기 플러그인
           timeGridPlugin, // 주간 및 일별 보기 플러그인
           interactionPlugin, // 날짜 클릭 및 드래그를 위한 플러그인
+          googleCalendarPlugin, // 구글 캘린더플러그인
         ],
         headerToolbar: {
           // 캘린더 상단 헤더 설정
-          left: 'today ', // 왼쪽에 이전/다음/오늘 버튼
+          left: 'today myCustomButton', // 왼쪽에 이전/다음/오늘 버튼
           center: 'prev title next', // 중앙에 제목 표시
           right: 'timeGridDay,timeGridWeek,dayGridMonth', // 오른쪽에 보기 전환 버튼
+        },
+        buttonText: {
+          today: 'Today', // 'today' 버튼의 텍스트를 변경
+          month: 'Month', // 'month' 버튼의 텍스트를 변경
+          week: 'Week', // 'week' 버튼의 텍스트를 변경
+          day: 'Day', // 'day' 버튼의 텍스트를 변경
         },
         initialView: 'dayGridMonth', // 초기 보기: 월간 보기
         initialEvents: INITIAL_EVENTS, // 초기 이벤트 설정
@@ -49,18 +106,37 @@ export default defineComponent({
         selectMirror: true, // 날짜 선택 시 미러 효과 활성화
         dayMaxEvents: true, // 하루 최대 이벤트 수 표시
         weekends: true, // 주말 표시 여부
-        // locale: 'ko', // 언어 설정: 한국어
+        locale: 'ko', // 언어 설정: 한국어
+        googleCalendarApiKey: googleCalendarApiKey,
         dayCellContent: (info) => {
           return info.date.getDate(); //'일' 텍스트제거 후 날짜의 '일(day)숫자'만 반환
         },
         select: this.handleDateSelect, // 날짜 선택 이벤트 핸들러
         eventClick: this.handleEventClick, // 이벤트 클릭 핸들러
-        eventsSet: this.handleEvents, // 이벤트 변경 시 호출되는 핸들러
+        eventsSet: this.handleEvents, // 모든 이벤트 변경 시 호출되는 핸들러
+        eventAdd: this.handleEventAdd, // 이벤트 추가 시 호출
+        eventChange: this.handleEventChange, // 이벤트 변경 시 호출
+        eventRemove: this.handleEventRemove, // 이벤트 삭제 시 호출
+        // 구글 캘린더 연동 공휴일 가져오기
+        eventSources: [
+          {
+            googleCalendarId: googleCalendarId,
+            className: 'holiday-event',
+          },
+        ],
+
         customButtons: {
           myCustomButton: {
-            text: '일정추가',
+            text: 'Add',
             click: () => {
-              alert('Custom button clicked!');
+              const calendarApi = this.calendarRef.getApi(); // 캘린더 API 가져오기
+              calendarApi.addEvent({
+                title: 'New Event',
+                start: new Date(),
+                end: new Date(),
+                // allDay: true,
+              });
+              alert('새 이벤트가 추가되었습니다!');
             },
           },
         },
@@ -74,191 +150,114 @@ export default defineComponent({
     };
   },
   methods: {
+    async handleDateSelect(selectInfo) {
+      try {
+        // 다이얼로그를 띄우고 입력값을 기다림
+        const title = await this.openDialog();
+        if (title) {
+          const calendarApi = selectInfo.view.calendar;
+          calendarApi.addEvent({
+            id: createEventId(), // 유니크 ID 생성
+            title, //다이얼로그 입력 타이틀
+            start: selectInfo.startStr, // 시작 날짜
+            end: selectInfo.endStr, // 종료 날짜
+            allDay: selectInfo.allDay, // 하루 종일 여부
+            display: 'background',
+          });
+        }
+      } catch (error) {
+        console.log('다이얼로그에서 입력 취소:', error);
+      } finally {
+        selectInfo.view.calendar.unselect(); // 선택 해제
+      }
+    },
+    openDialog() {
+      this.visible = true;
+      this.newEventTitle = ''; // 입력 초기화
+      return new Promise((resolve, reject) => {
+        this.resolvePromise = resolve;
+        this.rejectPromise = reject;
+      });
+    },
+    resolveDialog() {
+      if (this.newEventTitle.trim()) {
+        this.resolvePromise(this.newEventTitle.trim()); // 입력값 반환
+        console.log('반환타이틀', this.newEventTitle.trim());
+      } else {
+        this.resolvePromise(null); // 빈 값 반환
+      }
+      this.closeDialog();
+    },
+    rejectDialog() {
+      this.rejectPromise('취소됨');
+      this.closeDialog();
+    },
+    closeDialog() {
+      this.visible = false;
+      this.newEventTitle = '';
+    },
     // 주말 표시 여부를 토글하는 메서드
     handleWeekendsToggle() {
       this.calendarOptions.weekends = !this.calendarOptions.weekends; // 주말 표시 여부 변경
     },
-    // 날짜 선택 이벤트 핸들러
-    handleDateSelect(selectInfo) {
-      let title = prompt('새 이벤트의 제목을 입력하세요'); // 사용자 입력 요청
-      let calendarApi = selectInfo.view.calendar; // 캘린더 API 가져오기
-
-      calendarApi.unselect(); // 선택된 날짜 해제
-
-      if (title) {
-        calendarApi.addEvent({
-          id: createEventId(), // 유니크 ID 생성
-          title,
-          start: selectInfo.startStr, // 시작 날짜
-          end: selectInfo.endStr, // 종료 날짜
-          allDay: selectInfo.allDay, // 하루 종일 여부
-        });
-      }
-    },
     // 이벤트 클릭 시 호출되는 핸들러
     handleEventClick(clickInfo) {
+      console.log(clickInfo); // clickInfo 객체 확인
       if (
         confirm(`이벤트 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`)
       ) {
         clickInfo.event.remove(); // 이벤트 삭제
       }
     },
-    // 이벤트 변경 시 호출되는 핸들러
+    // 모든 이벤트 변경 시 호출되는 핸들러
     handleEvents(events) {
+      console.log(events); // clickInfo 객체 확인
       this.currentEvents = events; // 현재 이벤트를 업데이트
+    },
+    // 이벤트 추가 시 추가된 일정데이터와 함께 호출
+    async handleEventAdd(eventInfo) {
+      const event = eventInfo.event;
+      console.log('이벤트 추가시 호출됨:', event);
+      try {
+        const response = await axios.post('/api/events', {
+          id: event.id,
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          allDay: event.allDay,
+        });
+        console.log('이벤트 추가 성공:', response.data);
+      } catch (error) {
+        console.error('이벤트 추가 실패:', error);
+      }
+    },
+
+    // 이벤트 변경 시 호출
+    async handleEventChange(eventInfo) {
+      const event = eventInfo.event;
+      try {
+        const response = await axios.put(`/api/events/${event.id}`, {
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          allDay: event.allDay,
+        });
+        console.log('이벤트 변경 성공:', response.data);
+      } catch (error) {
+        console.error('이벤트 변경 실패:', error);
+      }
+    },
+
+    // 이벤트 삭제 시 호출
+    async handleEventRemove(eventInfo) {
+      const event = eventInfo.event;
+      try {
+        const response = await axios.delete(`/api/events/${event.id}`);
+        console.log('이벤트 삭제 성공:', response.data);
+      } catch (error) {
+        console.error('이벤트 삭제 실패:', error);
+      }
     },
   },
 });
 </script>
-
-<style>
-/* 스타일 정의 */
-
-.demo-app {
-  display: flex;
-  min-height: 100%;
-  font-family:
-    Arial,
-    Helvetica Neue,
-    Helvetica,
-    sans-serif;
-  font-size: 14px;
-}
-
-.demo-app-sidebar {
-  width: 200px;
-  line-height: 1.5;
-  background: #f9f1ff;
-  border-right: 1px solid #d3e2e8;
-}
-
-.demo-app-sidebar-section {
-  padding: 2em;
-}
-
-.demo-app-main {
-  flex-grow: 1;
-  padding: 2em;
-}
-
-.fc {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-/* 헤더 툴바 */
-.fc-header-toolbar {
-}
-/* 헤더 좌측  */
-.fc-toolbar-chunk:nth-of-type(1) {
-  width: 200px;
-  .fc-button {
-    border: 1px solid #e9e9e9 !important;
-    color: #787a7b !important; /* 텍스트 색상 */
-  }
-}
-/* 헤더 중앙 */
-.fc-toolbar-chunk:nth-of-type(2) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* 헤더 우측  */
-.fc-toolbar-chunk:nth-of-type(3) {
-  /*버튼 커스텀 */
-  .fc-button {
-    background-color: #fafbfd !important;
-    color: #000000; /* 텍스트 색상 */
-    cursor: pointer;
-  }
-  .fc-button:nth-of-type(1) {
-    border: 1px solid #d4d4d4 !important;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-  }
-  .fc-button:nth-of-type(2) {
-    border: 1px solid #d4d4d4 !important;
-  }
-  .fc-button:nth-of-type(3) {
-    border: 1px solid #d4d4d4 !important;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-
-  .fc-button:hover {
-    background-color: #f1f4f9 !important;
-  }
-  .fc-button:focus {
-    background-color: #5a8dff !important;
-    color: #ffff !important;
-    border: 1px solid #5a8dff !important;
-  }
-}
-
-/* 헤더 버튼 */
-.fc-button {
-  background-color: #ffffff !important;
-  border: none !important;
-  color: #000000 !important; /* 텍스트 색상 */
-  cursor: pointer;
-}
-.fc-button:hover {
-  background-color: #f1f4f9 !important;
-}
-.fc-button:focus {
-  box-shadow: none !important;
-}
-
-/* 테이블 헤더 셀 */
-.fc-col-header-cell {
-  height: 30px;
-  background: #f1f4f9;
-  border: none !important;
-}
-
-.fc-col-header-cell:nth-of-type(1) {
-  border-top-left-radius: 10px;
-}
-.fc-col-header-cell:nth-of-type(7) {
-  border-top-right-radius: 10px;
-}
-
-.fc-col-header-cell > div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 30px;
-  font-weight: 500;
-}
-/* 날짜 패딩효과 */
-.fc-daygrid-day-number {
-  padding: 10px !important;
-}
-.fc-theme-standard .fc-scrollgrid {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-/* 기본 이벤트 스타일 */
-.fc-event {
-  background-color: #4caf50; /* 녹색 배경 */
-  color: white; /* 흰색 텍스트 */
-  border: 1px solid #388e3c;
-  border-radius: 4px;
-  padding: 5px;
-}
-
-/* 마우스 호버 이벤트 */
-.fc-event:hover {
-  background-color: #388e3c; /* 더 진한 녹색 */
-  cursor: pointer;
-}
-
-/* 중요 이벤트 */
-.important-event {
-  background-color: #f44336; /* 빨간색 배경 */
-  border-color: #d32f2f;
-  color: white;
-}
-</style>
