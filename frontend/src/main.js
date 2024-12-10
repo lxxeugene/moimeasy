@@ -6,6 +6,7 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8088';
 import Header from './components/layouts/Header.vue';
 import SideBar from './components/layouts/SideBar.vue';
+import SideSpeedDial from './components/layouts/SideSpeedDial.vue';
 import PrimeVue from 'primevue/config'; // PrimeVue 추가
 import Aura from '@primevue/themes/aura';
 import ToastService from 'primevue/toastservice';
@@ -26,6 +27,7 @@ const app = createApp(App);
 app.component('Header', Header);
 app.component('SideBar', SideBar);
 app.component('Button', Button);
+app.component('SideSpeedDial', SideSpeedDial);
 app.component('InputText', InputText);
 app.component('PanelMenu', PanelMenu);
 

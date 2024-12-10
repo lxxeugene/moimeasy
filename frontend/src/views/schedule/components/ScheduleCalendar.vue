@@ -76,7 +76,11 @@ export default defineComponent({
   data() {
     return {
       visible: false, // Dialog 표시 여부
-      newEventTitle: '', // 다이얼로그 입력값
+      newEventTitle: '', // 다이얼로그 입력 - 일정명
+      newEventDescription: '', // 다이얼로그 입력 - 일정상세
+      newEventLocation: '', // 다이얼로그 입력 - 장소
+      newEventAttendants: '', // 다이얼로그 입력 - 참석자
+      newEventPriority: '', // 다이얼로그 입력 - 우선순위
       resolvePromise: null, // Promise resolve 함수
       rejectPromise: null, // Promise reject 함수
       // FullCalendar 설정 옵션
@@ -153,7 +157,7 @@ export default defineComponent({
     async handleDateSelect(selectInfo) {
       try {
         // 다이얼로그를 띄우고 입력값을 기다림
-        const title = await this.openDialog();
+        const title = await this.openDialog(); // 여기서 이제 객체로 여러 데이터를 받아오기
         if (title) {
           const calendarApi = selectInfo.view.calendar;
           calendarApi.addEvent({
@@ -162,7 +166,12 @@ export default defineComponent({
             start: selectInfo.startStr, // 시작 날짜
             end: selectInfo.endStr, // 종료 날짜
             allDay: selectInfo.allDay, // 하루 종일 여부
-            display: 'background',
+            extendedProps: {
+              description: '', // 기본값 처리
+              location: '미정',
+              attendants: [],
+              priority: '보통',
+            },
           });
         }
       } catch (error) {
@@ -194,7 +203,6 @@ export default defineComponent({
     },
     closeDialog() {
       this.visible = false;
-      this.newEventTitle = '';
     },
     // 주말 표시 여부를 토글하는 메서드
     handleWeekendsToggle() {
@@ -219,12 +227,16 @@ export default defineComponent({
       const event = eventInfo.event;
       console.log('이벤트 추가시 호출됨:', event);
       try {
-        const response = await axios.post('/api/events', {
-          id: event.id,
+        const response = await axios.post('/events', {
+          id: event.id, // 기본 필드
           title: event.title,
-          start: event.start,
-          end: event.end,
-          allDay: event.allDay,
+          start: event.start, // 시작 시간
+          end: event.end, // 종료 시간
+          allDay: event.allDay, // 하루 종일 여부
+          description: event.extendedProps.description, // 일정 상세
+          location: event.extendedProps.location, // 장소
+          attendants: event.extendedProps.attendants, // 참가자
+          priority: event.extendedProps.priority, // 우선순위
         });
         console.log('이벤트 추가 성공:', response.data);
       } catch (error) {
@@ -236,7 +248,7 @@ export default defineComponent({
     async handleEventChange(eventInfo) {
       const event = eventInfo.event;
       try {
-        const response = await axios.put(`/api/events/${event.id}`, {
+        const response = await axios.put(`/events/${event.id}`, {
           title: event.title,
           start: event.start,
           end: event.end,
@@ -252,7 +264,7 @@ export default defineComponent({
     async handleEventRemove(eventInfo) {
       const event = eventInfo.event;
       try {
-        const response = await axios.delete(`/api/events/${event.id}`);
+        const response = await axios.delete(`/events/${event.id}`);
         console.log('이벤트 삭제 성공:', response.data);
       } catch (error) {
         console.error('이벤트 삭제 실패:', error);

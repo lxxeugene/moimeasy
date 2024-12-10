@@ -24,13 +24,21 @@ public class Schedule extends BaseEntity {
     private Moeim moeim;
 
     @ManyToOne
-    @JoinColumn(name = "USER_ID", nullable = false)
+    @JoinColumn(name = "USER_ID", nullable = true)
     private User creator;
 
-    @Column(name = "SCHEDULE_NAME", nullable = false)
-    private String scheduleName;
+    @Column(name="EVENT_CODE", nullable = false)
+    private String eventCode;
 
-    private String contents;
+    @Column(name = "SCHEDULE_Title", nullable = false)
+    private String scheduleTitle;
+
+
+    @Column(name="DESCRIPTION", nullable = false)
+    private String description;
+
+    @Column(name="IS_ALL_DAY_EVENT" ,nullable = false)
+    private Boolean isAllDayEvent;
 
     @Column(name = "START_TIME", nullable = false)
     private Timestamp startTime;
@@ -38,6 +46,10 @@ public class Schedule extends BaseEntity {
     @Column(name = "END_TIME", nullable = false)
     private Timestamp endTime;
 
+
     @Column(name = "LOCATION")
     private String location;
+
+    @Column(name = "PRIORITY")
+    private String priority;
 }
