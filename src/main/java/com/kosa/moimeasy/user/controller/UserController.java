@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class UserController {
 
     @Autowired
@@ -30,21 +30,21 @@ public class UserController {
         List<UserDTO> userDTOs = users.stream().map(UserDTO::new).toList();
         return ResponseEntity.ok(userDTOs);
     }
-
+    //로그인, 회원가입돼서 필요없음
     @PostMapping("/create")
     public User createUser(@RequestBody UserDTO request) {
         Role role = roleService.findById(request.getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + request.getRoleId()));
         return userService.createUser(request, role);
     }
-
+    //요청한 정보만 수정가능
     @PutMapping("/update/{userId}")
     public User updateUser(@PathVariable Long userId, @RequestBody UserDTO request) {
-        Role role = roleService.findById(request.getRoleId())
-                .orElseThrow(() -> new ResourceNotFoundException("Role not found with ID: " + request.getRoleId()));
-        return userService.updateUser(userId, request, role);
+        return userService.updateUser(userId, request);
     }
 
+
+    //회원 조회
     @GetMapping("/{userId}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long userId) {
         User user = userService.findById(userId)
@@ -53,9 +53,4 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
-    @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
-        return "사용자가 삭제되었습니다.";
-    }
 }

@@ -107,8 +107,10 @@ export default {
   methods: {
     async fetchUsers() {
       try {
+        console.log('Fetching users for moeimId:', this.loggedInUserMoeimId);
         const response = await axios.get('/api/v1/users', {
           params: { moeimId: this.loggedInUserMoeimId }, // 로그인된 사용자의 moeimId를 서버에 전달
+          withCredentials: true,
         });
         console.log('Response data:', response.data);
         this.users = response.data.map((user) => ({
