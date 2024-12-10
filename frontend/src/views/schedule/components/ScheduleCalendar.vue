@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import '@/views/schedule/components/ScheduleCalendar.style.css';
 import { defineComponent } from 'vue';
 import FullCalendar from '@fullcalendar/vue3'; // FullCalendar Vue3 컴포넌트
 import dayGridPlugin from '@fullcalendar/daygrid'; // 월간 보기 플러그인
@@ -60,6 +61,7 @@ import { INITIAL_EVENTS, createEventId } from '@/utils/event-utils'; // 초기 �
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import Avatar from 'primevue/avatar';
 import Dialog from 'primevue/dialog';
+import axios from 'axios';
 
 // 구글 캘린더 API 키와 캘린더 ID
 const googleCalendarApiKey = import.meta.env.VITE_GOOGLE_API_KEY; // 구글 API 키
@@ -111,7 +113,10 @@ export default defineComponent({
         },
         select: this.handleDateSelect, // 날짜 선택 이벤트 핸들러
         eventClick: this.handleEventClick, // 이벤트 클릭 핸들러
-        eventsSet: this.handleEvents, // 이벤트 변경 시 호출되는 핸들러
+        eventsSet: this.handleEvents, // 모든 이벤트 변경 시 호출되는 핸들러
+        eventAdd: this.handleEventAdd, // 이벤트 추가 시 호출
+        eventChange: this.handleEventChange, // 이벤트 변경 시 호출
+        eventRemove: this.handleEventRemove, // 이벤트 삭제 시 호출
         // 구글 캘린더 연동 공휴일 가져오기
         eventSources: [
           {
@@ -157,6 +162,7 @@ export default defineComponent({
             start: selectInfo.startStr, // 시작 날짜
             end: selectInfo.endStr, // 종료 날짜
             allDay: selectInfo.allDay, // 하루 종일 여부
+            display: 'background',
           });
         }
       } catch (error) {
@@ -203,220 +209,55 @@ export default defineComponent({
         clickInfo.event.remove(); // 이벤트 삭제
       }
     },
-    // 이벤트 변경 시 호출되는 핸들러
+    // 모든 이벤트 변경 시 호출되는 핸들러
     handleEvents(events) {
       console.log(events); // clickInfo 객체 확인
       this.currentEvents = events; // 현재 이벤트를 업데이트
     },
+    // 이벤트 추가 시 추가된 일정데이터와 함께 호출
+    async handleEventAdd(eventInfo) {
+      const event = eventInfo.event;
+      console.log('이벤트 추가시 호출됨:', event);
+      try {
+        const response = await axios.post('/api/events', {
+          id: event.id,
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          allDay: event.allDay,
+        });
+        console.log('이벤트 추가 성공:', response.data);
+      } catch (error) {
+        console.error('이벤트 추가 실패:', error);
+      }
+    },
+
+    // 이벤트 변경 시 호출
+    async handleEventChange(eventInfo) {
+      const event = eventInfo.event;
+      try {
+        const response = await axios.put(`/api/events/${event.id}`, {
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          allDay: event.allDay,
+        });
+        console.log('이벤트 변경 성공:', response.data);
+      } catch (error) {
+        console.error('이벤트 변경 실패:', error);
+      }
+    },
+
+    // 이벤트 삭제 시 호출
+    async handleEventRemove(eventInfo) {
+      const event = eventInfo.event;
+      try {
+        const response = await axios.delete(`/api/events/${event.id}`);
+        console.log('이벤트 삭제 성공:', response.data);
+      } catch (error) {
+        console.error('이벤트 삭제 실패:', error);
+      }
+    },
   },
 });
 </script>
-<style>
-/* 스타일 정의 */
-:root {
-  --fc-today-bg-color: rgba(226, 225, 226, 0.3); /* 오늘 날짜 배경색 */
-  --fc-highlight-color: #e4f8f1;
-}
-.demo-app {
-  display: flex;
-  min-height: 100%;
-  font-family:
-    Arial,
-    Helvetica Neue,
-    Helvetica,
-    sans-serif;
-  font-size: 14px;
-}
-
-.demo-app-sidebar {
-  width: 200px;
-  line-height: 1.5;
-  background: #f9f1ff;
-  border-right: 1px solid #d3e2e8;
-}
-
-.demo-app-sidebar-section {
-  padding: 2em;
-}
-
-.demo-app-main {
-  flex-grow: 1;
-  padding: 2em;
-}
-
-.fc {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-/* 헤더 툴바 */
-.fc-header-toolbar {
-}
-/* 헤더 좌측  */
-.fc-toolbar-chunk:nth-of-type(1) {
-  width: 200px;
-  .fc-button {
-    border: 1px solid #e9e9e9 !important;
-    color: #787a7b !important; /* 텍스트 색상 */
-  }
-}
-/* 헤더 중앙 */
-.fc-toolbar-chunk:nth-of-type(2) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* 헤더 우측  */
-.fc-toolbar-chunk:nth-of-type(3) {
-  /*버튼 커스텀 */
-  .fc-button {
-    background-color: #fafbfd !important;
-    color: #787a7b !important; /* 텍스트 색상 */
-    cursor: pointer;
-  }
-  .fc-button:nth-of-type(1) {
-    border: 1px solid #d4d4d4 !important;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-  }
-  .fc-button:nth-of-type(2) {
-    border: 1px solid #d4d4d4 !important;
-  }
-  .fc-button:nth-of-type(3) {
-    border: 1px solid #d4d4d4 !important;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-
-  .fc-button:hover {
-    background-color: #f0ecfb !important;
-  }
-  .fc-button:focus {
-    background-color: #735bf3 !important;
-    color: #ffff !important;
-    border: 1px solid #735bf3 !important;
-  }
-}
-
-/* 헤더 버튼 */
-.fc-button {
-  background-color: #ffffff !important;
-  border: none !important;
-  color: #000000 !important; /* 텍스트 색상 */
-  cursor: pointer;
-}
-.fc-button:hover {
-  background-color: #f1f4f9 !important;
-}
-.fc-button:focus {
-  box-shadow: none !important;
-}
-
-/* 테이블 헤더 셀 */
-.fc-col-header-cell {
-  height: 30px;
-  background: #f2eefb;
-  border: none !important;
-}
-
-.fc-col-header-cell:nth-of-type(1) {
-  border-top-left-radius: 10px;
-}
-.fc-col-header-cell:nth-of-type(7) {
-  border-top-right-radius: 10px;
-}
-
-.fc-col-header-cell > div {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 30px;
-  font-weight: 500;
-}
-/* 날짜 패딩효과 */
-.fc-daygrid-day-number {
-  padding: 10px !important;
-}
-.fc-theme-standard .fc-scrollgrid {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-/* 기본 이벤트 스타일 */
-.fc-event {
-  background-color: #ebe2fd;
-  color: #7551e9;
-  font-weight: 600;
-  border-left: 4px solid #7551e9;
-  border-radius: 0px;
-  margin: 0;
-  padding: 5px;
-  cursor: pointer;
-}
-
-/*올 데이 이벤트 */
-.fc-h-event {
-  border: none;
-  background-color: #e4f8f1;
-  border-left: 4px solid #74cdab !important;
-  i {
-    color: #74cdab;
-    font-weight: 600;
-  }
-}
-
-/* 마우스 호버 이벤트 */
-.fc-event:hover {
-  /* background-color: #256428;  */
-  /* 더 진한 녹색 */
-  /* cursor: pointer; */
-}
-
-/* 중요 이벤트 */
-.important-event {
-  background-color: #f44336; /* 빨간색 배경 */
-  border-color: #d32f2f;
-  color: white;
-}
-
-.holiday-event {
-  background-color: #fff4e7;
-
-  border: none;
-  border-left: 4px solid #ffb85c !important;
-  i {
-    color: #ffb85c;
-  }
-}
-/* .holiday-event {
-  background-color: #ffe2e6;
-
-  border: none;
-  border-left: 4px solid #fd7385 !important;
-  i {
-    color: #fd7385;
-  }
-} */
-
-.fc-direction-ltr {
-  margin: 0 !important;
-}
-
-.add-dialog-subtitle {
-  color: 18px;
-}
-.add-dialog-inputbox {
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.add-dialog-inputbox-label {
-  font-weight: bold;
-}
-.add-dialog-input {
-  flex: 1 1 auto;
-}
-</style>
