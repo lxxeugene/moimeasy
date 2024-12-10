@@ -16,6 +16,9 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import PanelMenu from 'primevue/panelmenu';
 
+// axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
+axios.defaults.baseURL = 'http://localhost:8088';
+
 const pinia = createPinia();
 const app = createApp(App);
 
@@ -26,7 +29,7 @@ app.component('Button', Button);
 app.component('InputText', InputText);
 app.component('PanelMenu', PanelMenu);
 
-// 플러그인 등록
+// PrimeVue 플러그인 등록
 app.use(PrimeVue, {
   theme: {
     preset: Aura,
@@ -41,5 +44,7 @@ app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
 app.use(pinia);
+// app.use(PrimeVue);
+// app.directive('ripple', Ripple);
 
 app.use(router).mount('#app');
