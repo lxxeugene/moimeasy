@@ -37,7 +37,7 @@
         <div class="search-bar-box">
           <input class="search-bar" />
           <img
-            src="@/assets/searchIcon.svg?url"
+            src="@/assets/icons/searchIcon.svg?url"
             alt="search Icon"
             height="15px"
             class="search-icon"
@@ -57,7 +57,11 @@
           </OverlayBadge>
         </div>
         <div class="profile-box">
-          <img src="@/assets/Avatar.svg?url" alt="Avatar Icon" height="32px" />
+          <img
+            src="@/assets/icons/Avatar.svg?url"
+            alt="Avatar Icon"
+            height="32px"
+          />
           <p>유저407번</p>
         </div>
       </div>
