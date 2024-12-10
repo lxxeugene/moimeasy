@@ -4,11 +4,13 @@ import com.kosa.moimeasy.common.entity.BaseEntity;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.user.entity.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
 
+@Builder
 @Entity
 @Getter
 @Setter
@@ -20,7 +22,7 @@ public class Schedule extends BaseEntity {
     private Long scheduleId;
 
     @ManyToOne
-    @JoinColumn(name = "MOEIM_ID", nullable = false)
+    @JoinColumn(name = "MOEIM_ID", nullable = true)
     private Moeim moeim;
 
     @ManyToOne

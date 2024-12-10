@@ -30,18 +30,21 @@ app.component('Button', Button);
 app.component('SideSpeedDial', SideSpeedDial);
 app.component('InputText', InputText);
 app.component('PanelMenu', PanelMenu);
-
 // PrimeVue 플러그인 등록
-app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-    options: {
-      prefix: 'p',
-      darkModeSelector: 'none',
-      cssLayer: false,
+app.use(
+  PrimeVue,
+  {
+    theme: {
+      preset: Aura,
+      options: {
+        prefix: 'p',
+        darkModeSelector: 'none',
+        cssLayer: false,
+      },
     },
   },
-});
+  { ripple: true }
+);
 app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);

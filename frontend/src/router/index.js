@@ -52,6 +52,10 @@ const routes = [
         path: 'board',
         component: () => import('@/views/board/BoardView.vue'),
       },
+      {
+        path: 'chte',
+        component: () => import('@/views/schedule/components/ChTe.vue'),
+      },
     ],
   },
 ];
