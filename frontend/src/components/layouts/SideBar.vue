@@ -56,11 +56,11 @@
 </template>
 
 <script setup>
-import UsersIcon from '@/assets/usersIcon.svg?url';
-import OutlineIcon from '@/assets/outlineIcon.svg?url';
-import EditIcon from '@/assets/editIcon.svg?url';
-import Notebook from '@/assets/notebook.svg?url';
-import GraphIcon from '@/assets/graphIcon.svg?url';
+import UsersIcon from '@/assets/icons/usersIcon.svg?url';
+import OutlineIcon from '@/assets/icons/outlineIcon.svg?url';
+import EditIcon from '@/assets/icons/editIcon.svg?url';
+import Notebook from '@/assets/icons/notebook.svg?url';
+import GraphIcon from '@/assets/icons/graphIcon.svg?url';
 import PanelMenu from 'primevue/panelmenu';
 import { ref } from 'vue';
 import NavLogo from './NavLogo.vue';
