@@ -89,6 +89,10 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/:catchAll(.*)',
+    component: () => import('@/views/Error/Error404.vue'),
+  },
 ];
 
 const router = createRouter({
