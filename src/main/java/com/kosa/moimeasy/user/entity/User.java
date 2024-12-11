@@ -3,15 +3,14 @@ package com.kosa.moimeasy.user.entity;
 import com.kosa.moimeasy.common.entity.BaseEntity;
 import com.kosa.moimeasy.membership.entity.UserAccount;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
