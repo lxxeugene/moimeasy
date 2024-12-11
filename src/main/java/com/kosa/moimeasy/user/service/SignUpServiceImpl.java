@@ -54,7 +54,6 @@ public class SignUpServiceImpl implements SignUpService {
             // 여기서 역할 설정 부분
 //            user.setRole(user.getRole());
                 user.setRole(userRole);
-            user.setCreateAt(LocalDateTime.now());
 
             memberRepository.save(user);
             log.info("회원가입 성공: " + user.toString());

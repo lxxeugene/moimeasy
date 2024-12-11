@@ -5,13 +5,14 @@ import com.kosa.moimeasy.membership.entity.UserAccount;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
+@NoArgsConstructor
 @Entity
 @Getter
 @Setter
@@ -48,6 +49,8 @@ public class User extends BaseEntity {
     @Column
     private Long moeimId;
 
+    @Column(length = 255, nullable = true)
+    private String profileImage;
 
     @OneToMany(mappedBy = "user")
     private List<UserAccount> userAccounts = new ArrayList<>();

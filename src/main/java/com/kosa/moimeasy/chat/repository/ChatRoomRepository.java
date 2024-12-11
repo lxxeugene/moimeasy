@@ -1,7 +1,17 @@
 package com.kosa.moimeasy.chat.repository;
 
 import com.kosa.moimeasy.chat.entity.ChatRoom;
+import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
+    @EntityGraph(attributePaths = {"users"})
+    List<ChatRoom> findAll();
+
+    @Query("SELECT cr FROM ChatRoom cr JOIN cr.users u WHERE u.id = :userId")
+    List<ChatRoom> findByUserId(@Param("userId") Long userId);
 }

@@ -100,12 +100,12 @@ const updatePathInfo = () => {
 // 초기 경로 설정
 updatePathInfo();
 
-// 라우트 변경 감지
+// 라우트 변경 감지용
 watch(
   () => route.matched,
   () => {
     updatePathInfo();
-    console.log('라우트가 변경되었습니다:', items.value);
+    console.log('라우트 변경됨:', items.value);
   },
   { immediate: true } // 컴포넌트가 처음 마운트될 때도 실행
 );
