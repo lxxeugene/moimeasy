@@ -1,9 +1,9 @@
 <template>
   <Dialog
     v-model:visible="visible"
-    modal
+    :modal="false"
     header="일정 추가"
-    :style="{ width: '25rem', height: '600px' }"
+    :style="{ width: '25rem' }"
     @hide="rejectDialog"
   >
     <span class="add-dialog-subtitle">새 일정의 타이틀을 입력하세요</span>
