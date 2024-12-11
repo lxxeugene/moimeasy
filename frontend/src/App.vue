@@ -16,6 +16,7 @@
 
 <script setup>
 import { useUIStore } from '@/stores/uiStore';
+
 const uiStore = useUIStore();
 </script>
 

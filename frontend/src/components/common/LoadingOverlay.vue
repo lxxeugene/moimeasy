@@ -4,8 +4,8 @@
     :loader="spinner"
     background="rgba(255,255,255,0.8)"
     :color="spinnerColor"
-    width="130"
-    height="130"
+    width="140"
+    height="140"
   />
 </template>
 
