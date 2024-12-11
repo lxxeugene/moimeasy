@@ -300,9 +300,11 @@ async function handleEventChange(eventInfo) {
 }
 
 async function handleEventRemove(eventInfo) {
+  console.log('삭제이벤트호출');
+
   const event = eventInfo.event;
   try {
-    const response = await axios.delete(`/events/${event.id}`);
+    const response = await axios.delete(`/api/v1/events/${event.id}`);
     console.log('이벤트 삭제 성공:', response.data);
   } catch (error) {
     console.error('이벤트 삭제 실패:', error);

@@ -29,7 +29,8 @@ public class ScheduleController {
 
     //일정 삭제하기
     @DeleteMapping("/events/{id}")
-    public ResponseEntity<?>  deleteEvent(@PathVariable(name = "id") Long eventCode){
+    public ResponseEntity<?>  deleteEvent(@PathVariable(name = "id") String eventCode){
+        System.out.println("삭제api호출됨:이벤트코드 >>>>>>>>>>>> "+eventCode);
         scheduleService.deleteByEventCode(eventCode);
         return ResponseEntity.ok("삭제");
     }

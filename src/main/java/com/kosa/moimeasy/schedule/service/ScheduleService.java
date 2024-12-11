@@ -5,6 +5,7 @@ import com.kosa.moimeasy.schedule.dto.ScheduleDTO;
 import com.kosa.moimeasy.schedule.entity.Schedule;
 import com.kosa.moimeasy.schedule.repository.ScheduleRepository;
 import com.kosa.moimeasy.user.entity.User;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -47,8 +48,8 @@ public class ScheduleService {
         return fromEntity(savedSchedule);
     }
 
-
-    public void deleteByEventCode(Long eventCode) {
-        //        scheduleRepository.deleteByEventCode();
+    @Transactional
+    public void deleteByEventCode(String eventCode) {
+                scheduleRepository.deleteByEventCode(eventCode);
     }
 }

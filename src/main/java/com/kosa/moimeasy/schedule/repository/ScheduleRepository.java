@@ -9,4 +9,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     //모임 id로 스케쥴 이벤트 가져오기
     List<Schedule> findByMoeim_MoeimId(Long moeimId);
+    //이벤트코드로 스케쥴 이벤트 삭제
+    void deleteByEventCode(String eventCode);
 }
