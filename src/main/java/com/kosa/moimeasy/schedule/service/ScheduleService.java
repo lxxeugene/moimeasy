@@ -24,9 +24,9 @@ public class ScheduleService {
 //        User creator = userRepository.findById(dto.getUserId())
 //                .orElse(null);
         Moeim moeim = new Moeim();   //임시 null 데이터로 삽입
-        moeim.setMoeimId(1L);
+        moeim.setMoeimId(4L);
         User creator = new User();  //임시 null 데이터로 삽입
-        creator.setUserId(1L);
+        creator.setUserId(4L);
         Schedule schedule = toEntity(scheduleDTO, moeim, creator);
         Schedule savedSchedule = scheduleRepository.save(schedule); // 저장된 엔티티를 반환
         return fromEntity(savedSchedule);

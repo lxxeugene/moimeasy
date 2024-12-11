@@ -47,15 +47,20 @@
           <h4>선택된 회원</h4>
           <ul>
             <li v-for="id in selectedMembers" :key="id">
-              {{ members.find((member) => member.id === id).nickname }}
+              {{
+                members.find((member) => member.id === id)?.nickname ||
+                '알 수 없는 사용자'
+              }}
             </li>
           </ul>
         </div>
 
-        <button @click="createRoom" class="btn-primary">생성</button>
-        <button @click="closeCreateRoomModal" class="btn-secondary">
-          취소
-        </button>
+        <div class="modal-buttons">
+          <button @click="createRoom" class="btn-primary">생성</button>
+          <button @click="closeCreateRoomModal" class="btn-secondary">
+            취소
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -63,9 +68,6 @@
 
 <script>
 import axios from 'axios';
-
-axios.defaults.baseURL = 'http://localhost:8088';
-axios.defaults.withCredentials = true;
 
 export default {
   data() {
@@ -80,7 +82,9 @@ export default {
   methods: {
     async fetchRooms() {
       try {
-        const response = await axios.get('/api/v1/chat/rooms');
+        const response = await axios.get('/api/v1/chat/rooms', {
+          params: { userId: 2 }, // 현재 사용자 ID
+        });
         this.rooms = response.data;
       } catch (error) {
         console.error('Error fetching chat rooms:', error);
@@ -108,9 +112,12 @@ export default {
       try {
         const payload = {
           roomName: this.newRoomName || '',
+          createdBy: 2, // 현재 사용자 ID
           memberIds: this.selectedMembers,
         };
-        const response = await axios.post('/api/v1/chat/room', payload);
+        const response = await axios.post('/api/v1/chat/room', payload, {
+          params: { userId: 2 }, // 현재 사용자 ID
+        });
         this.rooms.push(response.data);
         this.closeCreateRoomModal();
       } catch (error) {
@@ -130,7 +137,7 @@ export default {
 
 <style scoped>
 .chat-room-list {
-  max-width: 600px;
+  max-width: 700px;
   margin: 50px auto;
   padding: 20px;
   background-color: #fff;
@@ -203,6 +210,21 @@ hr {
   background-color: rgba(127, 86, 217, 0.8);
 }
 
+.btn-secondary {
+  background-color: #ddd;
+  color: #333;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: #bbb;
+}
+
 .modal {
   position: fixed;
   top: 0;
@@ -231,28 +253,9 @@ hr {
   border-radius: 5px;
 }
 
-.selected-members ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.selected-members li {
-  font-size: 14px;
-  margin: 5px 0;
-}
-
-.btn-secondary {
-  background-color: #ddd;
-  color: #333;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-}
-
-.btn-secondary:hover {
-  background-color: #bbb;
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
 }
 </style>

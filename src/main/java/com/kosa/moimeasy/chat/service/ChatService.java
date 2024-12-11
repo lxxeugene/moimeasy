@@ -27,34 +27,41 @@ public class ChatService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ChatRoom createRoom(CreateRoomDTO request) {
-        ChatRoom chatRoom = new ChatRoom();
+    public ChatRoom createRoom(CreateRoomDTO request, Long userId) {
+        // 요청한 사용자가 포함된 `moeimId`로 멤버 필터링
+        List<User> members = userRepository.findAllById(request.getMemberIds())
+                .stream()
+                .filter(user -> user.getMoeimId().equals(request.getCreatedBy()))
+                .collect(Collectors.toList());
 
-        // 선택된 회원 가져오기
-        List<User> members = userRepository.findAllById(request.getMemberIds());
-        chatRoom.setUsers(members);
-
-        // 채팅방 이름 설정 로직
-        if (request.getRoomName() != null && !request.getRoomName().isEmpty()) {
-            chatRoom.setName(request.getRoomName()); // 사용자 지정 이름
-        } else {
-            chatRoom.setName(generateDefaultRoomName(members)); // 자동 생성 이름
+        if (members.isEmpty()) {
+            throw new IllegalArgumentException("해당 멤버는 모임에 속해 있지 않습니다.");
         }
 
-        chatRoom.setCreatedBy(request.getCreatedBy());
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setUsers(members);
+
+        // 채팅방 이름 설정
+        if (request.getRoomName() != null && !request.getRoomName().isEmpty()) {
+            chatRoom.setName(request.getRoomName());
+        } else {
+            chatRoom.setName(generateDefaultRoomName(members));
+        }
+
+        chatRoom.setCreatedBy(userId);
         return chatRoomRepository.save(chatRoom);
     }
 
     private String generateDefaultRoomName(List<User> members) {
-        if (members.size() <= 2) {
-            return members.stream()
-                          .map(User::getNickname)
-                          .collect(Collectors.joining(", "));
-        }
         return members.stream()
-                      .limit(3)
-                      .map(User::getNickname)
-                      .collect(Collectors.joining(", ")) + " 외 " + (members.size() - 3) + "명";
+                .map(User::getNickname)
+                .limit(3)
+                .collect(Collectors.joining(", ")) +
+                (members.size() > 3 ? " 외 " + (members.size() - 3) + "명" : "");
+    }
+
+    public List<ChatRoom> getAllRooms(Long userId) {
+        return chatRoomRepository.findByUserId(userId);
     }
 
     @Transactional
@@ -76,9 +83,14 @@ public class ChatService {
         return chatMessageRepository.save(message);
     }
 
-    public List<ChatRoom> getAllRooms() {
-        return chatRoomRepository.findAll();
+//    public List<ChatRoom> getAllRooms() {
+//        return chatRoomRepository.findAll();
+//    }
+
+    public List<ChatMessage> getMessagesSince(Long roomId, Long lastMessageId) {
+        return chatMessageRepository.findByChatRoomIdAndIdGreaterThan(roomId, lastMessageId);
     }
+
 }
 
 
