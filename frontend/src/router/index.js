@@ -16,7 +16,12 @@ import Category from '@/views/pay/Category.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
 import ChatView from '@/views/chat/ChatView.vue';
 
+// 다른 뷰를 추가로 임포트
+
+import { useAuthStore } from '../stores/auth'
+
 const routes = [
+   // **루트 경로를 /home으로 리디렉션하는 라우트 추가**
   { path: '/', name: 'Home', component: Home },
   { path: '/login', name: 'Login', component: Login },
   { path: '/signup', name: 'Signup', component: Signup },
@@ -61,4 +66,12 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
+  if (to.path !== '/login' && !isAuthenticated) {
+    next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+  } else {
+    next(); // 인증된 사용자는 요청한 경로로 이동
+  }
+});
 export default router;
