@@ -256,7 +256,7 @@ const items = ref([
   align-items: flex-start;
   justify-content: flex-start;
   position: relative;
-  left: 8px;
+  left: 22px;
   top: 122px;
 }
 

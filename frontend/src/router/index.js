@@ -57,6 +57,27 @@ const routes = [
         path: 'board',
         component: () => import('@/views/board/BoardView.vue'),
       },
+      {
+        path: 'chte',
+        component: () => import('@/views/schedule/components/ChTe.vue'),
+      },
+    ],
+  },
+  {
+    path: '/storage', // 파이어베이스 테스트 경로
+    children: [
+      {
+        path: 'upload',
+        component: () => import('@/firebase/StorageUploader.vue'),
+      },
+      {
+        path: 'dragUpload',
+        component: () => import('@/firebase/StorageDragDropUploader.vue'),
+      },
+      {
+        path: 'load',
+        component: () => import('@/firebase/StorageImageDownloader.vue'),
+      },
     ],
   },
 ];
