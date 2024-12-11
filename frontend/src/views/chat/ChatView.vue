@@ -3,7 +3,7 @@
     <h2>{{ roomName }}</h2>
     <div class="messages">
       <div v-for="message in messages" :key="message.id" class="message-item">
-        <strong>{{ message.sender }}:</strong> {{ message.content }}
+        <strong>{{ message.senderNickname }}:</strong> {{ message.content }}
       </div>
     </div>
     <div class="input-container">
@@ -41,12 +41,12 @@ export default {
     },
     async sendMessage() {
       try {
-        const payload = { content: this.newMessage };
+        const payload = { content: this.newMessage, messageType: 'TEXT' };
         await axios.post(
           `/api/v1/chat/rooms/${this.$route.params.roomId}/messages`,
           payload
         );
-        this.messages.push({ sender: 'You', content: this.newMessage });
+        this.messages.push({ senderNickname: 'You', content: this.newMessage });
         this.newMessage = '';
       } catch (error) {
         console.error('Error sending message:', error);

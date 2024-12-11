@@ -1,6 +1,11 @@
 <template>
   <div class="chat-room-list">
-    <h2>채팅방 목록</h2>
+    <div class="header">
+      <h2>채팅방 목록</h2>
+      <button @click="openCreateRoomModal" class="btn-primary">
+        채팅방 생성
+      </button>
+    </div>
     <ul>
       <li
         v-for="room in rooms"
@@ -8,23 +13,68 @@
         @click="enterRoom(room.id)"
         class="room-item"
       >
-        {{ room.name }}
+        <span class="room-name">{{ room.name }}</span>
+        <hr />
+        <small class="room-users">
+          참여자: {{ room.users.map((user) => user.nickname).join(', ') }}
+        </small>
       </li>
     </ul>
-    <button @click="createRoom" class="btn-primary">채팅방 생성</button>
+    <!-- 채팅방 생성 모달 -->
+    <div v-if="isCreateRoomModalOpen" class="modal">
+      <div class="modal-content">
+        <h3>채팅방 생성</h3>
+        <label for="roomName">채팅방 이름:</label>
+        <input v-model="newRoomName" id="roomName" placeholder="채팅방 이름" />
+
+        <h4>참여자 선택</h4>
+        <div class="members-list">
+          <ul>
+            <li v-for="user in members" :key="user.id">
+              <label>
+                <input
+                  type="checkbox"
+                  :value="user.id"
+                  v-model="selectedMembers"
+                />
+                {{ user.nickname }}
+              </label>
+            </li>
+          </ul>
+        </div>
+
+        <div class="selected-members">
+          <h4>선택된 회원</h4>
+          <ul>
+            <li v-for="id in selectedMembers" :key="id">
+              {{ members.find((member) => member.id === id).nickname }}
+            </li>
+          </ul>
+        </div>
+
+        <button @click="createRoom" class="btn-primary">생성</button>
+        <button @click="closeCreateRoomModal" class="btn-secondary">
+          취소
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 
-axios.defaults.baseURL = "http://localhost:8088";
+axios.defaults.baseURL = 'http://localhost:8088';
 axios.defaults.withCredentials = true;
 
 export default {
   data() {
     return {
       rooms: [],
+      members: [],
+      isCreateRoomModalOpen: false,
+      newRoomName: '',
+      selectedMembers: [],
     };
   },
   methods: {
@@ -36,14 +86,33 @@ export default {
         console.error('Error fetching chat rooms:', error);
       }
     },
+    async fetchMembers() {
+      try {
+        const response = await axios.get('/api/v1/users', {
+          params: { moeimId: 3 },
+        });
+        this.members = response.data;
+      } catch (error) {
+        console.error('Error fetching members:', error);
+      }
+    },
+    openCreateRoomModal() {
+      this.isCreateRoomModalOpen = true;
+    },
+    closeCreateRoomModal() {
+      this.isCreateRoomModalOpen = false;
+      this.newRoomName = '';
+      this.selectedMembers = [];
+    },
     async createRoom() {
       try {
-        const roomName = prompt('채팅방 이름을 입력하세요:');
-        if (!roomName) return;
-        const response = await axios.post('/api/v1/chat/rooms', {
-          name: roomName,
-        });
+        const payload = {
+          roomName: this.newRoomName || '',
+          memberIds: this.selectedMembers,
+        };
+        const response = await axios.post('/api/v1/chat/room', payload);
         this.rooms.push(response.data);
+        this.closeCreateRoomModal();
       } catch (error) {
         console.error('Error creating chat room:', error);
       }
@@ -54,6 +123,7 @@ export default {
   },
   mounted() {
     this.fetchRooms();
+    this.fetchMembers();
   },
 };
 </script>
@@ -69,36 +139,111 @@ export default {
   color: #414651;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
 h2 {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 20px;
 }
 
 ul {
   list-style-type: none;
   padding: 0;
-  margin: 0 0 20px 0;
+  margin: 0;
 }
 
 .room-item {
   padding: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   border-radius: 5px;
   cursor: pointer;
-  background-color: #7f56d9;
-  color: white;
-  text-align: center;
+  background-color: #f9f9f9;
+  text-align: left;
+  border: 1px solid #ddd;
 }
 
 .room-item:hover {
-  background-color: rgba(127, 86, 217, 0.8);
+  background-color: #f1f1f1;
+}
+
+.room-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #414651;
+}
+
+.room-users {
+  font-size: 14px;
+  color: #777;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 8px 0;
 }
 
 .btn-primary {
-  width: 100%;
   background-color: #7f56d9;
   color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: rgba(127, 86, 217, 0.8);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+}
+
+.members-list {
+  max-height: 150px;
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.selected-members ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.selected-members li {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.btn-secondary {
+  background-color: #ddd;
+  color: #333;
   padding: 10px;
   border-radius: 5px;
   font-size: 16px;
@@ -107,7 +252,7 @@ ul {
   border: none;
 }
 
-.btn-primary:hover {
-  background-color: rgba(127, 86, 217, 0.8);
+.btn-secondary:hover {
+  background-color: #bbb;
 }
 </style>
