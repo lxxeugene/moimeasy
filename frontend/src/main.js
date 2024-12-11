@@ -3,7 +3,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:8088';
+//axios.defaults.baseURL = 'http://localhost:8088';
 import Header from './components/layouts/Header.vue';
 import SideBar from './components/layouts/SideBar.vue';
 import PrimeVue from 'primevue/config'; // PrimeVue 추가
@@ -17,7 +17,10 @@ import InputText from 'primevue/inputtext';
 import PanelMenu from 'primevue/panelmenu';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
-axios.defaults.baseURL = 'http://localhost:8088';
+//axios.defaults.baseURL = 'http://localhost:8088';
+
+// 중앙집중식 Axios 인스턴스 임포트
+import api from './axios'
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -44,7 +47,7 @@ app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
 app.use(pinia);
-// app.use(PrimeVue);
-// app.directive('ripple', Ripple);
+// 전역 속성으로 Axios 설정 (선택 사항)
+app.config.globalProperties.$axios = api
 
 app.use(router).mount('#app');
