@@ -152,20 +152,15 @@
   }
 }
 
-/* 마우스 호버 이벤트 */
-.fc-event:hover {
-  /* background-color: #256428;  */
-  /* 더 진한 녹색 */
-  /* cursor: pointer; */
-}
-
 /* 중요 이벤트 */
 .important-event {
   background-color: #f44336; /* 빨간색 배경 */
-  border-color: #d32f2f;
-  color: white;
+  border-color: #d32f2f !important;
+  i {
+    color: white !important;
+  }
 }
-
+/* 공휴일 이벤트 */
 .holiday-event {
   background-color: #fff4e7;
 
@@ -185,6 +180,7 @@
   }
 } */
 
+/* 다이얼로그 커스텀 */
 .fc-direction-ltr {
   margin: 0 !important;
 }
@@ -204,4 +200,10 @@
 }
 .add-dialog-input {
   flex: 1 1 auto;
+}
+
+.add-dialog-inputbox {
+  display: flex;
+  flex-direction: column;
+  height: auto!;
 }
