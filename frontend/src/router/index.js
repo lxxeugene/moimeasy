@@ -18,10 +18,10 @@ import ChatView from '@/views/chat/ChatView.vue';
 
 // 다른 뷰를 추가로 임포트
 
-import { useAuthStore } from '../stores/auth'
+import { useAuthStore } from '../stores/auth';
 
 const routes = [
-   // **루트 경로를 /home으로 리디렉션하는 라우트 추가**
+  // **루트 경로를 /home으로 리디렉션하는 라우트 추가**
   { path: '/', name: 'Home', component: Home },
   { path: '/login', name: 'Login', component: Login },
   { path: '/signup', name: 'Signup', component: Signup },
@@ -48,17 +48,21 @@ const routes = [
   { path: '/chat/:roomId', name: 'ChatView', component: ChatView },
   {
     path: '/schedule',
+    name: '일정',
     children: [
       {
         path: 'calendar',
+        name: '일정 캘린더',
         component: () => import('@/views/schedule/ScheduleView.vue'),
       },
       {
         path: 'board',
+        name: '게시판',
         component: () => import('@/views/board/BoardView.vue'),
       },
       {
         path: 'chte',
+        name: '채팅',
         component: () => import('@/views/schedule/components/ChTe.vue'),
       },
     ],
