@@ -1,12 +1,15 @@
 package com.kosa.moimeasy.moeim.entity;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import com.kosa.moimeasy.transfer.entity.TransferHistory;
 import com.kosa.moimeasy.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,8 +30,11 @@ public class Moeim {
     @Column(nullable = false, length = 50, unique = true)
     private String moeimCode;
 
-    @Column(length = 50)
-    private String accountNum;
+    @Column(name = "moeim_account_number", nullable = false) // 길이 지정해야됌
+    private String accountNumber;
+
+    @Column(name = "moeim_account_balance", nullable = false)
+    private BigDecimal balance = BigDecimal.ZERO; // 오차 방지를 위해 Double 대신 BigDecimal 사용
 
     @Column(name = "CREATE_AT", nullable = false, updatable = false)
     private LocalDateTime createAt;
@@ -51,11 +57,22 @@ public class Moeim {
         return String.format("%06d", (int) (Math.random() * 1000000)); // 6자리 랜덤 숫자
     }
 
-    // 다대다 관계 설정
-//    @ManyToMany(mappedBy = "moeims")
-//    private Set<User> members = new HashSet<>();
+    // 거래내역 테이블
+    // Moeim 엔티티를 저장하면 Transaction 엔티티들도 자동으로 저장된다. (삭제도 마찬가지)
+    @OneToMany(mappedBy = "moeim", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<TransferHistory> transactionList = new ArrayList<>();
 
-//    @Column(name = "ACCOUNT_NUM", nullable = false)
-//    private String accountNum;
+    // 모임 계좌에 입금
+    public void deposit(BigDecimal balance){
+        this.balance = this.balance.add(balance);
+    }
+
+    // 모임 계좌에서 출금
+    public void withdraw(BigDecimal balance){
+        if(this.balance.compareTo(balance)<0){
+            throw new IllegalArgumentException("잔액 부족");
+        }
+        this.balance = this.balance.subtract(balance);
+    }
 
 }

@@ -1,10 +1,11 @@
 package com.kosa.moimeasy.user.entity;
 
-import com.kosa.moimeasy.membership.entity.UserAccount;
+import com.kosa.moimeasy.transfer.entity.TransferHistory;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,15 @@ public class User {
     @Column
     private Long moeimId;
 
+    @Column(name = "user_account_number", nullable = false) // 길이 지정해야됌
+    private String accountNumber;
+
+    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
+    private String accountPassword;
+
+    @Column(name = "user_account_balance", nullable = false)
+    private BigDecimal balance = BigDecimal.ZERO; // 오차 방지를 위해 Double 대신 BigDecimal 사용
+
     @PrePersist
     public void prePersist() {
         this.createAt = LocalDateTime.now();
@@ -59,7 +69,6 @@ public class User {
         }else {
             this.createAt = createAt;
         }
-
     }
 
     @PreUpdate
@@ -67,28 +76,24 @@ public class User {
         this.updateAt = LocalDateTime.now();
     }
 
-    @OneToMany(mappedBy = "user")
-    private List<UserAccount> userAccounts = new ArrayList<>();
+    // 회비 테이블
+    // User 엔티티를 저장하면 Fee 엔티티들도 자동으로 저장된다. (삭제도 마찬가지)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<TransferHistory> transferHistory = new ArrayList<>();
+
+    // 유저 계좌에 입금
+    public void deposit(BigDecimal balance){
+        this.balance = this.balance.add(balance);
+    }
+
+    // 유저 계좌에서 출금
+    public void withdraw(BigDecimal balance){
+        if(this.balance.compareTo(balance) <0 ){
+            throw new IllegalArgumentException("잔액 부족");
+        }
+        this.balance = this.balance.subtract(balance);
+    }
 }
-
-
-//    public enum Role {
-//        user,admin
-//    }
-
-
-
-//    @Column(name = "PROFILE_URL")
-//    private String profileUrl;
-//
-//    // 다대다 관계 설정
-//    @ManyToMany
-//    @JoinTable(
-//            name = "USER_MOEIM",
-//            joinColumns = @JoinColumn(name = "USER_ID"),
-//            inverseJoinColumns = @JoinColumn(name = "MOEIM_ID")
-//    )
-//    private Set<Moeim> moeims = new HashSet<>();
 
 
 

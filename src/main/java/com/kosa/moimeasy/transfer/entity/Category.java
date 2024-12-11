@@ -1,4 +1,4 @@
-package com.kosa.moimeasy.membership.entity;
+package com.kosa.moimeasy.transfer.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
