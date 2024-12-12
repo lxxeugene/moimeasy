@@ -16,12 +16,13 @@ import { createPinia } from 'pinia';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import PanelMenu from 'primevue/panelmenu';
+import LoadingOverlay from './components/common/LoadingOverlay.vue';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 //axios.defaults.baseURL = 'http://localhost:8088';
 
 // 중앙집중식 Axios 인스턴스 임포트
-import api from './axios'
+import api from './axios';
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -33,6 +34,7 @@ app.component('Button', Button);
 app.component('SideSpeedDial', SideSpeedDial);
 app.component('InputText', InputText);
 app.component('PanelMenu', PanelMenu);
+app.component('LoadingOverlay', LoadingOverlay);
 // PrimeVue 플러그인 등록
 app.use(
   PrimeVue,
@@ -53,6 +55,6 @@ app.use(ToastService);
 app.use(DialogService);
 app.use(pinia);
 // 전역 속성으로 Axios 설정 (선택 사항)
-app.config.globalProperties.$axios = api
+app.config.globalProperties.$axios = api;
 
 app.use(router).mount('#app');

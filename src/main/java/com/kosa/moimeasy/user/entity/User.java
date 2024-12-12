@@ -10,11 +10,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Getter
 @Setter
 @Table(name = "users")
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,12 +39,6 @@ public class User {
     @Column(length = 20)
     private String phone;
 
-    @Column(name = "create_at", nullable = false, updatable = false)
-    private LocalDateTime createAt;
-
-    @Column(name = "update_at")
-    private LocalDateTime updateAt;
-
     @ManyToOne(fetch = FetchType.LAZY) // Role과의 관계 설정
     @JoinColumn(name = "role_id", nullable = false) // 외래 키 매핑
     private Role role;
@@ -52,6 +49,8 @@ public class User {
     @Column
     private Long moeimId;
 
+    @Column(length = 255, nullable = true)
+    private String profileImage;
     @Column(name = "user_account_number", nullable = false) // 길이 지정해야됌
     private String accountNumber;
 

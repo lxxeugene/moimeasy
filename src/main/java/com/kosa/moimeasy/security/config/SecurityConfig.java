@@ -32,8 +32,13 @@ public class SecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(request -> {
                             CorsConfiguration config = new CorsConfiguration();
+
+                            config.addAllowedOrigin("http://localhost:3000");
+                            //config.setAllowedOrigins(List.of("http://localhost:5137")); //Vue.js
+
                             config.addAllowedOrigin("*");
                             config.setAllowedOrigins(List.of("http://localhost:3000")); //Vue.js
+
                             config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                             config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Refresh-Token"));
                             config.setAllowCredentials(true); //쿠키 전송 허용

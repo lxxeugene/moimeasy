@@ -2,6 +2,8 @@ package com.kosa.moimeasy.chat.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import com.kosa.moimeasy.user.entity.User;
 
@@ -16,7 +18,7 @@ public class ChatRoom extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String name; // 채팅방 이름
 
     @ManyToMany
     @JoinTable(
@@ -24,7 +26,11 @@ public class ChatRoom extends BaseTimeEntity {
         joinColumns = @JoinColumn(name = "chat_room_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> users;
+    private List<User> users = new ArrayList<>(); // 채팅방 사용자 목록
+
+    @Column(nullable = false)
+    private Long createdBy; // 채팅방 생성자
 }
+
 
 
