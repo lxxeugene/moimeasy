@@ -45,7 +45,12 @@ const routes = [
   { path: '/trade-list', name: 'TradeList', component: TradeList },
   { path: '/category', name: 'Category', component: Category },
   { path: '/chat-room-list', name: '채팅목록', component: ChatRoomList },
-  { path: '/chat/:roomId', name: '채팅방', component: ChatView },
+  {
+    path: '/chat/:roomId',
+    name: 'ChatView',
+    component: () => import('@/views/chat/ChatView.vue'),
+    props: true, // roomId를 컴포넌트에 props로 전달
+  },
   {
     path: '/schedule',
     name: '일정',
@@ -92,6 +97,11 @@ const routes = [
   {
     path: '/:catchAll(.*)',
     component: () => import('@/views/Error/Error404.vue'),
+  },
+  {
+    path: '/chat-layout',
+    name: '채팅',
+    component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
 ];
 

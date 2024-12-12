@@ -53,36 +53,50 @@ import Avatar from 'primevue/avatar';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import EmojiPicker from 'vue3-emoji-picker';
+import { useAuthStore } from '@/stores/auth'; // AuthStore 가져오기
 import axios from 'axios';
 import 'vue3-emoji-picker/css';
 
 export default {
-  setup() {
+  props: {
+    roomId: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props) {
     const messages = ref([]);
     const newMessage = ref('');
     const showEmojiPicker = ref(false);
     const chatContainer = ref(null);
     const pollingInterval = ref(null);
-    const loggedInUserId = 1; // 로그인된 사용자 ID
-    const roomId = 1; // 현재 채팅방 ID
     const lastMessageId = ref(0);
 
-    const fetchMessages = async () => {
-  try {
-    const response = await axios.get(
-      `/api/v1/chat/rooms/${roomId}/poll-messages`,
-      { params: { lastMessageId: lastMessageId.value } }
-    );
-    if (response.data.length > 0) {
-      messages.value.push(...response.data);
-      lastMessageId.value = response.data[response.data.length - 1].id;
-      scrollToBottom();
-    }
-  } catch (error) {
-    console.error('Error fetching messages:', error);
-  }
-};
+    // AuthStore에서 인증된 사용자 ID 가져오기
+    const authStore = useAuthStore();
+    const loggedInUserId = authStore.user?.userId;
 
+    const fetchMessages = async () => {
+      try {
+        const token = localStorage.getItem('accessToken'); // 저장된 토큰 가져오기
+        const response = await axios.get(
+          `/api/v1/chat/rooms/${props.roomId}/poll-messages`,
+          {
+            params: { lastMessageId: lastMessageId.value },
+            headers: {
+              Authorization: `Bearer ${token}`, // 인증 헤더 추가
+            },
+          }
+        );
+        if (response.data.length > 0) {
+          messages.value.push(...response.data);
+          lastMessageId.value = response.data[response.data.length - 1].id;
+          scrollToBottom();
+        }
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      }
+    };
 
     const sendMessage = async () => {
       if (!newMessage.value.trim()) {
@@ -91,14 +105,19 @@ export default {
       }
 
       const payload = {
-        chatRoomId: roomId,
+        chatRoomId: props.roomId,
         senderId: loggedInUserId,
         content: newMessage.value,
         messageType: 'TEXT',
       };
 
       try {
-        await axios.post('/api/v1/chat/message', payload);
+        const token = localStorage.getItem('accessToken'); // 토큰 가져오기
+        await axios.post('/api/v1/chat/message', payload, {
+          headers: {
+            Authorization: `Bearer ${token}`, // 인증 헤더 추가
+          },
+        });
         newMessage.value = '';
         fetchMessages();
       } catch (error) {
@@ -132,6 +151,7 @@ export default {
     };
 
     onMounted(() => {
+      console.log('ChatView loaded with roomId:', props.roomId);
       fetchMessages();
       startPolling();
       scrollToBottom();
@@ -151,6 +171,9 @@ export default {
       onSelectEmoji,
       loggedInUserId,
     };
+  },
+  mounted() {
+    console.log('ChatView loaded with roomId:', this.roomId);
   },
 };
 </script>

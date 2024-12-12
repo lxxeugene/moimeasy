@@ -105,8 +105,9 @@ public class ChatService {
 
 
     public List<ChatRoom> getAllRooms(Long userId) {
-        return chatRoomRepository.findByUserId(userId);
+        return chatRoomRepository.findByUserId(userId); // 적절한 Repository 메서드 호출
     }
+
 
     public List<ChatMessage> getMessagesSince(Long roomId, Long lastMessageId) {
         return chatMessageRepository.findByChatRoomIdAndIdGreaterThanOrderByCreatedAtAsc(roomId, lastMessageId);

@@ -15,9 +15,14 @@
       >
         <span class="room-name">{{ room.name }}</span>
         <hr />
-        <small class="room-users">
-          참여자: {{ room.users.map((user) => user.nickname).join(', ') }}
-        </small>
+        <p>
+          참여자:
+          {{
+            room.members
+              ? room.members.map((member) => member.userNickname).join(', ')
+              : '참여자 없음'
+          }}
+        </p>
       </li>
     </ul>
     <!-- 채팅방 생성 모달 -->
@@ -89,11 +94,22 @@ export default {
     async fetchRooms() {
       try {
         const token = this.authStore.accessToken;
-        const response = await api.get('/api/v1/chat/rooms', {
+        const userId = this.authStore.user?.userId;
+
+        if (!userId) {
+          console.error('User ID is not available in authStore.');
+          return;
+        }
+
+        console.log('Fetching rooms for userId:', userId);
+
+        const response = await axios.get(`/api/v1/chat/rooms`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+          params: { userId }, // userId를 쿼리 파라미터로 전달
         });
+
         this.rooms = response.data;
       } catch (error) {
         if (error.response?.status === 401) {
@@ -111,11 +127,16 @@ export default {
     async fetchMembers() {
       try {
         const token = this.authStore.accessToken;
-        const moeimId = this.authStore.user.moeimId;
+        const moeimId = this.authStore.user?.moeimId;
+
+        if (!moeimId) {
+          console.error('moeimId is not available in authStore.');
+          return;
+        }
 
         console.log('Fetching members with moeimId:', moeimId);
 
-        const response = await api.get('/api/v1/users', {
+        const response = await axios.get('/api/v1/users', {
           params: { moeimId },
           headers: {
             Authorization: `Bearer ${token}`,
@@ -143,7 +164,7 @@ export default {
           createdBy: this.authStore.user.id, // 현재 사용자 ID
           memberIds: this.selectedMembers,
         };
-        const response = await api.post('/api/v1/chat/room', payload, {
+        const response = await axios.post('/api/v1/chat/room', payload, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -155,12 +176,31 @@ export default {
       }
     },
     enterRoom(roomId) {
-      this.$router.push({ name: 'ChatView', params: { roomId } });
+      if (!roomId) {
+        console.error('Room ID is not defined.');
+        return;
+      }
+      console.log('Navigating to ChatView with roomId:', roomId);
+      this.$router.push({
+        name: 'ChatView',
+        params: { roomId: String(roomId) },
+      });
     },
   },
   mounted() {
-    this.fetchRooms();
-    this.fetchMembers();
+    console.log('AuthStore user:', this.authStore.user);
+
+    if (this.authStore.user?.moiemId) {
+      this.fetchMembers();
+    } else {
+      console.error('moiemId is not available in authStore.');
+    }
+
+    if (this.authStore.user?.userId) {
+      this.fetchRooms();
+    } else {
+      console.error('userId is not available in authStore.');
+    }
   },
 };
 </script>

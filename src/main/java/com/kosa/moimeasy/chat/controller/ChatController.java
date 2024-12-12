@@ -36,9 +36,18 @@ public class ChatController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Long userId = Long.valueOf(userDetails.getUsername()); // UserDetails에서 사용자 ID 추출
-        return ResponseEntity.ok(chatService.getAllRooms(userId));
+        Long userId = Long.valueOf(userDetails.getUsername()); // 사용자 ID 추출
+        List<ChatRoom> chatRooms = chatService.getAllRooms(userId);
+
+        // 필요한 데이터만 포함하도록 members 필터링
+        chatRooms.forEach(chatRoom -> chatRoom.getMembers().forEach(member -> {
+            member.setChatRoom(null); // 순환 참조 방지
+        }));
+
+        return ResponseEntity.ok(chatRooms);
     }
+
+
 
     // 채팅방 생성
     @PostMapping("/room")
