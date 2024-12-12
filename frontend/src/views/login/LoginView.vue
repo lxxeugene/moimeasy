@@ -44,46 +44,55 @@ export default {
     return {
       form: {
         email: '',
-        password: ''
+        password: '',
       },
-      errorMessage: ''
-    }
+      errorMessage: '',
+    };
   },
   setup() {
-    const authStore = useAuthStore()
-    return { authStore }
+    const authStore = useAuthStore();
+    return { authStore };
   },
   methods: {
     async handleLogin() {
       if (this.form.email.trim() === '' || this.form.password.trim() === '') {
-        alert('모든 필드를 채워주세요.')
-        return
+        alert('모든 필드를 채워주세요.');
+        return;
       }
       try {
-        await this.authStore.login(this.form.email, this.form.password)
-        console.log("로그인 성공"); // 로그인 성공 시 필요한 로직 추가 가능
+        await this.authStore.login(this.form.email, this.form.password);
+        console.log('로그인 성공'); // 로그인 성공 시 필요한 로직 추가 가능
+
+        // 로그인 후 moiemId 확인
+        if (this.authStore.user.moiemId === null) {
+          // moiemId가 null이면 MoeimSelectView로 이동
+          this.$router.push('/moeim-select');
+        } else {
+          // moiemId가 있으면 메인 페이지로 이동
+          this.$router.push('/main');
+        }
       } catch (error) {
-        this.errorMessage = error.message
+        this.errorMessage = error.message;
       }
     },
     resetForm() {
       this.form = {
         email: '',
         password: '',
-        rememberMe: false
-      }
-      this.errorMessage = ''
+        rememberMe: false,
+      };
+      this.errorMessage = '';
       // 리디렉션: 홈으로 이동 (필요 시)
-      this.$router.push('/main')
+      this.$router.push('/main');
     },
     forgotPassword() {
-      alert("비밀번호 찾기 기능은 아직 준비 중입니다.")
+      alert('비밀번호 찾기 기능은 아직 준비 중입니다.');
+    },
+    goToSignup() {
+      this.$router.push('/signup');
+    },
   },
-  goToSignup() {
-    this.$router.push('/signup')
-    }
-  }
-}
+};
 </script>
 
 <style scoped>
