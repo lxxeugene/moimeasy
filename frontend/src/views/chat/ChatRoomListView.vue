@@ -23,8 +23,8 @@
     <!-- 채팅방 생성 모달 -->
     <div v-if="isCreateRoomModalOpen" class="modal">
       <div class="modal-content">
-        <h3>채팅방 생성</h3>
-        <label for="roomName">채팅방 이름:</label>
+        <h2>채팅방 생성</h2>
+        <h3>채팅방 이름</h3>
         <input v-model="newRoomName" id="roomName" placeholder="채팅방 이름" />
 
         <h4>참여자 선택</h4>
@@ -67,9 +67,11 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 
 export default {
+  name: 'ChatRoomListView',
   data() {
     return {
       rooms: [],
@@ -79,21 +81,42 @@ export default {
       selectedMembers: [],
     };
   },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   methods: {
     async fetchRooms() {
+  try {
+    const token = this.authStore.accessToken;
+    const response = await axios.get('/api/v1/chat/rooms', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    this.rooms = response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 401) { // Example: Check for 401 Unauthorized
       try {
-        const response = await axios.get('/api/v1/chat/rooms', {
-          params: { userId: 2 }, // 현재 사용자 ID
-        });
-        this.rooms = response.data;
-      } catch (error) {
-        console.error('Error fetching chat rooms:', error);
+        await this.authStore.refreshAccessToken();
+      } catch (refreshError) {
+        // Handle refresh token failure (e.g., log out)
+        this.authStore.logout();
+        return;
       }
-    },
+      // Retry the API request with the refreshed token
+      return this.fetchRooms(); 
+    }
+    console.error('Error fetching chat rooms:', error);
+  }
+},
     async fetchMembers() {
       try {
+        const token = this.authStore.token;
         const response = await axios.get('/api/v1/users', {
-          params: { moeimId: 3 },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         this.members = response.data;
       } catch (error) {
@@ -110,13 +133,16 @@ export default {
     },
     async createRoom() {
       try {
+        const token = this.authStore.token;
         const payload = {
           roomName: this.newRoomName || '',
-          createdBy: 2, // 현재 사용자 ID
+          createdBy: this.authStore.user.id, // 현재 사용자 ID
           memberIds: this.selectedMembers,
         };
         const response = await axios.post('/api/v1/chat/room', payload, {
-          params: { userId: 2 }, // 현재 사용자 ID
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         this.rooms.push(response.data);
         this.closeCreateRoomModal();
@@ -156,6 +182,10 @@ export default {
 h2 {
   font-size: 24px;
   font-weight: bold;
+}
+h3,
+h4 {
+  font-size: 18px;
 }
 
 ul {
@@ -243,6 +273,7 @@ hr {
   border-radius: 10px;
   max-width: 500px;
   width: 100%;
+  
 }
 
 .members-list {

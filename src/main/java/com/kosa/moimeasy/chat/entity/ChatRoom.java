@@ -20,13 +20,8 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(nullable = false)
     private String name; // 채팅방 이름
 
-    @ManyToMany
-    @JoinTable(
-        name = "chat_room_members",
-        joinColumns = @JoinColumn(name = "chat_room_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private List<User> users = new ArrayList<>(); // 채팅방 사용자 목록
+    @OneToMany(mappedBy = "chatRoom")
+    private List<ChatRoomUser> members = new ArrayList<>();
 
     @Column(nullable = false)
     private Long createdBy; // 채팅방 생성자

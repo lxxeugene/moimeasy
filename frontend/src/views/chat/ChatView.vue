@@ -68,20 +68,21 @@ export default {
     const lastMessageId = ref(0);
 
     const fetchMessages = async () => {
-      try {
-        const response = await axios.get(
-          `/api/v1/chat/rooms/${roomId}/poll-messages`,
-          { params: { lastMessageId: lastMessageId.value } }
-        );
-        if (response.data.length > 0) {
-          messages.value.push(...response.data);
-          lastMessageId.value = response.data[response.data.length - 1].id;
-          scrollToBottom();
-        }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    };
+  try {
+    const response = await axios.get(
+      `/api/v1/chat/rooms/${roomId}/poll-messages`,
+      { params: { lastMessageId: lastMessageId.value } }
+    );
+    if (response.data.length > 0) {
+      messages.value.push(...response.data);
+      lastMessageId.value = response.data[response.data.length - 1].id;
+      scrollToBottom();
+    }
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+  }
+};
+
 
     const sendMessage = async () => {
       if (!newMessage.value.trim()) {
@@ -123,7 +124,7 @@ export default {
     };
 
     const startPolling = () => {
-      pollingInterval.value = setInterval(fetchMessages, 2000);
+      pollingInterval.value = setInterval(fetchMessages, 1000);
     };
 
     const stopPolling = () => {
