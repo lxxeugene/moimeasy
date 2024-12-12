@@ -1,22 +1,19 @@
 package com.kosa.moimeasy.user.entity;
 
-import com.kosa.moimeasy.common.entity.BaseEntity;
 import com.kosa.moimeasy.membership.entity.UserAccount;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 @Getter
 @Setter
 @Table(name = "users")
-public class User extends BaseEntity {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +35,12 @@ public class User extends BaseEntity {
     @Column(length = 20)
     private String phone;
 
+    @Column(name = "create_at", nullable = false, updatable = false)
+    private LocalDateTime createAt;
+
+    @Column(name = "update_at")
+    private LocalDateTime updateAt;
+
     @ManyToOne(fetch = FetchType.LAZY) // Role과의 관계 설정
     @JoinColumn(name = "role_id", nullable = false) // 외래 키 매핑
     private Role role;
@@ -45,11 +48,24 @@ public class User extends BaseEntity {
     @Column(length = 25)
     private String nickname;
 
-    @Column
+    @Column(nullable = true)
     private Long moeimId;
 
-    @Column(length = 255, nullable = true)
-    private String profileImage;
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDateTime.now();
+        if(this.createAt == null){
+            this.createAt = LocalDateTime.now();
+        }else {
+            this.createAt = createAt;
+        }
+
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "user")
     private List<UserAccount> userAccounts = new ArrayList<>();

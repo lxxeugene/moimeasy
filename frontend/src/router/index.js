@@ -28,24 +28,29 @@ const routes = [
   { path: '/moeim-select', name: 'MoeimSelect', component: MoeimSelect },
   { path: '/create-moeim', name: 'CreateMoeim', component: CreateMoeim },
   { path: '/enter-moeim', name: 'EnterMoeim', component: EnterMoeim },
-  { path: '/user-manage', name: 'UserManage', component: UserManage },
+  { path: '/user-manage', name: '회원관리', component: UserManage },
   {
     path: '/user-profile/:userId',
-    name: 'UserProfile',
+    name: '회원프로필',
     component: UserProfile,
   },
-  { path: '/invite-user', name: 'InviteUser', component: InviteUser },
+  { path: '/invite-user', name: '회원초대', component: InviteUser },
   {
     path: '/invitation-list',
-    name: 'InvitationList',
+    name: '초대목록',
     component: InvitationList,
   }, // 초대 목록 추가
   { path: '/pay-list', name: 'PayList', component: PayList },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
   { path: '/trade-list', name: 'TradeList', component: TradeList },
   { path: '/category', name: 'Category', component: Category },
-  { path: '/chat-room-list', name: 'ChatRoomList', component: ChatRoomList },
-  { path: '/chat/:roomId', name: 'ChatView', component: ChatView },
+  { path: '/chat-room-list', name: '채팅목록', component: ChatRoomList },
+  {
+    path: '/chat/:roomId',
+    name: 'ChatView',
+    component: () => import('@/views/chat/ChatView.vue'),
+    props: true, // roomId를 컴포넌트에 props로 전달
+  },
   {
     path: '/schedule',
     name: '일정',
@@ -92,6 +97,11 @@ const routes = [
   {
     path: '/:catchAll(.*)',
     component: () => import('@/views/Error/Error404.vue'),
+  },
+  {
+    path: '/chat-layout',
+    name: '채팅',
+    component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
 ];
 
