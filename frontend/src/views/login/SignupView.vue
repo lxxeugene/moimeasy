@@ -1,30 +1,85 @@
 <template>
   <div class="signup-container">
     <h2 class="title">회원가입</h2>
+
+        <!-- 오류 메시지 표시 -->
+        <div v-if="errorMessage" class="error-message">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- 성공 메시지 표시 -->
+    <div v-if="successMessage" class="success-message">
+      <p>{{ successMessage }}</p>
+    </div>
+
     <form @submit.prevent="submitSignup">
       <div class="form-group">
-        <label>Username</label>
+        <!-- 이름 -->
+        <label for="username">Username</label>
         <input
-          type="text"
-          v-model="formData.username"
+          type="text" id="username"
+          v-model="form.username"
           placeholder="Your username"
-          required
-        />
+          required/>
+          <!-- <div v-if="errors.name" class="error-message">
+            <p>{{ errors.name }}</p>
+          </div> -->
       </div>
+
+      <!-- 이메일 -->
       <div class="form-group">
-        <label>Email</label>
+        <label for="email">Email</label>
         <input
           type="email"
-          v-model="formData.email"
+          id="email"
+          v-model="form.email"
+          @input="resetEmailCheck"
           placeholder="Your email"
-          required
-        />
+          required/>
+          <!-- <button type="button" class="check-button" @click="checkEmail" :disabled="isEmailChecked || isSubmitting">
+            중복 확인
+          </button>
+          <div :class="feedbackEmailClass">{{ feedbackEmail }}</div>
+          <div v-if="errors.email" class="error-message">
+            <p>{{ errors.email }}</p>
+          </div> -->
       </div>
+
+      <!-- 닉네임 -->
+      <div class="form-group">
+        <label for="nickname">Nickname</label>
+        <input
+          type="nickname"
+          v-model="form.nickname"
+          @input="resetNicknameCheck"
+          placeholder="Your nickname"
+          required/>
+          <!-- <button type="button" class="check-button" @click="checkNickname" :disabled="isNicknameChecked || isSubmitting">
+            중복 확인
+          </button>
+          <div :class="feedbackNicknameClass">{{ feedbackNickname }}</div>
+          <div v-if="errors.nickname" class="error-message">
+            <p>{{ errors.nickname }}</p>
+          </div> -->
+      </div>
+
+      <!-- 연락처 -->
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input
+          type="tel"
+          v-model="form.phone"
+          placeholder="Your phone"
+          required
+          pattern="^[0-9\-+() ]+$"
+          />
+        </div>
+
       <div class="form-group">
         <label>Password</label>
         <input
           type="password"
-          v-model="formData.password"
+          v-model="form.password"
           placeholder="Password"
           required
         />
@@ -33,7 +88,7 @@
         <label>Confirm Password</label>
         <input
           type="password"
-          v-model="formData.confirmPassword"
+          v-model="form.confirmPassword"
           placeholder="Confirm password"
           required
         />
@@ -42,7 +97,7 @@
         <input
           type="checkbox"
           id="terms"
-          v-model="formData.acceptTerms"
+          v-model="form.acceptTerms"
           required
         />
         <label for="terms">I accept the terms and privacy policy</label>
@@ -50,12 +105,12 @@
       <button type="submit" class="btn-primary">회원가입</button>
     </form>
     <div class="alternative">
-      <p>Or Register with</p>
-      <div class="social-buttons">
+      <!-- <p>Or Register with</p> -->
+      <!-- <div class="social-buttons">
         <button class="social-btn">Facebook</button>
         <button class="social-btn">Google</button>
         <button class="social-btn">Apple</button>
-      </div>
+      </div> -->
     </div>
     <p class="footer-text">
       Already have an account? <a href="#" @click.prevent="goToLogin">Log in</a>
@@ -64,13 +119,17 @@
 </template>
 
 <script>
+import { formatDate } from '@fullcalendar/core';
+
 export default {
   name: "Signup",
   data() {
     return {
-      formData: {
+      form: {
         username: "",
         email: "",
+        nickname:"",
+        phone:"",
         password: "",
         confirmPassword: "",
         acceptTerms: false,
@@ -79,7 +138,7 @@ export default {
   },
   methods: {
     submitSignup() {
-      if (this.formData.password !== this.formData.confirmPassword) {
+      if (this.form.password !== this.form.confirmPassword) {
         alert("Passwords do not match!");
         return;
       }
@@ -87,7 +146,7 @@ export default {
         alert("You must accept the terms and privacy policy!");
         return;
       }
-      console.log("회원가입 성공:", this.formData.username);
+      console.log("회원가입 성공:", this.form.username);
       // 회원가입 완료 후 로그인 페이지로 이동
       this.$router.push("/login");
     },
@@ -102,7 +161,7 @@ export default {
 <style scoped>
 /* 스타일 추가 */
 .signup-container {
-  min-width: 400px;
+  min-width: 500px;
   width: 400px;
   margin: 50px auto;
   padding: 20px;
@@ -120,7 +179,7 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 label {
@@ -132,7 +191,9 @@ label {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"], 
+input[type="nickname"], 
+input[type="tel"]{
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
