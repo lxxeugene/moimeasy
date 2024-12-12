@@ -96,6 +96,7 @@ public class LoginServiceImpl implements LoginService {
 
             return TokenResponseDTO.builder()
                     .userId(user.getUserId())
+                    .moiemId(user.getMoeimId())
                     .name(user.getUserName())
                     .email(user.getEmail())
                     .nickname(user.getNickname())
