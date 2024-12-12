@@ -148,7 +148,7 @@ export default {
     searchQuery: 'updateFilter', // 검색어 변경 시 데이터 업데이트
   },
   mounted() {
-    this.loggedInUserMoeimId = 3;
+    this.loggedInUserMoeimId = 1;
     this.fetchUsers();
   },
 };

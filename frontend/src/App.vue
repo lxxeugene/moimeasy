@@ -1,5 +1,7 @@
 <template>
   <div class="app-layout">
+    <!-- 로딩 스피너 -->
+    <LoadingOverlay />
     <!-- 사이드바 -->
     <SideBar class="sidebar" :class="{ expanded: uiStore.visible }" />
     <!-- 스피드다이얼 영역-->
@@ -14,6 +16,7 @@
 
 <script setup>
 import { useUIStore } from '@/stores/uiStore';
+
 const uiStore = useUIStore();
 </script>
 
