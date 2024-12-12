@@ -72,7 +72,11 @@
           placeholder="Your phone"
           required
           pattern="^[0-9\-+() ]+$"
+          title="유효한 연락처를 입력해 주세요."
           />
+          <!-- <div v-if="errors.phone_number" class="error-message">
+            <p>{{ errors.phone_number }}</p>
+          </div> -->
         </div>
 
       <div class="form-group">
