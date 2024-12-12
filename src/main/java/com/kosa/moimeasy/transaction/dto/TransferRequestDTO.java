@@ -1,6 +1,5 @@
-package com.kosa.moimeasy.transfer.dto;
+package com.kosa.moimeasy.transaction.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,7 @@ import java.math.BigDecimal;
 public class TransferRequestDTO {
     private Long userId; // 회원 id
     private Long moeimId; // 모임 id
-    private BigDecimal transferAmount; // 이체 금액
-    private String memo; // 메모
-    private String transferType; // 이체 타입
+    private double transferAmount; // 이체 금액
+    private String content; // 메모
+    private int transferType; // 거래 유형 (출금 : 0, 입금 : 1)
 }

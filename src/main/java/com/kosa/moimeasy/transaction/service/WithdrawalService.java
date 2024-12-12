@@ -1,9 +1,7 @@
-package com.kosa.moimeasy.transfer.service;
+package com.kosa.moimeasy.transaction.service;
 
-import com.kosa.moimeasy.moeim.dto.MoeimDTO;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
-import com.kosa.moimeasy.moeim.service.MoeimService;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,23 +20,23 @@ public class WithdrawalService {
 
     // 모임 계좌에서 출금
     @Transactional
-    public void moeimAccountWithdraw(String moeimAccount, BigDecimal amount){
+    public void moeimAccountWithdraw(String moeimAccount, double amount){
 
         Moeim withdrawAccount = moeimRepository.findAccountNumber(moeimAccount);
 
         // 출금 후 계좌 잔액 업데이트
-        BigDecimal withdrawResult = withdrawAccount.getBalance().subtract(amount);
+        double withdrawResult = withdrawAccount.getBalance() - amount;
         withdrawAccount.setBalance(withdrawResult);
     }
 
     // 회원 계좌에서 출금
     @Transactional
-    public void userAccountWithdraw(String userAccount, BigDecimal amount){
+    public void userAccountWithdraw(String userAccount, double amount){
 
         User withdrawAccount = userRepository.findAccountNumber(userAccount);
 
         // 출금 후 계좌 잔액 업데이트
-        BigDecimal withdrawResult = withdrawAccount.getBalance().subtract(amount);
+        double withdrawResult = withdrawAccount.getBalance() - amount;
         withdrawAccount.setBalance(withdrawResult);
     }
 

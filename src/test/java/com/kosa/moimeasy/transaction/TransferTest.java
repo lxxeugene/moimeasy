@@ -1,11 +1,11 @@
-package com.kosa.moimeasy.transfer;
+package com.kosa.moimeasy.transaction;
 
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
-import com.kosa.moimeasy.transfer.dto.TransferRequestDTO;
-import com.kosa.moimeasy.transfer.entity.TransferHistory;
-import com.kosa.moimeasy.transfer.repository.TransferHistoryRepository;
-import com.kosa.moimeasy.transfer.service.TransferService;
+import com.kosa.moimeasy.transaction.dto.TransferRequestDTO;
+import com.kosa.moimeasy.transaction.entity.Transaction;
+import com.kosa.moimeasy.transaction.repository.TransactionRepository;
+import com.kosa.moimeasy.transaction.service.TransferService;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,11 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,7 +29,7 @@ class TransferServiceTest {
     private MoeimRepository moeimRepository;
 
     @Mock
-    private TransferHistoryRepository transferHistoryRepository;
+    private TransactionRepository transactionRepository;
 
     @InjectMocks
     private TransferService transferService;
@@ -45,21 +44,21 @@ class TransferServiceTest {
         // Given: Mock 데이터 설정
         Long userId = 1L;
         Long moeimId = 2L;
-        BigDecimal transferAmount = BigDecimal.valueOf(1000);
+        double transferAmount = 1000;
 
         User user = new User();
         user.setUserId(userId);
-        user.setBalance(BigDecimal.valueOf(5000));
+        user.setBalance(5000);
 
         Moeim moeim = new Moeim();
         moeim.setMoeimId(moeimId);
-        moeim.setBalance(BigDecimal.valueOf(2000));
+        moeim.setBalance(2000);
 
         TransferRequestDTO requestDTO = new TransferRequestDTO();
         requestDTO.setUserId(userId);
         requestDTO.setMoeimId(moeimId);
         requestDTO.setTransferAmount(transferAmount);
-        requestDTO.setMemo("Test Transfer");
+        requestDTO.setContent("Test Transfer");
 
         // Mock 리포지토리 동작
         when(userRepository.findAccountNumberById(userId)).thenReturn(Optional.of(user));
@@ -75,12 +74,12 @@ class TransferServiceTest {
         System.out.println("User Balance: " + user.getBalance());
         System.out.println("Moeim Balance: " + moeim.getBalance());
         // 회원 잔액 감소
-        assert(user.getBalance().equals(BigDecimal.valueOf(4000)));
+        assert(user.getBalance() == 4000);
         // 모임 잔액 증가
-        assert(moeim.getBalance().equals(BigDecimal.valueOf(3000)));
+        assert(moeim.getBalance() == 3000);
 
         // 거래 내역 저장 확인
-        verify(transferHistoryRepository, atLeastOnce()).save(any(TransferHistory.class));
+        verify(transactionRepository, atLeastOnce()).save(any(Transaction.class));
     }
 
     @Test
@@ -88,7 +87,7 @@ class TransferServiceTest {
         // Given: Mock 데이터 설정
         Long userId = 1L;
         Long moeimId = 2L;
-        BigDecimal transferAmount = BigDecimal.valueOf(1000);
+        double transferAmount = 1000;
 
         TransferRequestDTO requestDTO = new TransferRequestDTO();
         requestDTO.setUserId(userId);
@@ -106,6 +105,6 @@ class TransferServiceTest {
         // Exception 메시지 검증 (필요시 메시지 추가)
         verify(userRepository, atLeastOnce()).findAccountNumberById(userId);
         verifyNoInteractions(moeimRepository); // 모임 계좌와 거래 내역 저장은 호출되지 않아야 함
-        verifyNoInteractions(transferHistoryRepository);
+        verifyNoInteractions(transactionRepository);
     }
 }

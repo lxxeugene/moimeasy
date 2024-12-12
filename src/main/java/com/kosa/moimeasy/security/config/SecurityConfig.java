@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //Session off
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/v1/login", "/api/v1/signup/**","/api/v1/find/**", "/api/v1/reset/**", "/api/v1/logout/**").permitAll() // 로그인 및 회원가입 엔드포인트는 누구나 접근 가능
-                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // 'admin'역활만 접근 가능
-                                //.requestMatchers("/api/v1/{reviewId}/**").hasRole("OWNER") // 'owner' 역활만 접근 가능
+                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // 'admin'역할만 접근 가능
+                                //.requestMatchers("/api/v1/{reviewId}/**").hasRole("OWNER") // 'owner' 역할만 접근 가능
                                 //.anyRequest().hasRole("USER") //로그인 한 사용자 'user' 역활 필요
                                 .anyRequest().permitAll() //나머지 모든 요청, 허용(개발 중)
                         //.anyRequest().authenticated() //인증된 사용자만 이용

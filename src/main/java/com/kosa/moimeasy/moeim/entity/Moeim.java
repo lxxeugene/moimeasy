@@ -1,6 +1,6 @@
 package com.kosa.moimeasy.moeim.entity;
 
-import com.kosa.moimeasy.transfer.entity.TransferHistory;
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import com.kosa.moimeasy.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class Moeim {
     private String accountNumber;
 
     @Column(name = "moeim_account_balance", nullable = false)
-    private BigDecimal balance = BigDecimal.ZERO; // 오차 방지를 위해 Double 대신 BigDecimal 사용
+    private double balance; // 오차 방지를 위해 Double 대신 BigDecimal 사용
 
     @Column(name = "CREATE_AT", nullable = false, updatable = false)
     private LocalDateTime createAt;
@@ -60,19 +60,19 @@ public class Moeim {
     // 거래내역 테이블
     // Moeim 엔티티를 저장하면 Transaction 엔티티들도 자동으로 저장된다. (삭제도 마찬가지)
     @OneToMany(mappedBy = "moeim", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TransferHistory> transactionList = new ArrayList<>();
+    private List<Transaction> transactionList = new ArrayList<>();
 
     // 모임 계좌에 입금
-    public void deposit(BigDecimal balance){
-        this.balance = this.balance.add(balance);
+    public void deposit(double balance){
+        this.balance += balance;
     }
 
     // 모임 계좌에서 출금
-    public void withdraw(BigDecimal balance){
-        if(this.balance.compareTo(balance)<0){
+    public void withdraw(double balance){
+        if(this.balance< balance){
             throw new IllegalArgumentException("잔액 부족");
         }
-        this.balance = this.balance.subtract(balance);
+        this.balance -= balance;
     }
 
 }

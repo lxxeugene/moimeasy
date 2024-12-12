@@ -1,6 +1,6 @@
-package com.kosa.moimeasy.transfer.repository;
+package com.kosa.moimeasy.transaction.repository;
 
-import com.kosa.moimeasy.transfer.entity.Category;
+import com.kosa.moimeasy.transaction.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

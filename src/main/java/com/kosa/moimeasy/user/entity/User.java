@@ -1,6 +1,6 @@
 package com.kosa.moimeasy.user.entity;
 
-import com.kosa.moimeasy.transfer.entity.TransferHistory;
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -55,11 +55,11 @@ public class User {
     @Column(name = "user_account_number", nullable = false) // 길이 지정해야됌
     private String accountNumber;
 
-    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
-    private String accountPassword;
+//    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
+//    private String accountPassword;
 
     @Column(name = "user_account_balance", nullable = false)
-    private BigDecimal balance = BigDecimal.ZERO; // 오차 방지를 위해 Double 대신 BigDecimal 사용
+    private double balance;
 
     @PrePersist
     public void prePersist() {
@@ -76,22 +76,21 @@ public class User {
         this.updateAt = LocalDateTime.now();
     }
 
-    // 회비 테이블
-    // User 엔티티를 저장하면 Fee 엔티티들도 자동으로 저장된다. (삭제도 마찬가지)
+    // 거래내역 테이블
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<TransferHistory> transferHistory = new ArrayList<>();
+    private List<Transaction> transaction = new ArrayList<>();
 
     // 유저 계좌에 입금
-    public void deposit(BigDecimal balance){
-        this.balance = this.balance.add(balance);
+    public void deposit(double balance){
+        this.balance += balance;
     }
 
     // 유저 계좌에서 출금
-    public void withdraw(BigDecimal balance){
-        if(this.balance.compareTo(balance) <0 ){
+    public void withdraw(double balance){
+        if(this.balance< balance){
             throw new IllegalArgumentException("잔액 부족");
         }
-        this.balance = this.balance.subtract(balance);
+        this.balance -= balance;
     }
 }
 

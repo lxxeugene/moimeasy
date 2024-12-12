@@ -1,11 +1,11 @@
-package com.kosa.moimeasy.transfer.service;
+package com.kosa.moimeasy.transaction.service;
 
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
-import com.kosa.moimeasy.transfer.dto.TransferRequestDTO;
-import com.kosa.moimeasy.transfer.entity.TransferHistory;
-import com.kosa.moimeasy.transfer.repository.CategoryRepository;
-import com.kosa.moimeasy.transfer.repository.TransferHistoryRepository;
+import com.kosa.moimeasy.transaction.dto.TransferRequestDTO;
+import com.kosa.moimeasy.transaction.entity.Transaction;
+import com.kosa.moimeasy.transaction.repository.CategoryRepository;
+import com.kosa.moimeasy.transaction.repository.TransactionRepository;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class TransferService {
 
     private final UserRepository userRepository;
     private final MoeimRepository moeimRepository;
-    private final TransferHistoryRepository transferHistoryRepository;
+    private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
 
     // 이체 실행
@@ -33,30 +33,32 @@ public class TransferService {
         User userAccount = getUserAccount(userId); // 회원 계좌
         Moeim moeimAccount = getMoeimAccount(moeimId); // 모임 계좌
 
+        double transferAmount = transferRequestDTO.getTransferAmount(); // 이체 금액
+
         userAccount.withdraw(transferRequestDTO.getTransferAmount()); // 회원 계좌 출금
         moeimAccount.deposit(transferRequestDTO.getTransferAmount()); // 모임 계좌 입금
 
-        saveTransferHistory(transferRequestDTO, userAccount.getBalance(), moeimAccount.getBalance());
+        // 거래 내역 저장
+        Transaction transaction = Transaction.builder()
+                .user(userAccount) // 회원 계좌
+                .moeim(moeimAccount) // 모임 계좌
+                .transferAmount(transferAmount) // 이체 금액
+                .withdrawalAmount(userAccount.getBalance()) // 회원 계좌의 잔액 (출금 후)
+                .depositAmount(moeimAccount.getBalance()) // 모임 계좌의 잔액 (입금 후)
+                .content(transferRequestDTO.getContent()) // 거래 내용
+                .transactionType(1) // (출금: 0 입금 : 1)
+                .categoryName("회비 입금") // 소비 항목
+                .build();
+
+        // 회원 계좌에서 출금, 모임 계좌에 입금 내역 기록
+        transactionRepository.save(transaction); // 거래 내역 저장
     }
 
     // 거래내역 조회
-    public List<TransferHistory> getTransferHistory(){
-        return transferHistoryRepository.findAll();
+    public List<Transaction> getTransferHistory(){
+        return transactionRepository.findAll();
     }
 
-    // 회원 계좌에서 출금, 모임 계좌에 입금 내역 기록
-    private void saveTransferHistory(TransferRequestDTO transferRequestDTO, BigDecimal amountAfterWithdrawal, BigDecimal amountAfterDeposit){
-        TransferHistory transferHistory = new TransferHistory(
-                getUserAccount(transferRequestDTO.getUserId()),
-                amountAfterWithdrawal,
-                transferRequestDTO.getMemo(),
-                getMoeimAccount(transferRequestDTO.getMoeimId()),
-                amountAfterDeposit,
-                transferRequestDTO.getTransferAmount(),
-                TransferHistory.TransferType.INCOME
-        );
-        transferHistoryRepository.save(transferHistory); // 거래내역 저장
-    }
 
     // 모임 계좌 조회
     private Moeim getMoeimAccount(Long moeimId){
