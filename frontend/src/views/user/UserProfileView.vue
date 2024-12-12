@@ -3,15 +3,37 @@
     <h2>회원 관리 &gt; 회원 내역 &gt; 회원 프로필</h2>
     <form v-if="user">
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="userProfile">프로필이미지</label>
+        <div class="profile-box">
+          <Avatar
+            :icon="src ? undefined : 'pi pi-user'"
+            :image="src || undefined"
+            class="mr-2"
+            size="xlarge"
+            shape="circle"
+          />
+          <FileUpload
+            mode="basic"
+            @select="onFileSelect"
+            customUpload
+            auto
+            severity="secondary"
+            class="p-button-outlined"
+          />
+        </div>
+
+        <!-- <input id="username" v-model="user.userName" type="text" readonly /> -->
+      </div>
+      <div class="form-group">
+        <label for="username">유저명</label>
         <input id="username" v-model="user.userName" type="text" readonly />
       </div>
       <div class="form-group">
-        <label for="email">Email address</label>
+        <label for="email">이메일</label>
         <input id="email" v-model="user.email" type="email" readonly />
       </div>
       <div class="form-group">
-        <label for="phone">Phone number</label>
+        <label for="phone">전화번호</label>
         <input id="phone" v-model="user.phone" type="text" readonly />
       </div>
       <div class="form-group">
@@ -34,6 +56,7 @@ export default {
   data() {
     return {
       user: null,
+      src: null,
     };
   },
   mounted() {
@@ -49,6 +72,14 @@ export default {
         console.error('사용자 정보를 불러오는데 실패했습니다:', error);
         alert('사용자 정보를 불러오는데 실패했습니다.');
       }
+    },
+    onFileSelect(event) {
+      const file = event.files[0];
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        this.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     },
   },
 };
@@ -90,5 +121,14 @@ input {
 
 input[readonly] {
   background-color: #f9f9f9;
+}
+
+.p-avatar {
+  width: 100px;
+  height: 100px;
+}
+.profile-box {
+  display: flex;
+  flex-direction: column;
 }
 </style>

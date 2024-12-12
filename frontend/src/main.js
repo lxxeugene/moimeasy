@@ -17,6 +17,9 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import PanelMenu from 'primevue/panelmenu';
 import LoadingOverlay from './components/common/LoadingOverlay.vue';
+import Noir from './presets/Noir.js';
+import Avatar from 'primevue/avatar';
+import FileUpload from 'primevue/fileupload';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 //axios.defaults.baseURL = 'http://localhost:8088';
@@ -35,6 +38,8 @@ app.component('SideSpeedDial', SideSpeedDial);
 app.component('InputText', InputText);
 app.component('PanelMenu', PanelMenu);
 app.component('LoadingOverlay', LoadingOverlay);
+app.component('Avatar', Avatar);
+app.component('FileUpload', FileUpload);
 // PrimeVue 플러그인 등록
 app.use(
   PrimeVue,
