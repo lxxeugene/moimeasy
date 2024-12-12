@@ -4,9 +4,7 @@ import com.kosa.moimeasy.common.entity.BaseEntity;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 
@@ -14,6 +12,8 @@ import java.sql.Timestamp;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Schedule extends BaseEntity {
 
     @Id
