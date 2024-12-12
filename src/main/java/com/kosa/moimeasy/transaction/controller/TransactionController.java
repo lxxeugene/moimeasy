@@ -1,74 +1,67 @@
 package com.kosa.moimeasy.transaction.controller;
 
-import com.kosa.moimeasy.moeim.entity.Moeim;
-import com.kosa.moimeasy.transaction.dto.TransferRequestDTO;
-import com.kosa.moimeasy.transaction.dto.response.ListResponseResult;
-import com.kosa.moimeasy.transaction.dto.response.ResponseResult;
-import com.kosa.moimeasy.transaction.dto.response.SingleResponseResult;
-import com.kosa.moimeasy.transaction.entity.Transaction;
+import com.kosa.moimeasy.transaction.dto.DepositDto;
+import com.kosa.moimeasy.transaction.dto.RemittanceDto;
+import com.kosa.moimeasy.transaction.dto.TransactionListDto;
+import com.kosa.moimeasy.transaction.dto.WithdrawDto;
 import com.kosa.moimeasy.transaction.service.TransactionService;
-import com.kosa.moimeasy.transaction.service.TransferService;
-import com.kosa.moimeasy.user.entity.User;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
-@ApiResponses({
-        @ApiResponse(responseCode = "200", description = "응답이 성공적으로 반환되었습니다."),
-        @ApiResponse(responseCode = "400", description = "응답이 실패하였습니다.",
-                content = @Content(schema = @Schema(implementation = ResponseResult.class)))})
 @Slf4j
-@Tag(name = "Transaction Controller", description = "거래내역 컨트롤러")
-@RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/api/v1/transaction")
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionService transactionService;
-    private final TransferService transferService;
 
-
-    @PostMapping("/pay")
-    public ResponseResult executeTransfer(@RequestBody @Valid TransferRequestDTO transferRequestDTO) {
-        try {
-            log.info("TransferController -> Initiating transfer for userId: {} and moeimId: {}",
-                    transferRequestDTO.getUserId(), transferRequestDTO.getMoeimId());
-            transferService.executeTransfer(transferRequestDTO);
-            return ResponseResult.successResponse;
-        } catch (Exception e) {
-            log.error("TransferController -> Error occurred during transfer: {}", e.getMessage(), e);
-            return ResponseResult.failResponse;
-        }
+    // 입금
+    @PutMapping("/deposit")
+    public ResponseEntity<DepositDto.Response> deposit(
+            @RequestBody @Valid DepositDto.Request request
+    ) {
+        DepositDto.Response response = transactionService.deposit(request);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("{moeimId}")
-    public ResponseResult getAllTransaction(@Valid @PathVariable Long moeimId) {
-        return new ListResponseResult<>(transactionService.findByMoeimId(moeimId));
+    // 출금
+    @PutMapping("/withdraw")
+    public ResponseEntity<WithdrawDto.Response> withdraw(
+            @RequestBody @Valid WithdrawDto.Request request
+    ) {
+        // 사용자 정보를 SecurityContextHolder에서 가져옵니다.
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        WithdrawDto.Response response = transactionService.withdraw(username, request);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{moeimId}/{idx}")
-    public ResponseResult getTransactionList(
-            @PathVariable(name = "moeimId") Long moeimId,
-            @PathVariable(name = "idx") int idx) {
-        log.info("모임 계좌 거래 내역 조회");
-        return new ListResponseResult<>(transactionService.getTransactionList(moeimId, idx));
+
+    // 송금
+    @PutMapping("/remittance")
+    public ResponseEntity<RemittanceDto.Response> remittance(
+            @RequestBody @Valid RemittanceDto.Request request
+    ) {
+        // 사용자 정보를 SecurityContextHolder에서 가져옵니다.
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(transactionService.remittance(username, request));
     }
 
-    @GetMapping("/category/{moeimId}")
-    public ResponseResult getTransactionListByCategory(
-            @PathVariable(name = "moeimId") Long moeimId,
-            @RequestParam(name = "year") int year,
-            @RequestParam(name = "month") int month) {
-        log.info("모임 계좌의 카테고리별 소비내역 조회");
-        return new ListResponseResult<>(transactionService.getTransactionListByCategory(moeimId, year, month));
+    /*
+     * @return 최소 하루 ~ 최대 일주일의 거래 내역
+     * @apiNote 시작 날짜, 끝 날짜 둘 다 null 로 보낼 경우 조회일 포함 일주일 내역 반환
+     * @apiNote 날짜 포맷 : yyyy-MM-dd
+     */
+    // 거래내역
+    @GetMapping("/transaction-list")
+    public ResponseEntity<TransactionListDto.Response> getTransactionList(
+            @RequestBody @Valid TransactionListDto.Request request
+    ) {
+        // 사용자 정보를 SecurityContextHolder에서 가져옵니다.
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(transactionService.getTransactionList(username, request));
     }
-
 }

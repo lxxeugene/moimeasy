@@ -10,17 +10,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
-public class Transaction extends BaseEntity { // 거래내역
+public class TransactionSample extends BaseEntity { // 거래내역
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY) // (회원 계좌와 거래내역은 1:N 관계)
+    @JoinColumn(name = "userId", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY) // (모임 계좌와 거래내역은 1:N 관계)
+    @JoinColumn(name = "moeimId", nullable = false)
+    private Moeim moeim;
 
     @Column(name = "transfer_amount", nullable = false)
     private double transferAmount; //  이체 금액
@@ -40,19 +48,13 @@ public class Transaction extends BaseEntity { // 거래내역
     @Column(nullable = false)
     private String categoryName; // 소비항목
 
-    @ManyToOne(fetch = FetchType.LAZY) // (회원 계좌와 거래내역은 1:N 관계)
-    @JoinColumn(name = "userId", nullable = false)
-    private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY) // (모임 계좌와 거래내역은 1:N 관계)
-    @JoinColumn(name = "moeimId", nullable = false)
-    private Moeim moeim;
 
 
     // 모임 계좌에 입금 내역 생성 메서드
-    public Transaction transaction(User userAccount, double amountAfterWithdrawal, String content, Moeim moeimAccount,
-                                   double amountAfterDeposit, double transferAmount) {
-        return Transaction.builder()
+    public TransactionSample transaction(User userAccount, double amountAfterWithdrawal, String content, Moeim moeimAccount,
+                                         double amountAfterDeposit, double transferAmount) {
+        return TransactionSample.builder()
                 .user(userAccount) // 유저와 연결된 계좌
                 .moeim(moeimAccount) // 모임과 연결된 계좌
                 .depositAmount(amountAfterDeposit) // 입금액
@@ -64,9 +66,9 @@ public class Transaction extends BaseEntity { // 거래내역
     }
 
     // 거래내역 생성 메서드
-    public static Transaction createTransaction(User user, Moeim moeim, double depositAmount,
-                                                double withdrawalAmount, String content) {
-        return Transaction.builder()
+    public static TransactionSample createTransaction(User user, Moeim moeim, double depositAmount,
+                                                      double withdrawalAmount, String content) {
+        return TransactionSample.builder()
                 .user(user) // 유저와 연결된 계좌
                 .moeim(moeim) // 모임과 연결된 계좌
                 .depositAmount(depositAmount) // 입금액

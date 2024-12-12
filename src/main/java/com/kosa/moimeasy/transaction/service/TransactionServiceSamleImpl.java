@@ -5,8 +5,8 @@ import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.transaction.dto.GetTransactionByCategoryResponseDTO;
 import com.kosa.moimeasy.transaction.dto.GetTransactionResponseDTO;
-import com.kosa.moimeasy.transaction.entity.Transaction;
-import com.kosa.moimeasy.transaction.repository.TransactionRepository;
+import com.kosa.moimeasy.transaction.entity.TransactionSample;
+import com.kosa.moimeasy.transaction.repository.TransactionRepositorySample;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,44 +27,44 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class TransactionServiceImpl implements TransactionService  {
+public class TransactionServiceSamleImpl implements TransactionServiceSamle {
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionRepositorySample transactionRepositorySample;
     private final MoeimRepository moeimRepository;
     private final UserRepository userRepository;
 
     // 거래내역 저장
     @Override
-    public void registTransactionInfo(Transaction transaction) {
-        transactionRepository.save(transaction);
+    public void registTransactionInfo(TransactionSample transactionSample) {
+        transactionRepositorySample.save(transactionSample);
     }
 
     // 모임의 전체 거래내역 조회
     @Override
-    public List<Transaction> findByMoeimId(Long moeimId) {
-        return transactionRepository.findByMoeim_Id(moeimId);
+    public List<TransactionSample> findByMoeimId(Long moeimId) {
+        return transactionRepositorySample.findByMoeim_Id(moeimId);
     }
 
     // 특정 시점 이후 모임 계좌의 거래 내역을 조회
     @Override
-    public List<Transaction> findTransactionsAfter(Moeim moeim, LocalDateTime transactionAt) {
-        return transactionRepository.findByTransactionAtList(transactionAt, moeim.getAccountNumber());
+    public List<TransactionSample> findTransactionsAfter(Moeim moeim, LocalDateTime transactionAt) {
+        return transactionRepositorySample.findByTransactionAtList(transactionAt, moeim.getAccountNumber());
     }
 
     // 특정 시점 이후 발생한 모임 계좌의 출금 내역 조회
     @Override
-    public List<Transaction> findWithdrawalsAfter(Moeim moeim, LocalDateTime transactionAt) {
-         return transactionRepository.findByMoeimAndTransactionAtAfterAndWithdrawalAmountGreaterThan(moeim, transactionAt);
+    public List<TransactionSample> findWithdrawalsAfter(Moeim moeim, LocalDateTime transactionAt) {
+         return transactionRepositorySample.findByMoeimAndTransactionAtAfterAndWithdrawalAmountGreaterThan(moeim, transactionAt);
     }
 
     // 모임 계좌의 카테고리 반환
     @Override
     public int findTransactionOne(Long moeimId) {
         Moeim moeimAccount = moeimRepository.findAccountNumberById(moeimId).orElseThrow(NotExistMoeimAccountException::new);
-        Transaction transaction = transactionRepository.findFirstByMoeim(moeimAccount);
+        TransactionSample transactionSample = transactionRepositorySample.findFirstByMoeim(moeimAccount);
         int category = 0;
-        if(transaction != null) {
-            String categoryName = transaction.getCategoryName();
+        if(transactionSample != null) {
+            String categoryName = transactionSample.getCategoryName();
             if(categoryName.equals("회식")) category = 1;
             if(categoryName.equals("음료")) category = 2;
             if(categoryName.equals("운영")) category = 3;
@@ -79,7 +79,7 @@ public class TransactionServiceImpl implements TransactionService  {
     public List<GetTransactionResponseDTO> getTransactionList(Long moeimId, int idx) {
         log.info("모임 계좌의 거래내역 조회(5건씩)");
         Pageable pageable = PageRequest.of(idx, 5, Sort.by(Sort.Order.desc("createAt")));
-        Page<Transaction> transactions = transactionRepository.findByMoeim(moeimId, pageable);
+        Page<TransactionSample> transactions = transactionRepositorySample.findByMoeim(moeimId, pageable);
         return transactions.getContent().stream().map(transaction -> transaction.toGetTransactionResponseDto()).toList();
     }
 
@@ -91,7 +91,7 @@ public class TransactionServiceImpl implements TransactionService  {
         // 카테고리별로 액수 구분
         HashMap<String,Integer> categoryMap = new HashMap<>();
         AtomicInteger totalAmount = new AtomicInteger(0);
-        transactionRepository.findByMoeimAndYearAndMonth(moeimId, year, month)
+        transactionRepositorySample.findByMoeimAndYearAndMonth(moeimId, year, month)
                 .stream().forEach(transaction -> {
                     categoryMap.put(transaction.getCategoryName(), categoryMap.getOrDefault(transaction.getCategoryName(), 0) + (int)transaction.getWithdrawalAmount());
                     totalAmount.addAndGet((int)transaction.getWithdrawalAmount());

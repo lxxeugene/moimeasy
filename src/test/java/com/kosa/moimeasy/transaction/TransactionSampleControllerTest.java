@@ -2,10 +2,11 @@ package com.kosa.moimeasy.transaction;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kosa.moimeasy.moeim.entity.Moeim;
-import com.kosa.moimeasy.transaction.controller.TransactionController;
+import com.kosa.moimeasy.transaction.controller.TransactionControllerSample;
+import com.kosa.moimeasy.transaction.dto.GetTransactionResponseDTO;
 import com.kosa.moimeasy.transaction.dto.TransferRequestDTO;
-import com.kosa.moimeasy.transaction.entity.Transaction;
-import com.kosa.moimeasy.transaction.service.TransactionService;
+import com.kosa.moimeasy.transaction.entity.TransactionSample;
+import com.kosa.moimeasy.transaction.service.TransactionServiceSamle;
 import com.kosa.moimeasy.transaction.service.TransferService;
 import com.kosa.moimeasy.user.entity.User;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -29,18 +29,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class TransactionControllerTest {
+class TransactionSampleControllerTest {
 
     private MockMvc mockMvc;
 
     @Mock
-    private TransactionService transactionService;
+    private TransactionServiceSamle transactionService;
 
     @Mock
     private TransferService transferService;
 
     @InjectMocks
-    private TransactionController transactionController;
+    private TransactionControllerSample transactionControllerSample;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,7 +51,7 @@ class TransactionControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(transactionController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(transactionControllerSample).build();
 
         // Initialize mock User
         mockUser = new User();
@@ -117,7 +117,7 @@ class TransactionControllerTest {
         Long moeimId = mockMoeim.getMoeimId();
 
         // Mock Transaction 데이터
-        Transaction t1 = Transaction.builder()
+        TransactionSample t1 = TransactionSample.builder()
                 .id(1L)
                 .moeim(mockMoeim)
                 .user(mockUser)
@@ -129,7 +129,7 @@ class TransactionControllerTest {
                 .categoryName("Food")
                 .build();
 
-        Transaction t2 = Transaction.builder()
+        TransactionSample t2 = TransactionSample.builder()
                 .id(2L)
                 .moeim(mockMoeim)
                 .user(mockUser)
@@ -159,27 +159,21 @@ class TransactionControllerTest {
         Long moeimId = mockMoeim.getMoeimId();
         int idx = 1;
 
-        // Mock Transaction 데이터
-        Transaction t1 = Transaction.builder()
-                .id(1L)
-                .moeim(mockMoeim)
-                .user(mockUser)
-                .transferAmount(500.0)
-                .depositAmount(1000.0)
-                .withdrawalAmount(0.0)
-                .content("Deposit Transaction 1")
-                .transactionType(1)
-                .categoryName("Food")
-                .build();
+        // Mock ResponseDTO 데이터
+        GetTransactionResponseDTO responseDTO = new GetTransactionResponseDTO();
+        responseDTO.setId(1L);
+        responseDTO.setContent("Deposit Transaction 1");
+        responseDTO.setCategoryName("Food");
+        // 필요한 필드 값 설정
 
-//        when(transactionService.getTransactionList(moeimId, idx)).thenReturn(List.of(t1));
+        when(transactionService.getTransactionList(moeimId, idx)).thenReturn(List.of(responseDTO));
 
         mockMvc.perform(get("/api/v1/transaction/{moeimId}/{idx}", moeimId, idx))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data").isArray())
-                .andExpect(jsonPath("$.data[0].id").value(t1.getId()))
-                .andExpect(jsonPath("$.data[0].content").value(t1.getContent()));
+                .andExpect(jsonPath("$.data[0].id").value(responseDTO.getId()))
+                .andExpect(jsonPath("$.data[0].content").value(responseDTO.getContent()));
     }
 
     @Test
@@ -190,7 +184,7 @@ class TransactionControllerTest {
         int month = 12;
 
         // Mock Transaction 데이터
-        Transaction t1 = Transaction.builder()
+        TransactionSample t1 = TransactionSample.builder()
                 .id(1L)
                 .moeim(mockMoeim)
                 .user(mockUser)
@@ -202,7 +196,7 @@ class TransactionControllerTest {
                 .categoryName("Travel")
                 .build();
 
-        Transaction t2 = Transaction.builder()
+        TransactionSample t2 = TransactionSample.builder()
                 .id(2L)
                 .moeim(mockMoeim)
                 .user(mockUser)
@@ -214,8 +208,8 @@ class TransactionControllerTest {
                 .categoryName("Food")
                 .build();
 
-//        when(transactionService.getTransactionListByCategory(moeimId, year, month))
-//                .thenReturn(List.of(t1, t2));
+        when(transactionService.getTransactionListByCategory(moeimId, year, month))
+                .thenReturn(List.of(t1, t2));
 
         mockMvc.perform(get("/api/v1/transaction/category/{moeimId}", moeimId)
                         .param("year", String.valueOf(year))

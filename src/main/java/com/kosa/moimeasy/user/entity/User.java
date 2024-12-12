@@ -1,12 +1,10 @@
 package com.kosa.moimeasy.user.entity;
 
-import com.kosa.moimeasy.transaction.entity.Transaction;
+import com.kosa.moimeasy.common.entity.BaseEntity;
+import com.kosa.moimeasy.transaction.entity.TransactionSample;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,46 +49,20 @@ public class User extends BaseEntity {
 
     @Column(length = 255, nullable = true)
     private String profileImage;
+
     @Column(name = "user_account_number", nullable = false) // 길이 지정해야됌
     private String accountNumber;
 
 //    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
 //    private String accountPassword;
 
-    @Column(name = "user_account_balance", nullable = false)
-    private double balance;
-
-    @PrePersist
-    public void prePersist() {
-        this.createAt = LocalDateTime.now();
-        if(this.createAt == null){
-            this.createAt = LocalDateTime.now();
-        }else {
-            this.createAt = createAt;
-        }
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.updateAt = LocalDateTime.now();
-    }
+    @Column(name = "user_account_amount", nullable = false)
+    private double amount;
 
     // 거래내역 테이블
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Transaction> transaction = new ArrayList<>();
+    private List<TransactionSample> transactionSample = new ArrayList<>();
 
-    // 유저 계좌에 입금
-    public void deposit(double balance){
-        this.balance += balance;
-    }
-
-    // 유저 계좌에서 출금
-    public void withdraw(double balance){
-        if(this.balance< balance){
-            throw new IllegalArgumentException("잔액 부족");
-        }
-        this.balance -= balance;
-    }
 }
 
 

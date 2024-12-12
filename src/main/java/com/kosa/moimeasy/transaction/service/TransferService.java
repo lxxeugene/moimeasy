@@ -3,16 +3,15 @@ package com.kosa.moimeasy.transaction.service;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.transaction.dto.TransferRequestDTO;
-import com.kosa.moimeasy.transaction.entity.Transaction;
+import com.kosa.moimeasy.transaction.entity.TransactionSample;
 import com.kosa.moimeasy.transaction.repository.CategoryRepository;
-import com.kosa.moimeasy.transaction.repository.TransactionRepository;
+import com.kosa.moimeasy.transaction.repository.TransactionRepositorySample;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -22,7 +21,7 @@ public class TransferService {
 
     private final UserRepository userRepository;
     private final MoeimRepository moeimRepository;
-    private final TransactionRepository transactionRepository;
+    private final TransactionRepositorySample transactionRepositorySample;
     private final CategoryRepository categoryRepository;
 
     // 이체 실행
@@ -39,7 +38,7 @@ public class TransferService {
         moeimAccount.deposit(transferRequestDTO.getTransferAmount()); // 모임 계좌 입금
 
         // 거래 내역 저장
-        Transaction transaction = Transaction.builder()
+        TransactionSample transactionSample = TransactionSample.builder()
                 .user(userAccount) // 회원 계좌
                 .moeim(moeimAccount) // 모임 계좌
                 .transferAmount(transferAmount) // 이체 금액
@@ -51,12 +50,12 @@ public class TransferService {
                 .build();
 
         // 회원 계좌에서 출금, 모임 계좌에 입금 내역 기록
-        transactionRepository.save(transaction); // 거래 내역 저장
+        transactionRepositorySample.save(transactionSample); // 거래 내역 저장
     }
 
     // 거래내역 조회
-    public List<Transaction> getTransferHistory(){
-        return transactionRepository.findAll();
+    public List<TransactionSample> getTransferHistory(){
+        return transactionRepositorySample.findAll();
     }
 
 

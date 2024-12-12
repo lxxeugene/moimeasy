@@ -3,8 +3,8 @@ package com.kosa.moimeasy.transaction;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.transaction.dto.TransferRequestDTO;
-import com.kosa.moimeasy.transaction.entity.Transaction;
-import com.kosa.moimeasy.transaction.repository.TransactionRepository;
+import com.kosa.moimeasy.transaction.entity.TransactionSample;
+import com.kosa.moimeasy.transaction.repository.TransactionRepositorySample;
 import com.kosa.moimeasy.transaction.service.TransferService;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
@@ -29,7 +29,7 @@ class TransferServiceTest {
     private MoeimRepository moeimRepository;
 
     @Mock
-    private TransactionRepository transactionRepository;
+    private TransactionRepositorySample transactionRepositorySample;
 
     @InjectMocks
     private TransferService transferService;
@@ -79,7 +79,7 @@ class TransferServiceTest {
         assert(moeim.getBalance() == 3000);
 
         // 거래 내역 저장 확인
-        verify(transactionRepository, atLeastOnce()).save(any(Transaction.class));
+        verify(transactionRepositorySample, atLeastOnce()).save(any(TransactionSample.class));
     }
 
     @Test
@@ -105,6 +105,6 @@ class TransferServiceTest {
         // Exception 메시지 검증 (필요시 메시지 추가)
         verify(userRepository, atLeastOnce()).findAccountNumberById(userId);
         verifyNoInteractions(moeimRepository); // 모임 계좌와 거래 내역 저장은 호출되지 않아야 함
-        verifyNoInteractions(transactionRepository);
+        verifyNoInteractions(transactionRepositorySample);
     }
 }

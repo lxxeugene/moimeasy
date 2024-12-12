@@ -5,9 +5,9 @@ import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.transaction.dto.GetTransactionByCategoryResponseDTO;
 import com.kosa.moimeasy.transaction.dto.GetTransactionResponseDTO;
-import com.kosa.moimeasy.transaction.entity.Transaction;
-import com.kosa.moimeasy.transaction.repository.TransactionRepository;
-import com.kosa.moimeasy.transaction.service.TransactionServiceImpl;
+import com.kosa.moimeasy.transaction.entity.TransactionSample;
+import com.kosa.moimeasy.transaction.repository.TransactionRepositorySample;
+import com.kosa.moimeasy.transaction.service.TransactionServiceSamleImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,16 +26,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class TransactionServiceImplTest {
+class TransactionSampleServiceImplTest {
 
     @Mock
-    private TransactionRepository transactionRepository;
+    private TransactionRepositorySample transactionRepositorySample;
 
     @Mock
     private MoeimRepository moeimRepository;
 
     @InjectMocks
-    private TransactionServiceImpl transactionService;
+    private TransactionServiceSamleImpl transactionService;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +45,7 @@ class TransactionServiceImplTest {
     @Test
     void registTransactionInfo_savesTransaction() {
         // Given
-        Transaction transaction = Transaction.builder()
+        TransactionSample transactionSample = TransactionSample.builder()
                 .content("Test Content")
                 .transactionType(1)
                 .depositAmount(1000.0)
@@ -53,28 +53,28 @@ class TransactionServiceImplTest {
                 .build();
 
         // When
-        transactionService.registTransactionInfo(transaction);
+        transactionService.registTransactionInfo(transactionSample);
 
         // Then
-        verify(transactionRepository, times(1)).save(transaction);
+        verify(transactionRepositorySample, times(1)).save(transactionSample);
     }
 
     @Test
     void findByMoeimId_returnsTransactions() {
         // Given
         Long moeimId = 1L;
-        List<Transaction> transactions = Arrays.asList(
-                Transaction.builder().content("Transaction 1").build(),
-                Transaction.builder().content("Transaction 2").build()
+        List<TransactionSample> transactionSamples = Arrays.asList(
+                TransactionSample.builder().content("Transaction 1").build(),
+                TransactionSample.builder().content("Transaction 2").build()
         );
-        when(transactionRepository.findByMoeim_Id(moeimId)).thenReturn(transactions);
+        when(transactionRepositorySample.findByMoeim_Id(moeimId)).thenReturn(transactionSamples);
 
         // When
-        List<Transaction> result = transactionService.findByMoeimId(moeimId);
+        List<TransactionSample> result = transactionService.findByMoeimId(moeimId);
 
         // Then
         assertEquals(2, result.size());
-        verify(transactionRepository, times(1)).findByMoeim_Id(moeimId);
+        verify(transactionRepositorySample, times(1)).findByMoeim_Id(moeimId);
     }
 
     @Test
@@ -86,12 +86,12 @@ class TransactionServiceImplTest {
         moeim.setAccountNumber("1234567890");
         moeim.setBalance(1000);
 
-        Transaction transaction = Transaction.builder()
+        TransactionSample transactionSample = TransactionSample.builder()
                 .categoryName("음료")
                 .build();
 
         when(moeimRepository.findAccountNumberById(moeimId)).thenReturn(Optional.of(moeim));
-        when(transactionRepository.findFirstByMoeim(moeim)).thenReturn(transaction);
+        when(transactionRepositorySample.findFirstByMoeim(moeim)).thenReturn(transactionSample);
 
         // When
         int category = transactionService.findTransactionOne(moeimId);
@@ -116,19 +116,19 @@ class TransactionServiceImplTest {
         // Given
         Long moeimId = 1L;
         int idx = 0;
-        List<Transaction> transactions = Arrays.asList(
-                Transaction.builder().content("Transaction 1").build(),
-                Transaction.builder().content("Transaction 2").build()
+        List<TransactionSample> transactionSamples = Arrays.asList(
+                TransactionSample.builder().content("Transaction 1").build(),
+                TransactionSample.builder().content("Transaction 2").build()
         );
-        Page<Transaction> page = new PageImpl<>(transactions);
-        when(transactionRepository.findByMoeim(eq(moeimId), any(Pageable.class))).thenReturn(page);
+        Page<TransactionSample> page = new PageImpl<>(transactionSamples);
+        when(transactionRepositorySample.findByMoeim(eq(moeimId), any(Pageable.class))).thenReturn(page);
 
         // When
         List<GetTransactionResponseDTO> result = transactionService.getTransactionList(moeimId, idx);
 
         // Then
         assertEquals(2, result.size());
-        verify(transactionRepository, times(1)).findByMoeim(eq(moeimId), any(Pageable.class));
+        verify(transactionRepositorySample, times(1)).findByMoeim(eq(moeimId), any(Pageable.class));
     }
 
     @Test
@@ -138,18 +138,18 @@ class TransactionServiceImplTest {
         int year = 2024;
         int month = 12;
 
-        Transaction transaction1 = Transaction.builder()
+        TransactionSample transactionSample1 = TransactionSample.builder()
                 .categoryName("음료")
                 .withdrawalAmount(500)
                 .build();
 
-        Transaction transaction2 = Transaction.builder()
+        TransactionSample transactionSample2 = TransactionSample.builder()
                 .categoryName("회식")
                 .withdrawalAmount(1000)
                 .build();
 
-        when(transactionRepository.findByMoeimAndYearAndMonth(eq(moeimId), eq(year), eq(month)))
-                .thenReturn(Arrays.asList(transaction1, transaction2));
+        when(transactionRepositorySample.findByMoeimAndYearAndMonth(eq(moeimId), eq(year), eq(month)))
+                .thenReturn(Arrays.asList(transactionSample1, transactionSample2));
 
         // When
         List<GetTransactionByCategoryResponseDTO> result = transactionService.getTransactionListByCategory(moeimId, year, month);
@@ -158,6 +158,6 @@ class TransactionServiceImplTest {
         assertEquals(2, result.size());
         assertEquals("회식", result.get(0).getCategory());
         assertEquals(66.7, result.get(0).getRate(), 0.1); // 1000/1500 = 66.7%
-        verify(transactionRepository, times(1)).findByMoeimAndYearAndMonth(eq(moeimId), eq(year), eq(month));
+        verify(transactionRepositorySample, times(1)).findByMoeimAndYearAndMonth(eq(moeimId), eq(year), eq(month));
     }
 }
