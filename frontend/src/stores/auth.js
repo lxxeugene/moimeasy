@@ -21,6 +21,7 @@ export const useAuthStore = defineStore('auth', {
         // 사용자 정보 저장
         this.user = {
           userId: response.data.userId,
+          moiemId: response.data.moiemId,
           name: response.data.name,
           email: response.data.email,
           nickname: response.data.nickname,
