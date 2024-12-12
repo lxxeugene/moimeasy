@@ -25,19 +25,19 @@ public class WithdrawalService {
         Moeim withdrawAccount = moeimRepository.findAccountNumber(moeimAccount);
 
         // 출금 후 계좌 잔액 업데이트
-        double withdrawResult = withdrawAccount.getBalance() - amount;
-        withdrawAccount.setBalance(withdrawResult);
+        double withdrawResult = withdrawAccount.getAmount() - amount;
+        withdrawAccount.setAmount(withdrawResult);
     }
 
     // 회원 계좌에서 출금
-    @Transactional
-    public void userAccountWithdraw(String userAccount, double amount){
-
-        User withdrawAccount = userRepository.findAccountNumber(userAccount);
-
-        // 출금 후 계좌 잔액 업데이트
-        double withdrawResult = withdrawAccount.getBalance() - amount;
-        withdrawAccount.setBalance(withdrawResult);
-    }
+//    @Transactional
+//    public void userAccountWithdraw(Long userId, double amount){
+//
+//        User withdrawAccount = userRepository.findById(userId);
+//
+//        // 출금 후 계좌 잔액 업데이트
+//        double withdrawResult = withdrawAccount.getAmount() - amount;
+//        withdrawAccount.setAmount(withdrawResult);
+//    }
 
 }

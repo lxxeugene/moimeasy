@@ -4,12 +4,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 public class WithdrawDto {
 
     @Getter
+    @Setter
     public static class Request {
 
         @NotBlank(message = "계좌번호는 필수값입니다.")

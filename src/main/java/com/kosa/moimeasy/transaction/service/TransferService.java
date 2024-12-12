@@ -34,16 +34,16 @@ public class TransferService {
 
         double transferAmount = transferRequestDTO.getTransferAmount(); // 이체 금액
 
-        userAccount.withdraw(transferRequestDTO.getTransferAmount()); // 회원 계좌 출금
-        moeimAccount.deposit(transferRequestDTO.getTransferAmount()); // 모임 계좌 입금
+        userAccount.setAmount(userAccount.getAmount() - transferAmount); // 회원 계좌 출금
+        moeimAccount.setAmount(moeimAccount.getAmount() +  transferAmount); // 모임 계좌 입금
 
         // 거래 내역 저장
         TransactionSample transactionSample = TransactionSample.builder()
                 .user(userAccount) // 회원 계좌
                 .moeim(moeimAccount) // 모임 계좌
                 .transferAmount(transferAmount) // 이체 금액
-                .withdrawalAmount(userAccount.getBalance()) // 회원 계좌의 잔액 (출금 후)
-                .depositAmount(moeimAccount.getBalance()) // 모임 계좌의 잔액 (입금 후)
+                .withdrawalAmount(userAccount.getAmount()) // 회원 계좌의 잔액 (출금 후)
+                .depositAmount(moeimAccount.getAmount()) // 모임 계좌의 잔액 (입금 후)
                 .content(transferRequestDTO.getContent()) // 거래 내용
                 .transactionType(1) // (출금: 0 입금 : 1)
                 .categoryName("회비 입금") // 소비 항목
@@ -67,7 +67,7 @@ public class TransferService {
 
     // 회원 계좌 조회
     private User getUserAccount(Long userId){
-        return userRepository.findAccountNumberById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 

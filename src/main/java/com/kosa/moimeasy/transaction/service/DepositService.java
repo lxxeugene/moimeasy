@@ -23,7 +23,7 @@ public class DepositService {
         Moeim depositAccount = moeimRepository.findAccountNumber(depositAccountNumber);
 
         // 입금할 금액을 모임의 잔액에 저장
-        double depositResult = depositAccount.getBalance() + amount;
-        depositAccount.setBalance(depositResult);
+        double depositResult = depositAccount.getAmount() + amount;
+        depositAccount.setAmount(depositResult);
     }
 }

@@ -3,11 +3,13 @@ package com.kosa.moimeasy.transaction.dto;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 
 public class RemittanceDto {
 
     @Getter
+    @Setter
     public static class Request {
 
         @NotBlank(message = "보내는 계좌번호는 필수값입니다.")
