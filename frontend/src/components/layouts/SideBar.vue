@@ -64,6 +64,7 @@ import GraphIcon from '@/assets/icons/graphIcon.svg?url';
 import PanelMenu from 'primevue/panelmenu';
 import { ref } from 'vue';
 import NavLogo from './NavLogo.vue';
+import ChatIcon from '@/assets/icons/chatIcon.svg?url';
 
 //사이드바 메뉴구성 아이템
 const items = ref([
@@ -90,12 +91,12 @@ const items = ref([
       {
         label: '회원관리-1',
         icon: UsersIcon,
-        url: 'https://vuejs.org/', // 외부 링크는 url을 사용
+        route: '/user-manage',
       },
       {
         label: '회원관리-2',
         icon: UsersIcon,
-        route: '/login', // 내부 링크는 route를 사용
+        route: '/invitation-list',
       },
     ],
   },
@@ -120,14 +121,14 @@ const items = ref([
     icon: Notebook,
     items: [
       {
-        label: '회비관리-1',
+        label: '납부내역',
         icon: Notebook,
-        url: 'https://vuejs.org/',
+        route: '/pay-list',
       },
       {
-        label: '회비관리-2',
+        label: '거래내역',
         icon: Notebook,
-        url: 'https://vuejs.org/',
+        route: '/trade-list',
       },
     ],
   },
@@ -136,17 +137,28 @@ const items = ref([
     icon: GraphIcon,
     items: [
       {
-        label: '통계-1',
+        label: '카테고리별',
         icon: GraphIcon,
-        url: 'https://vuejs.org/',
+        route: '/category',
       },
       {
-        label: '통계-2',
+        label: '월별',
         icon: GraphIcon,
-        url: 'https://vuejs.org/',
+        route: '/category',
       },
     ],
   },
+  {
+      label: '채팅',
+      icon: ChatIcon,
+      items: [
+        {
+          label: '채팅목록',
+          icon: ChatIcon,
+          url: '/chat-room-list',
+        },
+      ],
+    },
 ]);
 </script>
 
