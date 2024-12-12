@@ -89,12 +89,12 @@ const items = ref([
     icon: UsersIcon,
     items: [
       {
-        label: '회원관리-1',
+        label: '회원관리',
         icon: UsersIcon,
         route: '/user-manage',
       },
       {
-        label: '회원관리-2',
+        label: '초대목록',
         icon: UsersIcon,
         route: '/invitation-list',
       },

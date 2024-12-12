@@ -25,8 +25,16 @@ public class UserController {
     private RoleService roleService;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getUsersByMoeimId(@RequestParam Long moeimId) {
+    public ResponseEntity<List<UserDTO>> getUsersByMoeimId(@RequestParam(required = false) Long moeimId) {
+        if (moeimId == null) {
+            throw new IllegalArgumentException("moeimId는 필수 파라미터입니다.");
+        }
+
         List<User> users = userService.findByMoeimId(moeimId);
+        if (users.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 데이터가 없는 경우 204 반환
+        }
+
         List<UserDTO> userDTOs = users.stream().map(UserDTO::new).toList();
         return ResponseEntity.ok(userDTOs);
     }

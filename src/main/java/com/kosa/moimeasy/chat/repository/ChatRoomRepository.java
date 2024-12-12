@@ -13,10 +13,9 @@ import java.util.List;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
-    @EntityGraph(attributePaths = {"users"})
+    @EntityGraph(attributePaths = {"members.user"})
     List<ChatRoom> findAll();
 
-    @Query("SELECT DISTINCT cr FROM ChatRoom cr JOIN cr.members m WHERE m.userId = :userId")
+    @Query("SELECT DISTINCT cr FROM ChatRoom cr JOIN cr.members m WHERE m.user.userId = :userId")
     List<ChatRoom> findByUserId(@Param("userId") Long userId);
-
 }

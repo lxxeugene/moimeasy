@@ -87,37 +87,41 @@ export default {
   },
   methods: {
     async fetchRooms() {
-  try {
-    const token = this.authStore.accessToken;
-    const response = await axios.get('/api/v1/chat/rooms', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    this.rooms = response.data;
-  } catch (error) {
-    if (error.response && error.response.status === 401) { // Example: Check for 401 Unauthorized
       try {
-        await this.authStore.refreshAccessToken();
-      } catch (refreshError) {
-        // Handle refresh token failure (e.g., log out)
-        this.authStore.logout();
-        return;
-      }
-      // Retry the API request with the refreshed token
-      return this.fetchRooms(); 
-    }
-    console.error('Error fetching chat rooms:', error);
-  }
-},
-    async fetchMembers() {
-      try {
-        const token = this.authStore.token;
-        const response = await axios.get('/api/v1/users', {
+        const token = this.authStore.accessToken;
+        const response = await api.get('/api/v1/chat/rooms', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        this.rooms = response.data;
+      } catch (error) {
+        if (error.response?.status === 401) {
+          try {
+            await this.authStore.refreshAccessToken();
+            return this.fetchRooms(); // 토큰 갱신 후 다시 요청
+          } catch (refreshError) {
+            this.authStore.logout();
+            return;
+          }
+        }
+        console.error('Error fetching chat rooms:', error);
+      }
+    },
+    async fetchMembers() {
+      try {
+        const token = this.authStore.accessToken;
+        const moeimId = this.authStore.user.moeimId;
+
+        console.log('Fetching members with moeimId:', moeimId);
+
+        const response = await api.get('/api/v1/users', {
+          params: { moeimId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         this.members = response.data;
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -139,7 +143,7 @@ export default {
           createdBy: this.authStore.user.id, // 현재 사용자 ID
           memberIds: this.selectedMembers,
         };
-        const response = await axios.post('/api/v1/chat/room', payload, {
+        const response = await api.post('/api/v1/chat/room', payload, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -273,7 +277,6 @@ hr {
   border-radius: 10px;
   max-width: 500px;
   width: 100%;
-  
 }
 
 .members-list {

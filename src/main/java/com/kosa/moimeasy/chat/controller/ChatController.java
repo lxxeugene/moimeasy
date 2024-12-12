@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -28,43 +29,59 @@ public class ChatController {
 
     private final ChatService chatService;
 
+    // 채팅방 목록 조회
+    @GetMapping("/rooms")
+    public ResponseEntity<List<ChatRoom>> getAllRooms(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = Long.valueOf(userDetails.getUsername()); // UserDetails에서 사용자 ID 추출
+        return ResponseEntity.ok(chatService.getAllRooms(userId));
+    }
+
+    // 채팅방 생성
     @PostMapping("/room")
-    public ResponseEntity<ChatRoom> createRoom(@RequestBody CreateRoomDTO request) {
-        Long userId = getLoggedInUserId(); // 로그인된 사용자 ID 추출
+    public ResponseEntity<ChatRoom> createRoom(@RequestBody CreateRoomDTO request, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = Long.valueOf(userDetails.getUsername());
         ChatRoom chatRoom = chatService.createRoom(request, userId);
         return ResponseEntity.ok(chatRoom);
     }
 
-    @GetMapping("/rooms")
-    public ResponseEntity<List<ChatRoom>> getAllRooms() {
-        Long userId = getLoggedInUserId(); // JWT에서 로그인된 사용자 ID 추출
-        return ResponseEntity.ok(chatService.getAllRooms(userId));
-    }
-
-    private Long getLoggedInUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !(authentication.getPrincipal() instanceof UserDetails)) {
-            throw new IllegalArgumentException("유효하지 않은 인증 정보입니다.");
-        }
-        return Long.valueOf(authentication.getName()); // JWT에서 userId 추출
-    }
-
-
-
-
+    // 메시지 전송
     @PostMapping("/message")
-    public ResponseEntity<ChatMessage> sendMessage(@RequestBody SendMessageDTO request) {
+    public ResponseEntity<ChatMessage> sendMessage(@RequestBody SendMessageDTO request, @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = Long.valueOf(userDetails.getUsername());
+        request.setSenderId(userId); // 요청의 senderId를 로그인된 사용자 ID로 설정
         ChatMessage message = chatService.sendMessage(request);
         return ResponseEntity.ok(message);
     }
 
+    // 새로운 메시지 폴링
     @GetMapping("/rooms/{roomId}/poll-messages")
     public ResponseEntity<List<ChatMessage>> pollMessages(
             @PathVariable Long roomId,
-            @RequestParam Long lastMessageId) {
+            @RequestParam Long lastMessageId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = Long.valueOf(userDetails.getUsername());
+        // Optional: 사용자가 해당 방의 멤버인지 검증 로직 추가 가능
         List<ChatMessage> messages = chatService.getMessagesSince(roomId, lastMessageId);
         return ResponseEntity.ok(messages);
     }
+
 
 
 

@@ -20,12 +20,13 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(nullable = false)
     private String name; // 채팅방 이름
 
-    @OneToMany(mappedBy = "chatRoom")
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoomUser> members = new ArrayList<>();
 
     @Column(nullable = false)
     private Long createdBy; // 채팅방 생성자
 }
+
 
 
 

@@ -9,23 +9,26 @@ import lombok.Setter;
 @Table(name = "chat_room_users")
 @Getter
 @Setter
-public class ChatRoomUser {
+public class ChatRoomUser extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "chat_room_id")
+    @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    private Long userId; // Store userId directly
+    @Column(name = "user_nickname", nullable = false)
+    private String userNickname; // 캐싱된 닉네임(필요 시)
 
-    @Column(nullable = false)
-    private String userNickname;
+    @Column(name = "last_read_message_id")
+    private Long lastReadMessageId;
 }
+
+
+

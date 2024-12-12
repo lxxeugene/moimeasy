@@ -50,18 +50,20 @@ public class ChatService {
         chatRoom.setCreatedBy(userId);
 
         chatRoom = chatRoomRepository.save(chatRoom);
+
         // ChatRoomUser 생성 및 저장
+        ChatRoom finalChatRoom = chatRoom;
         members.forEach(user -> {
             ChatRoomUser chatRoomUser = new ChatRoomUser();
-            chatRoomUser.setChatRoom(chatRoom);
+            chatRoomUser.setChatRoom(finalChatRoom); // finalChatRoom 사용
             chatRoomUser.setUser(user);
-            chatRoomUser.setUserId(user.getId());
             chatRoomUser.setUserNickname(user.getNickname());
             chatRoomUserRepository.save(chatRoomUser);
         });
 
         return chatRoom;
     }
+
 
 
 
@@ -79,6 +81,14 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
+        // 사용자가 채팅방에 포함되어 있는지 확인
+        boolean isMember = chatRoom.getMembers().stream()
+                .anyMatch(member -> member.getUser().getUserId().equals(request.getSenderId()));
+
+        if (!isMember) {
+            throw new IllegalArgumentException("사용자는 이 채팅방의 멤버가 아닙니다.");
+        }
+
         ChatMessage message = new ChatMessage();
         message.setSender(request.getSenderId());
         message.setChatRoom(chatRoom);
@@ -93,8 +103,8 @@ public class ChatService {
         return chatMessageRepository.save(message);
     }
 
+
     public List<ChatRoom> getAllRooms(Long userId) {
-        // 사용자 ID가 포함된 채팅방만 조회
         return chatRoomRepository.findByUserId(userId);
     }
 
