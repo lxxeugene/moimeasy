@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/HomeView.vue';
 import Login from '@/views/login/LoginView.vue';
-import Signup from '@/views/login/SignupView.vue';
+import Signup from '@/views/signup/SignupView.vue';
 import MoeimSelect from '@/views/moeim/MoeimSelectView.vue';
 import CreateMoeim from '@/views/moeim/CreateMoeimView.vue';
 import EnterMoeim from '@/views/moeim/EnterMoeimView.vue';

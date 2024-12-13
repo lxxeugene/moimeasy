@@ -144,8 +144,8 @@ public class LoginServiceImpl implements LoginService {
         log.debug("Refresh Token 갱신 성공: {}", newRefreshToken);
 
         return TokenResponseDTO.builder()
-                .moiemId(user.getMoeimId())
                 .userId(user.getUserId())
+                .moiemId(user.getMoeimId())
                 .name(user.getUserName())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
