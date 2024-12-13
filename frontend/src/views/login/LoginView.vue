@@ -31,6 +31,7 @@
       </div>
       <button type="submit" class="btn-primary">로그인</button>
     </form>
+    <!-- 회원가입 버튼 -->
     <button class="btn-secondary" @click="goToSignup">회원가입</button>
   </div>
 </template>
@@ -54,7 +55,7 @@ export default {
     return { authStore };
   },
   methods: {
-    async handleLogin() {
+    async handleLogin() {  // 로그인 처리 코드
       if (this.form.email.trim() === '' || this.form.password.trim() === '') {
         alert('모든 필드를 채워주세요.');
         return;
@@ -89,7 +90,8 @@ export default {
       alert('비밀번호 찾기 기능은 아직 준비 중입니다.');
     },
     goToSignup() {
-      this.$router.push('/signup');
+      console.log('회원가입 버튼 클릭');
+      this.$router.push('/signup'); // 회원가입 페이지로 이동
     },
   },
 };

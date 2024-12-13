@@ -167,6 +167,12 @@ export default {
       isEmailChecked: false
     }
   },
+  mounted() {
+    const isAuthenticated = localStorage.getItem('accessToken');
+    if (isAuthenticated) {
+      this.$router.push('/main'); // 로그인된 사용자는 메인 페이지로 리디렉션
+    }
+  },
   methods: {
     /**
      * 회원가입 처리
