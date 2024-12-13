@@ -21,6 +21,8 @@ import Avatar from 'primevue/avatar';
 import FileUpload from 'primevue/fileupload';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
+import Select from 'primevue/select';
+import FloatLabel from 'primevue/floatlabel';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 //axios.defaults.baseURL = 'http://localhost:8088';
@@ -42,6 +44,8 @@ app.component('LoadingOverlay', LoadingOverlay);
 app.component('Avatar', Avatar);
 app.component('FileUpload', FileUpload);
 app.component('ConfirmDialog', ConfirmDialog);
+app.component('Select', Select);
+app.component('FloatLabel', FloatLabel);
 // PrimeVue 플러그인 등록
 app.use(
   PrimeVue,
