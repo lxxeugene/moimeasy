@@ -1,4 +1,5 @@
 <template>
+  <Toast position="bottom-right" />
   <Dialog
     v-model:visible="visible"
     :modal="false"
@@ -95,6 +96,9 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import { createEventId } from '@/utils/event-utils';
 import axios from 'axios';
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+const toast = useToast();
 
 // 스토어
 const loadingStore = useLoadingStore();
@@ -132,7 +136,7 @@ const calendarOptions = reactive({
     googleCalendarPlugin,
   ],
   headerToolbar: {
-    left: 'today myCustomButton',
+    left: 'today', // 추후 myCustomButton버튼 추가
     center: 'prev title next',
     right: 'timeGridDay,timeGridWeek,dayGridMonth',
   },
@@ -164,20 +168,20 @@ const calendarOptions = reactive({
   //     className: 'holiday-event',
   //   },
   // ],
-  customButtons: {
-    myCustomButton: {
-      text: 'Add',
-      click: () => {
-        const calendarApi = calendarRef.value.getApi();
-        calendarApi.addEvent({
-          title: 'New Event',
-          start: new Date(),
-          end: new Date(),
-        });
-        alert('새 이벤트가 추가되었습니다!');
-      },
-    },
-  },
+  // customButtons: {
+  //   myCustomButton: {
+  //     text: 'Add',
+  //     click: () => {
+  //       const calendarApi = calendarRef.value.getApi();
+  //       calendarApi.addEvent({
+  //         title: 'New Event',
+  //         start: new Date(),
+  //         end: new Date(),
+  //       });
+  //       alert('새 이벤트가 추가되었습니다!');
+  //     },
+  //   },
+  // },
 });
 
 //아래부터 메서드 정의
@@ -250,9 +254,9 @@ function rejectDialog() {
 function closeDialog() {
   visible.value = false;
 }
-
+// 삭제 클릭 이벤트
 function handleEventClick(clickInfo) {
-  console.log(clickInfo);
+  console.log('삭제클릭', clickInfo.event);
   if (confirm(`이벤트 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`)) {
     clickInfo.event.remove();
   }
@@ -273,12 +277,14 @@ async function handleEventAdd(eventInfo) {
       startTime: event.start,
       endTime: event.end,
       isAllDayEvent: event.allDay,
+      // className: 'custom-event',
       description: event.extendedProps.description,
       location: event.extendedProps.location,
       attendants: event.extendedProps.attendants,
       priority: event.extendedProps.priority,
     });
     console.log('이벤트 추가 성공:', response.data);
+    showSuccess();
   } catch (error) {
     console.error('이벤트 추가 실패:', error);
   }
@@ -321,6 +327,7 @@ async function fetchEvents() {
       start: event.startTime,
       end: event.endTime,
       allDay: event.isAllDayEvent,
+      // className: 'custom-event ',
       extendedProps: {
         description: event.description || '',
         location: event.location || '미정',
@@ -345,6 +352,15 @@ async function fetchEvents() {
     loadingStore.stopLoading(); // 로딩스피너 제거
   }
 }
+//일정등록 토스트알림
+const showSuccess = () => {
+  toast.add({
+    severity: 'success',
+    summary: '[일정 등록]',
+    detail: '새 일정이 등록되었습니다.',
+    life: 3000,
+  });
+};
 
 // 컴포넌트 마운트 시 이벤트 fetch로 가져옴
 onMounted(() => {

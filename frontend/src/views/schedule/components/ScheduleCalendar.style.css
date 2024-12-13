@@ -163,7 +163,14 @@
 /* 공휴일 이벤트 */
 .holiday-event {
   background-color: #fff4e7;
-
+  border: none;
+  border-left: 4px solid #ffb85c !important;
+  i {
+    color: #ffb85c;
+  }
+}
+.custom-event {
+  background-color: #fff4e7;
   border: none;
   border-left: 4px solid #ffb85c !important;
   i {
