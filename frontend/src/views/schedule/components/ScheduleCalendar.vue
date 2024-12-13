@@ -1,6 +1,6 @@
 <template>
   <Toast position="bottom-right" />
-  <ConfirmDialog group="positioned" showIcon="false"></ConfirmDialog>
+  <ConfirmDialog group="positioned" :modal="false"></ConfirmDialog>
   <Dialog
     v-model:visible="visible"
     :modal="false"
