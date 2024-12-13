@@ -119,6 +119,7 @@ const router = createRouter({
 //     next(); // 인증된 사용자는 요청한 경로로 이동
 //   }
 // });
+
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
 
