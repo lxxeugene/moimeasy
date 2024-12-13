@@ -30,10 +30,11 @@ export const useAuthStore = defineStore('auth', {
         localStorage.setItem('user', JSON.stringify(this.user));
 
         // 로그인 성공 시 리디렉션
-        router.push('/main'); // 원하는 페이지로 변경 가능
+        const redirectPath = router.currentRoute.value.query.redirect || '/main';
+        router.push(redirectPath); // 원하는 페이지로 변경 가능
       } catch (error) {
         if (error.response && error.response.data) {
-          this.errorMessage = error.response.data;
+          this.errorMessage = error.response.data.message || '로그인 실패';
         } else {
           this.errorMessage = '로그인 중 오류가 발생했습니다.';
         }
@@ -42,7 +43,13 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout() {
       try {
-        await api.post('/logout');
+        await api.post('/api/v1/logout', null, {
+          headers: {
+            Authorization: `Bearer ${this.accessToken}`, // Access Token 헤더 추가
+          },
+          withCredentials: true, // 쿠키 포함
+        });
+        alert('로그아웃이 성공적으로 처리되었습니다.'); // 알림 추가
       } catch (error) {
         console.error('로그아웃 중 오류가 발생했습니다.', error);
       } finally {
