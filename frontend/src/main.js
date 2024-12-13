@@ -10,7 +10,6 @@ import SideSpeedDial from './components/layouts/SideSpeedDial.vue';
 import PrimeVue from 'primevue/config'; // PrimeVue 추가
 import Aura from '@primevue/themes/aura';
 import ToastService from 'primevue/toastservice';
-import ConfirmationService from 'primevue/confirmationservice';
 import DialogService from 'primevue/dialogservice';
 import { createPinia } from 'pinia';
 import Button from 'primevue/button';
@@ -20,6 +19,8 @@ import LoadingOverlay from './components/common/LoadingOverlay.vue';
 import Noir from './presets/Noir.js';
 import Avatar from 'primevue/avatar';
 import FileUpload from 'primevue/fileupload';
+import ConfirmationService from 'primevue/confirmationservice';
+import ConfirmDialog from 'primevue/confirmdialog';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 //axios.defaults.baseURL = 'http://localhost:8088';
@@ -40,6 +41,7 @@ app.component('PanelMenu', PanelMenu);
 app.component('LoadingOverlay', LoadingOverlay);
 app.component('Avatar', Avatar);
 app.component('FileUpload', FileUpload);
+app.component('ConfirmDialog', ConfirmDialog);
 // PrimeVue 플러그인 등록
 app.use(
   PrimeVue,
@@ -55,9 +57,9 @@ app.use(
   },
   { ripple: true }
 );
-app.use(ConfirmationService);
 app.use(ToastService);
 app.use(DialogService);
+app.use(ConfirmationService);
 app.use(pinia);
 // 전역 속성으로 Axios 설정 (선택 사항)
 app.config.globalProperties.$axios = api;

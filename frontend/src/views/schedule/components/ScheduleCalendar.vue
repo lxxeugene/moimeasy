@@ -1,5 +1,6 @@
 <template>
   <Toast position="bottom-right" />
+  <ConfirmDialog group="positioned"></ConfirmDialog>
   <Dialog
     v-model:visible="visible"
     :modal="false"
@@ -70,6 +71,13 @@
   </Dialog>
 
   <div class="demo-app">
+    <Button
+      @click="confirmPosition('top')"
+      icon="pi pi-arrow-down"
+      label="Top"
+      severity="secondary"
+      style="min-width: 10rem"
+    ></Button>
     <div class="demo-app-main">
       <FullCalendar
         ref="calendarRef"
@@ -98,7 +106,9 @@ import axios from 'axios';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
 const toast = useToast();
+const primeConfirm = useConfirm();
 
 // 스토어
 const loadingStore = useLoadingStore();
@@ -256,10 +266,8 @@ function closeDialog() {
 }
 // 삭제 클릭 이벤트
 function handleEventClick(clickInfo) {
-  console.log('삭제클릭', clickInfo.event);
-  if (confirm(`이벤트 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`)) {
-    clickInfo.event.remove();
-  }
+  console.log('삭제 클릭 이벤트', clickInfo.event);
+  confirmPosition('top', clickInfo);
 }
 
 function handleEvents(events) {
@@ -307,11 +315,11 @@ async function handleEventChange(eventInfo) {
 
 async function handleEventRemove(eventInfo) {
   console.log('삭제이벤트호출');
-
   const event = eventInfo.event;
   try {
     const response = await axios.delete(`/api/v1/events/${event.id}`);
     console.log('이벤트 삭제 성공:', response.data);
+    eventInfo.event.remove(); // 캘린더에서 이벤트 제거
   } catch (error) {
     console.error('이벤트 삭제 실패:', error);
   }
@@ -356,12 +364,47 @@ async function fetchEvents() {
 const showSuccess = () => {
   toast.add({
     severity: 'success',
-    summary: '[일정 등록]',
-    detail: '새 일정이 등록되었습니다.',
+    summary: '일정 등록',
+    detail: '새 일정이 등록되었습니다',
     life: 3000,
   });
 };
-
+const confirmPosition = (position, clickInfo) => {
+  console.error('dddd');
+  primeConfirm.require({
+    group: 'positioned',
+    message: `등록된 일정 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`,
+    header: '일정 삭제',
+    icon: 'pi pi-info-circle',
+    position: 'top',
+    rejectProps: {
+      label: '취소',
+      severity: 'secondary',
+      text: true,
+    },
+    acceptProps: {
+      label: '삭제',
+      text: true,
+    },
+    accept: () => {
+      handleEventRemove(clickInfo);
+      toast.add({
+        severity: 'info',
+        summary: '일정삭제',
+        detail: '등록된 일정이 삭제되었습니다',
+        life: 3000,
+      });
+    },
+    reject: () => {
+      toast.add({
+        severity: 'error',
+        summary: '일정삭제',
+        detail: '취소되었습니다',
+        life: 3000,
+      });
+    },
+  });
+};
 // 컴포넌트 마운트 시 이벤트 fetch로 가져옴
 onMounted(() => {
   fetchEvents();
