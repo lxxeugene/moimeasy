@@ -94,7 +94,7 @@ const items = ref([
         route: '/user-manage',
       },
       {
-        label: '초대목록',
+        label: '초대목록',
         icon: UsersIcon,
         route: '/invitation-list',
       },
@@ -159,6 +159,7 @@ const items = ref([
         },
       ],
     },
+
 ]);
 </script>
 

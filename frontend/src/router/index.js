@@ -110,12 +110,28 @@ const router = createRouter({
   routes,
 });
 
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
+  
+//   if (to.path !== '/login' && !isAuthenticated) {
+//     next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+//   } else {
+//     next(); // 인증된 사용자는 요청한 경로로 이동
+//   }
+// });
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
-  if (to.path !== '/login' && !isAuthenticated) {
-    next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+
+  // 로그인이 필요한 페이지를 지정 (예: /main, /moeim-select)
+  const requiresAuth = !['/login', '/signup'].includes(to.path);
+
+  if (requiresAuth && !isAuthenticated) {
+    // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+    next('/login');
   } else {
-    next(); // 인증된 사용자는 요청한 경로로 이동
+    // 인증된 사용자 또는 예외 경로는 그대로 진행
+    next();
   }
 });
+
 export default router;
