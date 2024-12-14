@@ -114,6 +114,14 @@ public class ChatService {
         return chatMessageRepository.findByChatRoomIdAndIdGreaterThanOrderByCreatedAtAsc(roomId, lastMessageId);
     }
 
+    @Transactional
+    public List<String> getMemberNicknames(List<Long> memberIds) {
+        // UserRepository를 통해 사용자 닉네임 조회
+        return userRepository.findAllById(memberIds).stream()
+                .map(User::getNickname)
+                .collect(Collectors.toList());
+    }
+
 
 
 }

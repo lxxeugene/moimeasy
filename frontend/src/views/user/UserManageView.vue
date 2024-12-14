@@ -101,7 +101,6 @@ export default {
       return this.sortedUsers.slice(start, start + this.rowsPerPage);
     },
   },
-
   methods: {
     async fetchUsers() {
       try {
@@ -117,12 +116,15 @@ export default {
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        // 응답 데이터 매핑
         this.users = response.data.map((user) => ({
-          id: user.userId,
-          name: user.userName || 'N/A',
-          nickname: user.nickname || 'N/A',
-          role: user.roleName || 'N/A',
-          joinDate: user.createAt || 'N/A',
+          id: user.userId, // 회원 ID
+          name: user.userName || 'N/A', // 이름
+          nickname: user.nickname || 'N/A', // 닉네임
+          role: user.roleName || 'N/A', // 권한
+          joinDate: user.createAt
+            ? new Date(user.createAt).toLocaleDateString()
+            : 'N/A', // 가입 날짜 (날짜 형식 변환)
         }));
 
         this.currentPage = 1;
@@ -137,10 +139,17 @@ export default {
       if (this.currentPage > 1) this.currentPage--;
     },
     inviteMember() {
-      this.$router.push({ name: 'InviteUser' });
+      this.$router.push({ name: '회원초대' });
     },
     viewProfile(user) {
-      this.$router.push({ name: 'UserProfile', params: { userId: user.id } });
+      if (!user.id) {
+        console.error('User ID is missing');
+        return;
+      }
+      this.$router.push({
+        name: '회원프로필',
+        params: { userId: user.id.toString() },
+      });
     },
   },
   watch: {

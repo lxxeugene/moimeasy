@@ -76,6 +76,13 @@ public class UserController {
         Long userId = Long.valueOf(userDetails.getUsername()); // 현재 로그인된 사용자 ID
 
         List<UserDTO> members = userService.getUsersByMoeimId(moeimId);
+
+        // DTO에 필요한 정보만 설정
+        members.forEach(member -> {
+            member.setRoleName(member.getRoleName());
+            member.setCreateAt(member.getCreateAt());
+        });
+
         return ResponseEntity.ok(members);
     }
 

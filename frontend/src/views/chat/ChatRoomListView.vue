@@ -13,18 +13,31 @@
         @click="enterRoom(room.id)"
         class="room-item"
       >
-        <span class="room-name">{{ room.name }}</span>
+        <div class="room-header">
+          <!-- 채팅방명이 있을 경우 표시 -->
+          <span v-if="room.name" class="room-name">{{ room.name }}</span>
+          <!-- 채팅방명이 없으면 참여자 닉네임 표시 -->
+          <span v-else class="room-name">
+            {{
+              Array.isArray(room.members)
+                ? room.members.map((member) => member.userNickname).join(', ')
+                : '참여자 없음'
+            }}
+          </span>
+        </div>
         <hr />
-        <p>
+        <!-- 참여자 목록을 채팅방명이 있더라도 항상 표시 -->
+        <p class="room-participants">
           참여자:
           {{
-            room.members
+            Array.isArray(room.members)
               ? room.members.map((member) => member.userNickname).join(', ')
               : '참여자 없음'
           }}
         </p>
       </li>
     </ul>
+
     <!-- 채팅방 생성 모달 -->
     <Dialog
       header="채팅방 생성"
@@ -128,7 +141,11 @@ export default {
           params: { userId },
         });
 
-        this.rooms = response.data;
+        console.log('Rooms API response:', response.data);
+        this.rooms = response.data.map((room) => ({
+          ...room,
+          members: room.members || [], // members가 null/undefined인 경우 빈 배열로 설정
+        }));
       } catch (error) {
         console.error('Error fetching chat rooms:', error);
       }
@@ -191,8 +208,7 @@ export default {
         console.error('Room ID is not defined.');
         return;
       }
-      console.log(`Room selected: ${roomId}`); // 선택된 채팅방 ID 확인
-      this.$emit('selectRoom', roomId); // 부모 컴포넌트로 roomId 전달
+      this.$emit('selectRoom', roomId);
     },
   },
   mounted() {
@@ -337,5 +353,15 @@ hr {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+}
+.room-header {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.room-participants {
+  font-size: 14px;
+  color: #777;
 }
 </style>

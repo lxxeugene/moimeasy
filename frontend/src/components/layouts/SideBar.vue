@@ -172,17 +172,16 @@ const items = ref([
     ],
   },
   {
-      label: '채팅',
-      icon: ChatIcon,
-      items: [
-        {
-          label: '채팅목록',
-          icon: ChatIcon,
-          url: '/chat-room-list',
-        },
-      ],
-    },
-
+    label: '채팅',
+    icon: ChatIcon,
+    items: [
+      {
+        label: '채팅목록',
+        icon: ChatIcon,
+        url: '/chat-layout',
+      },
+    ],
+  },
 ]);
 </script>
 

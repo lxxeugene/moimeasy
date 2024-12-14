@@ -7,7 +7,9 @@
 
     <!-- 채팅방 뷰 -->
     <div class="chat-view">
-      <ChatView v-if="selectedRoomId" :roomId="selectedRoomId" />
+      <div v-if="selectedRoomId">
+        <ChatView :key="selectedRoomId" :roomId="selectedRoomId" />
+      </div>
       <div v-else class="no-chat-selected">채팅방을 선택하세요.</div>
     </div>
   </div>
