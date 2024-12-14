@@ -22,6 +22,17 @@
                 <span class="menu-title">{{ item.label }}</span>
               </a>
             </router-link>
+            <!-- 로그아웃 및 기타 -->
+            <a
+              v-else-if="item.command"
+              v-ripple
+              class="dropmenu-item"
+              href="#"
+              @click.prevent="item.command"
+            >
+              <img class="icon-dashboard" :src="item.icon" width="15px" />
+              <span class="menu-title">{{ item.label }}</span>
+            </a>
             <!-- 기타 메뉴 -->
             <a
               v-else
@@ -63,8 +74,12 @@ import Notebook from '@/assets/icons/notebook.svg?url';
 import GraphIcon from '@/assets/icons/graphIcon.svg?url';
 import PanelMenu from 'primevue/panelmenu';
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
 import NavLogo from './NavLogo.vue';
 import ChatIcon from '@/assets/icons/chatIcon.svg?url';
+
+// Pinia auth 스토어 사용
+const authStore = useAuthStore();
 
 //사이드바 메뉴구성 아이템
 const items = ref([
@@ -82,6 +97,14 @@ const items = ref([
         icon: OutlineIcon,
         route: '/theming/unstyled',
       },
+      {
+        label: '로그아웃',
+        icon: OutlineIcon,
+        command: () => {
+          console.log('로그아웃 실행'); // 디버깅 로그
+          authStore.logout(); // Pinia auth 스토어의 logout 호출
+        },
+      },
     ],
   },
   {
@@ -89,12 +112,12 @@ const items = ref([
     icon: UsersIcon,
     items: [
       {
-        label: '회원관리-1',
+        label: '회원관리',
         icon: UsersIcon,
         route: '/user-manage',
       },
       {
-        label: '회원관리-2',
+        label: '초대목록',
         icon: UsersIcon,
         route: '/invitation-list',
       },
@@ -159,6 +182,7 @@ const items = ref([
         },
       ],
     },
+
 ]);
 </script>
 

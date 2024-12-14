@@ -1,6 +1,6 @@
 <template>
   <div class="profile-container">
-    <h2>회원 관리 &gt; 회원 내역 &gt; 회원 프로필</h2>
+    
     <form v-if="user">
       <div class="form-group">
         <label for="userProfile">프로필이미지</label>

@@ -3,7 +3,6 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 import axios from 'axios';
-//axios.defaults.baseURL = 'http://localhost:8088';
 import Header from './components/layouts/Header.vue';
 import SideBar from './components/layouts/SideBar.vue';
 import SideSpeedDial from './components/layouts/SideSpeedDial.vue';
@@ -16,6 +15,7 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import PanelMenu from 'primevue/panelmenu';
 import LoadingOverlay from './components/common/LoadingOverlay.vue';
+<<<<<<< HEAD
 import Noir from './presets/Noir.js';
 import Avatar from 'primevue/avatar';
 import FileUpload from 'primevue/fileupload';
@@ -23,9 +23,12 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Select from 'primevue/select';
 import FloatLabel from 'primevue/floatlabel';
+=======
+import Ripple from 'primevue/ripple';
+>>>>>>> bb769efaac9cc0b3aaa7c7530693931a55239654
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
-//axios.defaults.baseURL = 'http://localhost:8088';
+axios.defaults.baseURL = 'http://localhost:8088'; // 서버 URL 설정
 
 // 중앙집중식 Axios 인스턴스 임포트
 import api from './axios';
@@ -67,5 +70,6 @@ app.use(ConfirmationService);
 app.use(pinia);
 // 전역 속성으로 Axios 설정 (선택 사항)
 app.config.globalProperties.$axios = api;
-
+// Ripple 디렉티브 등록
+app.directive('ripple', Ripple);
 app.use(router).mount('#app');

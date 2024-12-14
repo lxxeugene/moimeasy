@@ -5,7 +5,9 @@ import com.kosa.moimeasy.chat.dto.CreateRoomDTO;
 import com.kosa.moimeasy.chat.dto.SendMessageDTO;
 import com.kosa.moimeasy.chat.entity.ChatMessage;
 import com.kosa.moimeasy.chat.entity.ChatMessage.MessageType;
+import com.kosa.moimeasy.chat.entity.ChatRoomUser;
 import com.kosa.moimeasy.chat.repository.ChatRoomRepository;
+import com.kosa.moimeasy.chat.repository.ChatRoomUserRepository;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 
@@ -25,32 +27,45 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
 
     @Transactional
     public ChatRoom createRoom(CreateRoomDTO request, Long userId) {
-        // 요청한 사용자가 포함된 `moeimId`로 멤버 필터링
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Long userMoeimId = currentUser.getMoeimId();
+
+        // `moeimId`를 기반으로 멤버 필터링
         List<User> members = userRepository.findAllById(request.getMemberIds())
                 .stream()
-                .filter(user -> user.getMoeimId().equals(request.getCreatedBy()))
+                .filter(user -> user.getMoeimId().equals(userMoeimId))
                 .collect(Collectors.toList());
 
         if (members.isEmpty()) {
-            throw new IllegalArgumentException("해당 멤버는 모임에 속해 있지 않습니다.");
+            throw new IllegalArgumentException("모임 회원이 아닙니다.");
         }
 
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setUsers(members);
-
-        // 채팅방 이름 설정
-        if (request.getRoomName() != null && !request.getRoomName().isEmpty()) {
-            chatRoom.setName(request.getRoomName());
-        } else {
-            chatRoom.setName(generateDefaultRoomName(members));
-        }
-
+        chatRoom.setName(request.getRoomName() != null ? request.getRoomName() : generateDefaultRoomName(members));
         chatRoom.setCreatedBy(userId);
-        return chatRoomRepository.save(chatRoom);
+
+        chatRoom = chatRoomRepository.save(chatRoom);
+
+        // ChatRoomUser 생성 및 저장
+        ChatRoom finalChatRoom = chatRoom;
+        members.forEach(user -> {
+            ChatRoomUser chatRoomUser = new ChatRoomUser();
+            chatRoomUser.setChatRoom(finalChatRoom); // finalChatRoom 사용
+            chatRoomUser.setUser(user);
+            chatRoomUser.setUserNickname(user.getNickname());
+            chatRoomUserRepository.save(chatRoomUser);
+        });
+
+        return chatRoom;
     }
+
+
+
 
     private String generateDefaultRoomName(List<User> members) {
         return members.stream()
@@ -60,14 +75,19 @@ public class ChatService {
                 (members.size() > 3 ? " 외 " + (members.size() - 3) + "명" : "");
     }
 
-    public List<ChatRoom> getAllRooms(Long userId) {
-        return chatRoomRepository.findByUserId(userId);
-    }
 
     @Transactional
     public ChatMessage sendMessage(SendMessageDTO request) {
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+
+        // 사용자가 채팅방에 포함되어 있는지 확인
+        boolean isMember = chatRoom.getMembers().stream()
+                .anyMatch(member -> member.getUser().getUserId().equals(request.getSenderId()));
+
+        if (!isMember) {
+            throw new IllegalArgumentException("사용자는 이 채팅방의 멤버가 아닙니다.");
+        }
 
         ChatMessage message = new ChatMessage();
         message.setSender(request.getSenderId());
@@ -83,13 +103,17 @@ public class ChatService {
         return chatMessageRepository.save(message);
     }
 
-//    public List<ChatRoom> getAllRooms() {
-//        return chatRoomRepository.findAll();
-//    }
+
+    public List<ChatRoom> getAllRooms(Long userId) {
+        return chatRoomRepository.findByUserId(userId); // 적절한 Repository 메서드 호출
+    }
+
 
     public List<ChatMessage> getMessagesSince(Long roomId, Long lastMessageId) {
-        return chatMessageRepository.findByChatRoomIdAndIdGreaterThan(roomId, lastMessageId);
+        return chatMessageRepository.findByChatRoomIdAndIdGreaterThanOrderByCreatedAtAsc(roomId, lastMessageId);
     }
+
+
 
 }
 

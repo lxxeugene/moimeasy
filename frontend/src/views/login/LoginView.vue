@@ -31,6 +31,7 @@
       </div>
       <button type="submit" class="btn-primary">로그인</button>
     </form>
+    <!-- 회원가입 버튼 -->
     <button class="btn-secondary" @click="goToSignup">회원가입</button>
   </div>
 </template>
@@ -55,6 +56,7 @@ export default {
   },
   methods: {
     async handleLogin() {
+      // 로그인 처리 코드
       if (this.form.email.trim() === '' || this.form.password.trim() === '') {
         alert('모든 필드를 채워주세요.');
         return;
@@ -62,6 +64,15 @@ export default {
       try {
         await this.authStore.login(this.form.email, this.form.password);
         console.log('로그인 성공'); // 로그인 성공 시 필요한 로직 추가 가능
+
+        // 로그인 후 moiemId 확인
+        if (this.authStore.user.moiemId === null) {
+          // moiemId가 null이면 MoeimSelectView로 이동
+          this.$router.push('/moeim-select');
+        } else {
+          // moiemId가 있으면 메인 페이지로 이동
+          this.$router.push('/main');
+        }
       } catch (error) {
         this.errorMessage = error.message;
       }
@@ -80,7 +91,8 @@ export default {
       alert('비밀번호 찾기 기능은 아직 준비 중입니다.');
     },
     goToSignup() {
-      this.$router.push('/signup');
+      console.log('회원가입 버튼 클릭');
+      this.$router.push('/signup'); // 회원가입 페이지로 이동
     },
   },
 };
