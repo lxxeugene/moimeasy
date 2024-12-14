@@ -35,6 +35,8 @@ public class Schedule extends BaseEntity {
     @Column(name = "SCHEDULE_Title", nullable = false)
     private String scheduleTitle;
 
+    @Column(name = "SCHEDULE_TYPE", nullable = true)
+    private String scheduleType;
 
     @Column(name="DESCRIPTION", nullable = false)
     private String description;
@@ -52,6 +54,5 @@ public class Schedule extends BaseEntity {
     @Column(name = "LOCATION")
     private String location;
 
-    @Column(name = "PRIORITY")
-    private String priority;
+
 }

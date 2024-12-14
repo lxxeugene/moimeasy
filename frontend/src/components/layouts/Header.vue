@@ -34,6 +34,7 @@
         </div>
       </div>
       <div class="header-box2">
+        <!-- 검색창 -->
         <div class="search-bar-box">
           <input class="search-bar" />
           <img
