@@ -51,6 +51,9 @@ public class User {
     @Column(nullable = true)
     private Long moeimId;
 
+    @Column
+    private String profileImage;
+
     @PrePersist
     public void prePersist() {
         this.createAt = LocalDateTime.now();
