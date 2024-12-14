@@ -76,7 +76,7 @@ const routes = [
       {
         path: 'post',
         name: '게시글작성',
-        component: () => import('@/views/board/components/PostBoard.vue'),
+        component: () => import('@/views/board/BoardPostView.vue'),
       },
       {
         path: 'chte',
@@ -120,7 +120,7 @@ const router = createRouter({
 
 // router.beforeEach((to, from, next) => {
 //   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
-  
+
 //   if (to.path !== '/login' && !isAuthenticated) {
 //     next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
 //   } else {
