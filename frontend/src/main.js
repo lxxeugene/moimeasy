@@ -15,7 +15,6 @@ import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import PanelMenu from 'primevue/panelmenu';
 import LoadingOverlay from './components/common/LoadingOverlay.vue';
-<<<<<<< HEAD
 import Noir from './presets/Noir.js';
 import Avatar from 'primevue/avatar';
 import FileUpload from 'primevue/fileupload';
@@ -23,9 +22,7 @@ import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
 import Select from 'primevue/select';
 import FloatLabel from 'primevue/floatlabel';
-=======
 import Ripple from 'primevue/ripple';
->>>>>>> bb769efaac9cc0b3aaa7c7530693931a55239654
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 axios.defaults.baseURL = 'http://localhost:8088'; // 서버 URL 설정
