@@ -26,7 +26,6 @@ public class ScheduleService {
         if (eventList.isEmpty()) {
             throw new RuntimeException("일정 조회불가");
         }
-
         return eventList.stream()  // Schedule 엔티티 → DTO 변환 스트림사용
                 .map(ScheduleDTO::fromEntity) // 각 Schedule을 ScheduleDTO로 변환
                 .collect(Collectors.toList()); // List로 변환하여 반환하기
@@ -48,8 +47,9 @@ public class ScheduleService {
         return fromEntity(savedSchedule);
     }
 
+    //일정 삭제하기
     @Transactional
     public void deleteByEventCode(String eventCode) {
-                scheduleRepository.deleteByEventCode(eventCode);
+        scheduleRepository.deleteByEventCode(eventCode);
     }
 }
