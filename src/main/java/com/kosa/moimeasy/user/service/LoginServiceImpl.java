@@ -96,7 +96,7 @@ public class LoginServiceImpl implements LoginService {
 
             return TokenResponseDTO.builder()
                     .userId(user.getUserId())
-                    .moiemId(user.getMoeimId())
+                    .moeimId(user.getMoeimId())
                     .name(user.getUserName())
                     .email(user.getEmail())
                     .nickname(user.getNickname())
@@ -145,7 +145,7 @@ public class LoginServiceImpl implements LoginService {
 
         return TokenResponseDTO.builder()
                 .userId(user.getUserId())
-                .moiemId(user.getMoeimId())
+                .moeimId(user.getMoeimId())
                 .name(user.getUserName())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
