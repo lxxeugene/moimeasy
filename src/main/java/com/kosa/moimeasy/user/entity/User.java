@@ -1,6 +1,6 @@
 package com.kosa.moimeasy.user.entity;
 
-import com.kosa.moimeasy.membership.entity.UserAccount;
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -67,28 +67,21 @@ public class User {
         this.updateAt = LocalDateTime.now();
     }
 
-    @OneToMany(mappedBy = "user")
-    private List<UserAccount> userAccounts = new ArrayList<>();
+    @Column(name = "user_account_number", nullable = false) // 10자리 자동 생성
+    private String accountNumber;
+
+//    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
+//    private String accountPassword;
+
+    // 기본 값을 0으로 설정
+    @Column(name = "user_account_amount", nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double amount = 0.0;
+
+    // 거래내역 테이블
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY)
+    private List<Transaction> transactionSample = new ArrayList<>();
+
 }
-
-
-//    public enum Role {
-//        user,admin
-//    }
-
-
-
-//    @Column(name = "PROFILE_URL")
-//    private String profileUrl;
-//
-//    // 다대다 관계 설정
-//    @ManyToMany
-//    @JoinTable(
-//            name = "USER_MOEIM",
-//            joinColumns = @JoinColumn(name = "USER_ID"),
-//            inverseJoinColumns = @JoinColumn(name = "MOEIM_ID")
-//    )
-//    private Set<Moeim> moeims = new HashSet<>();
 
 
 

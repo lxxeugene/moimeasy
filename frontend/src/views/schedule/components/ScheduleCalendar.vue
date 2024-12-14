@@ -1,54 +1,69 @@
 <template>
+  <Toast position="bottom-right" />
+  <ConfirmDialog group="positioned" :modal="false"></ConfirmDialog>
   <Dialog
     v-model:visible="visible"
     :modal="false"
-    header="일정 추가"
+    header="새 일정 "
     :style="{ width: '25rem' }"
     @hide="rejectDialog"
   >
-    <span class="add-dialog-subtitle">새 일정의 타이틀을 입력하세요</span>
+    <span class="add-dialog-subtitle"></span>
     <div class="add-dialog-inputbox">
-      <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
-      <InputText
-        id="eventTitle"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventTitle"
-      />
-      <label for="eventDescription" class="add-dialog-inputbox-label"
-        >설명</label
-      >
-      <InputText
-        id="eventDescription"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventDescription"
-      />
-      <label for="eventLocation" class="add-dialog-inputbox-label">장소</label>
-      <InputText
-        id="eventLocation"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventLocation"
-      />
-      <label for="eventAttendants" class="add-dialog-inputbox-label"
-        >참석자</label
-      >
-      <InputText
-        id="eventAttendants"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventAttendants"
-      />
-      <label for="eventPriority" class="add-dialog-inputbox-label"
-        >우선순위</label
-      >
-      <InputText
-        id="eventPriority"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventPriority"
-      />
+      <FloatLabel variant="on">
+        <InputText
+          id="eventTitle"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventTitle"
+        />
+        <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
+      </FloatLabel>
+      <FloatLabel class="float-label-container" variant="on">
+        <Select
+          v-model="newEventType"
+          inputId="eventType"
+          :options="types"
+          optionLabel="name"
+          class="select-style"
+        />
+        <label for="eventType" class="add-dialog-inputbox-label"
+          >일정 타입</label
+        >
+      </FloatLabel>
+      <FloatLabel variant="on">
+        <InputText
+          id="eventDescription"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventDescription"
+        />
+        <label for="eventDescription" class="add-dialog-inputbox-label"
+          >설명</label
+        >
+      </FloatLabel>
+      <FloatLabel variant="on">
+        <InputText
+          id="eventLocation"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventLocation"
+        />
+        <label for="eventLocation" class="add-dialog-inputbox-label"
+          >장소</label
+        >
+      </FloatLabel>
+      <!-- <FloatLabel variant="on">
+        <InputText
+          id="eventAttendants"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventAttendants"
+        />
+        <label for="eventAttendants" class="add-dialog-inputbox-label"
+          >참석자</label
+        >
+      </FloatLabel> -->
     </div>
     <template #footer>
       <Button
@@ -85,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import '@/views/schedule/components/ScheduleCalendar.style.css';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -95,7 +110,18 @@ import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import { createEventId } from '@/utils/event-utils';
 import axios from 'axios';
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+import { useConfirm } from 'primevue/useconfirm';
+const toast = useToast();
+const primeConfirm = useConfirm();
 
+const types = ref([
+  { name: '기본이벤트', type: 'custom-event1' },
+  { name: '공휴일이벤트 ', type: 'holiday-event' },
+  { name: '중요이벤트', type: 'important-event' },
+  { name: '일반이벤트', type: '' },
+]);
 // 스토어
 const loadingStore = useLoadingStore();
 // PrimeVue 컴포넌트
@@ -114,9 +140,9 @@ const newEventTitle = ref('');
 const newEventDescription = ref('');
 const newEventLocation = ref('');
 const newEventAttendants = ref('');
-const newEventPriority = ref('');
 const newStartTime = ref('');
 const newEndTime = ref('');
+const newEventType = ref('');
 
 // Reactive 데이터 정의
 const currentEvents = ref([]);
@@ -132,7 +158,7 @@ const calendarOptions = reactive({
     googleCalendarPlugin,
   ],
   headerToolbar: {
-    left: 'today myCustomButton',
+    left: 'today', // 추후 myCustomButton버튼 추가
     center: 'prev title next',
     right: 'timeGridDay,timeGridWeek,dayGridMonth',
   },
@@ -164,25 +190,26 @@ const calendarOptions = reactive({
   //     className: 'holiday-event',
   //   },
   // ],
-  customButtons: {
-    myCustomButton: {
-      text: 'Add',
-      click: () => {
-        const calendarApi = calendarRef.value.getApi();
-        calendarApi.addEvent({
-          title: 'New Event',
-          start: new Date(),
-          end: new Date(),
-        });
-        alert('새 이벤트가 추가되었습니다!');
-      },
-    },
-  },
+  // customButtons: {
+  //   myCustomButton: {
+  //     text: 'Add',
+  //     click: () => {
+  //       const calendarApi = calendarRef.value.getApi();
+  //       calendarApi.addEvent({
+  //         title: 'New Event',
+  //         start: new Date(),
+  //         end: new Date(),
+  //       });
+  //       alert('새 이벤트가 추가되었습니다!');
+  //     },
+  //   },
+  // },
 });
 
 //아래부터 메서드 정의
 async function handleDateSelect(selectInfo) {
   try {
+    // 다이얼로그 OK 시 전달되는 일정 데이터
     const eventData = await openDialog(selectInfo);
     if (eventData) {
       const calendarApi = selectInfo.view.calendar;
@@ -192,12 +219,12 @@ async function handleDateSelect(selectInfo) {
         start: selectInfo.startStr,
         end: selectInfo.endStr,
         allDay: selectInfo.allDay,
-        // className: 'important-event',
+        className: eventData.eventType, // 이벤트 타입 value = 클레스네임
+        // className: 'custom-event',
         extendedProps: {
           description: eventData.description || '',
           location: eventData.location || '미정',
           attendants: eventData.attendants || [],
-          priority: eventData.priority || '보통',
         },
       });
     }
@@ -207,14 +234,15 @@ async function handleDateSelect(selectInfo) {
     selectInfo.view.calendar.unselect();
   }
 }
-
+// 일정 추가 다이얼로그 오픈
 function openDialog(selectInfo) {
+  //일정 이벤트 속성 초기화
   visible.value = true;
   newEventTitle.value = '';
   newEventDescription.value = '';
   newEventLocation.value = '';
   newEventAttendants.value = '';
-  newEventPriority.value = '';
+  newEventType.value = '';
   newStartTime.value = selectInfo.startStr;
   newEndTime.value = selectInfo.endStr;
 
@@ -233,7 +261,7 @@ function resolveDialog() {
       attendants: newEventAttendants.value
         .split(',')
         .map((attendant) => attendant.trim()),
-      priority: newEventPriority.value.trim(),
+      eventType: newEventType.value.type,
     };
     resolvePromise.value(eventData);
   } else {
@@ -250,12 +278,10 @@ function rejectDialog() {
 function closeDialog() {
   visible.value = false;
 }
-
+// 삭제 클릭 이벤트
 function handleEventClick(clickInfo) {
-  console.log(clickInfo);
-  if (confirm(`이벤트 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`)) {
-    clickInfo.event.remove();
-  }
+  console.log('삭제 클릭 이벤트', clickInfo.event);
+  confirmPosition('top', clickInfo);
 }
 
 function handleEvents(events) {
@@ -263,9 +289,11 @@ function handleEvents(events) {
   currentEvents.value = events;
 }
 
+/**서버에 일정 추가 */
 async function handleEventAdd(eventInfo) {
-  const event = eventInfo.event;
+  const event = eventInfo.event; // 캘린더api에 방금 추가된 일정 데이터를 불러옴
   console.log('이벤트 추가시 호출됨:', event);
+  console.log('이벤트 추가시 호출됨:', event.classNames[0]);
   try {
     const response = await axios.post('/api/v1/events', {
       eventCode: event.id,
@@ -273,12 +301,13 @@ async function handleEventAdd(eventInfo) {
       startTime: event.start,
       endTime: event.end,
       isAllDayEvent: event.allDay,
+      scheduleType: event.classNames[0], //일정에 적용된 클래스네임이 타입으로 들어감
       description: event.extendedProps.description,
       location: event.extendedProps.location,
       attendants: event.extendedProps.attendants,
-      priority: event.extendedProps.priority,
     });
     console.log('이벤트 추가 성공:', response.data);
+    showSuccess();
   } catch (error) {
     console.error('이벤트 추가 실패:', error);
   }
@@ -301,7 +330,6 @@ async function handleEventChange(eventInfo) {
 
 async function handleEventRemove(eventInfo) {
   console.log('삭제이벤트호출');
-
   const event = eventInfo.event;
   try {
     const response = await axios.delete(`/api/v1/events/${event.id}`);
@@ -321,11 +349,11 @@ async function fetchEvents() {
       start: event.startTime,
       end: event.endTime,
       allDay: event.isAllDayEvent,
+      className: event.scheduleType,
       extendedProps: {
         description: event.description || '',
         location: event.location || '미정',
         attendants: event.attendants || [],
-        priority: event.priority || '보통',
       },
     }));
 
@@ -345,7 +373,57 @@ async function fetchEvents() {
     loadingStore.stopLoading(); // 로딩스피너 제거
   }
 }
+//일정등록 토스트알림
+const showSuccess = () => {
+  toast.add({
+    severity: 'success',
+    summary: '일정 등록',
+    detail: '새 일정이 등록되었습니다',
+    life: 3000,
+  });
+};
+const confirmPosition = (position, clickInfo) => {
+  console.error('dddd');
+  primeConfirm.require({
+    group: 'positioned',
+    message: `등록된 일정 '${clickInfo.event.title}'을(를) 삭제하시겠습니까?`,
+    header: '일정 삭제',
+    icon: 'pi pi-info-circle',
+    position: 'top',
+    rejectProps: {
+      label: '취소',
+      severity: 'secondary',
+      text: true,
+    },
+    acceptProps: {
+      label: '삭제',
+      text: true,
+    },
+    accept: () => {
+      clickInfo.event.remove(); // 캘린더에서 이벤트 제거
+      handleEventRemove(clickInfo);
+      toast.add({
+        severity: 'info',
+        summary: '일정삭제',
+        detail: '등록된 일정이 삭제되었습니다',
+        life: 3000,
+      });
+    },
+    reject: () => {
+      toast.add({
+        severity: 'error',
+        summary: '일정삭제',
+        detail: '취소되었습니다',
+        life: 3000,
+      });
+    },
+  });
+};
 
+// watch 사용
+watch(newEventType, (newVal, oldVal) => {
+  console.log('newEventType 변경:', newVal);
+});
 // 컴포넌트 마운트 시 이벤트 fetch로 가져옴
 onMounted(() => {
   fetchEvents();
