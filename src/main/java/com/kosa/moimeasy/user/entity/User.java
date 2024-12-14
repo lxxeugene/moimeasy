@@ -1,6 +1,6 @@
 package com.kosa.moimeasy.user.entity;
 
-import com.kosa.moimeasy.membership.entity.UserAccount;
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,10 +46,45 @@ public class User {
     private String profileImage;
 
     @Column(nullable = true)
+<<<<<<< HEAD
     private Long moeimI;
+=======
+    private Long moeimId;
 
-    @OneToMany(mappedBy = "user")
-    private List<UserAccount> userAccounts = new ArrayList<>();
+    @Column
+    private String profileImage;
+
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDateTime.now();
+        if(this.createAt == null){
+            this.createAt = LocalDateTime.now();
+        }else {
+            this.createAt = createAt;
+        }
+
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+    }
+>>>>>>> 523bf7d03ca78cb2ff4e23ec1c12bd6a3ec04107
+
+    @Column(name = "user_account_number", nullable = false) // 10자리 자동 생성
+    private String accountNumber;
+
+//    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
+//    private String accountPassword;
+
+    // 기본 값을 0으로 설정
+    @Column(name = "user_account_amount", nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double amount = 0.0;
+
+    // 거래내역 테이블
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY)
+    private List<Transaction> transactionSample = new ArrayList<>();
+
 }
 
 
