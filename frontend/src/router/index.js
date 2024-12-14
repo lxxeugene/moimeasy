@@ -57,7 +57,7 @@ const routes = [
     path: '/chat/:roomId',
     name: 'ChatView',
     component: () => import('@/views/chat/ChatView.vue'),
-    props: true, // roomId를 컴포넌트에 props로 전달
+    props: true,
   },
   {
     path: '/schedule',
