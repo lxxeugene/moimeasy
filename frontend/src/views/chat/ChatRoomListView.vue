@@ -191,10 +191,8 @@ export default {
         console.error('Room ID is not defined.');
         return;
       }
-      this.$router.push({
-        name: 'ChatView',
-        params: { roomId: String(roomId) },
-      });
+      console.log(`Room selected: ${roomId}`); // 선택된 채팅방 ID 확인
+      this.$emit('selectRoom', roomId); // 부모 컴포넌트로 roomId 전달
     },
   },
   mounted() {
@@ -317,7 +315,6 @@ hr {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* 다른 UI 요소 위로 표시 */
 }
 
 .modal-content {
@@ -325,50 +322,20 @@ hr {
   padding: 20px;
   border-radius: 10px;
   max-width: 500px;
-  width: 90%;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
+  width: 100%;
 }
 
 .members-list {
-  max-height: 200px;
-  overflow-y: auto;
+  max-height: 150px;
+  overflow-y: scroll;
   border: 1px solid #ddd;
   padding: 10px;
   border-radius: 5px;
-  background: #f9f9f9;
-  margin-bottom: 10px;
-}
-
-.members-list ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.members-list li {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-.members-list li:last-child {
-  border-bottom: none;
 }
 
 .modal-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 </style>

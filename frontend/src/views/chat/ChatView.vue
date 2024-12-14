@@ -78,14 +78,12 @@ export default {
 
     const fetchMessages = async () => {
       try {
-        const token = localStorage.getItem('accessToken'); // 저장된 토큰 가져오기
+        const token = localStorage.getItem('accessToken');
         const response = await axios.get(
           `/api/v1/chat/rooms/${props.roomId}/poll-messages`,
           {
             params: { lastMessageId: lastMessageId.value },
-            headers: {
-              Authorization: `Bearer ${token}`, // 인증 헤더 추가
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
         if (response.data.length > 0) {
@@ -174,6 +172,13 @@ export default {
   },
   mounted() {
     console.log('ChatView loaded with roomId:', this.roomId);
+    this.fetchMessages();
+  },
+  watch: {
+    roomId(newRoomId) {
+      console.log('Room changed:', newRoomId);
+      this.fetchMessages(); // roomId 변경 시 메시지 다시 로드
+    },
   },
 };
 </script>

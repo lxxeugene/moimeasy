@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/HomeView.vue';
 import Login from '@/views/login/LoginView.vue';
-import Signup from '@/views/login/SignupView.vue';
+import Signup from '@/views/signup/SignupView.vue';
 import MoeimSelect from '@/views/moeim/MoeimSelectView.vue';
 import CreateMoeim from '@/views/moeim/CreateMoeimView.vue';
 import EnterMoeim from '@/views/moeim/EnterMoeimView.vue';
@@ -49,7 +49,7 @@ const routes = [
     path: '/chat/:roomId',
     name: 'ChatView',
     component: () => import('@/views/chat/ChatView.vue'),
-    props: true, // roomId를 컴포넌트에 props로 전달
+    props: true,
   },
   {
     path: '/schedule',
@@ -110,12 +110,29 @@ const router = createRouter({
   routes,
 });
 
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
+
+//   if (to.path !== '/login' && !isAuthenticated) {
+//     next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+//   } else {
+//     next(); // 인증된 사용자는 요청한 경로로 이동
+//   }
+// });
+
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
-  if (to.path !== '/login' && !isAuthenticated) {
-    next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+
+  // 로그인이 필요한 페이지를 지정 (예: /main, /moeim-select)
+  const requiresAuth = !['/login', '/signup'].includes(to.path);
+
+  if (requiresAuth && !isAuthenticated) {
+    // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+    next('/login');
   } else {
-    next(); // 인증된 사용자는 요청한 경로로 이동
+    // 인증된 사용자 또는 예외 경로는 그대로 진행
+    next();
   }
 });
+
 export default router;
