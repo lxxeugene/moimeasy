@@ -26,34 +26,47 @@
       </li>
     </ul>
     <!-- 채팅방 생성 모달 -->
-    <div v-if="isCreateRoomModalOpen" class="modal">
+    <Dialog
+      header="채팅방 생성"
+      :visible="isCreateRoomModalOpen"
+      style="width: 50vw"
+      :modal="true"
+      :closable="false"
+      @hide="closeCreateRoomModal"
+    >
       <div class="modal-content">
-        <h2>채팅방 생성</h2>
-        <h3>채팅방 이름</h3>
-        <input v-model="newRoomName" id="roomName" placeholder="채팅방 이름" />
+        <div class="form-group">
+          <label for="roomName">채팅방 이름</label>
+          <InputText
+            v-model="newRoomName"
+            id="roomName"
+            placeholder="채팅방 이름을 입력하세요"
+            class="p-inputtext"
+            style="width: 100%; margin-bottom: 10px"
+          />
+        </div>
 
         <h4>참여자 선택</h4>
         <div class="members-list">
           <ul>
-            <li v-for="user in members" :key="user.id">
-              <label>
-                <input
-                  type="checkbox"
-                  :value="user.id"
-                  v-model="selectedMembers"
-                />
-                {{ user.nickname }}
-              </label>
+            <li v-for="user in members" :key="user.userId" class="member-item">
+              <Checkbox
+                :value="user.userId"
+                v-model="selectedMembers"
+                class="member-checkbox"
+              />
+              <label>{{ user.nickname }}</label>
             </li>
           </ul>
         </div>
 
         <div class="selected-members">
           <h4>선택된 회원</h4>
-          <ul>
+          <p v-if="selectedMembers.length === 0">선택된 회원이 없습니다.</p>
+          <ul v-else>
             <li v-for="id in selectedMembers" :key="id">
               {{
-                members.find((member) => member.id === id)?.nickname ||
+                members.find((member) => member.userId === id)?.nickname ||
                 '알 수 없는 사용자'
               }}
             </li>
@@ -61,22 +74,29 @@
         </div>
 
         <div class="modal-buttons">
-          <button @click="createRoom" class="btn-primary">생성</button>
-          <button @click="closeCreateRoomModal" class="btn-secondary">
-            취소
-          </button>
+          <Button @click="createRoom" label="생성" class="p-button-success" />
+          <Button
+            @click="closeCreateRoomModal"
+            label="취소"
+            class="p-button-secondary"
+          />
         </div>
       </div>
-    </div>
+    </Dialog>
   </div>
 </template>
 
 <script>
 import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
+import InputText from 'primevue/inputtext';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import Checkbox from 'primevue/checkbox';
 
 export default {
   name: 'ChatRoomListView',
+  components: { InputText, Button, Checkbox, Dialog },
   data() {
     return {
       rooms: [],
@@ -101,26 +121,15 @@ export default {
           return;
         }
 
-        console.log('Fetching rooms for userId:', userId);
-
         const response = await axios.get(`/api/v1/chat/rooms`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          params: { userId }, // userId를 쿼리 파라미터로 전달
+          params: { userId },
         });
 
         this.rooms = response.data;
       } catch (error) {
-        if (error.response?.status === 401) {
-          try {
-            await this.authStore.refreshAccessToken();
-            return this.fetchRooms(); // 토큰 갱신 후 다시 요청
-          } catch (refreshError) {
-            this.authStore.logout();
-            return;
-          }
-        }
         console.error('Error fetching chat rooms:', error);
       }
     },
@@ -134,16 +143,17 @@ export default {
           return;
         }
 
-        console.log('Fetching members with moeimId:', moeimId);
-
-        const response = await axios.get('/api/v1/users', {
+        const response = await axios.get('/api/v1/users/members', {
           params: { moeimId },
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        this.members = response.data;
+        const currentUserId = this.authStore.user.userId;
+        this.members = response.data.filter(
+          (member) => member.userId !== currentUserId
+        );
       } catch (error) {
         console.error('Error fetching members:', error);
       }
@@ -158,17 +168,18 @@ export default {
     },
     async createRoom() {
       try {
-        const token = this.authStore.token;
+        const token = this.authStore.accessToken;
         const payload = {
           roomName: this.newRoomName || '',
-          createdBy: this.authStore.user.id, // 현재 사용자 ID
           memberIds: this.selectedMembers,
         };
+
         const response = await axios.post('/api/v1/chat/room', payload, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+
         this.rooms.push(response.data);
         this.closeCreateRoomModal();
       } catch (error) {
@@ -180,7 +191,6 @@ export default {
         console.error('Room ID is not defined.');
         return;
       }
-      console.log('Navigating to ChatView with roomId:', roomId);
       this.$router.push({
         name: 'ChatView',
         params: { roomId: String(roomId) },
@@ -188,12 +198,10 @@ export default {
     },
   },
   mounted() {
-    console.log('AuthStore user:', this.authStore.user);
-
-    if (this.authStore.user?.moiemId) {
+    if (this.authStore.user?.moeimId) {
       this.fetchMembers();
     } else {
-      console.error('moiemId is not available in authStore.');
+      console.error('moeimId is not available in authStore.');
     }
 
     if (this.authStore.user?.userId) {
@@ -309,6 +317,7 @@ hr {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000; /* 다른 UI 요소 위로 표시 */
 }
 
 .modal-content {
@@ -316,20 +325,50 @@ hr {
   padding: 20px;
   border-radius: 10px;
   max-width: 500px;
-  width: 100%;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .members-list {
-  max-height: 150px;
-  overflow-y: scroll;
+  max-height: 200px;
+  overflow-y: auto;
   border: 1px solid #ddd;
   padding: 10px;
   border-radius: 5px;
+  background: #f9f9f9;
+  margin-bottom: 10px;
+}
+
+.members-list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.members-list li {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.members-list li:last-child {
+  border-bottom: none;
 }
 
 .modal-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>

@@ -9,6 +9,7 @@
   </div>
 </template>
 
+
 <script>
 import ChatRoomList from './ChatRoomListView.vue';
 import ChatView from './ChatView.vue';
@@ -17,12 +18,12 @@ export default {
   name: 'ChatLayout',
   data() {
     return {
-      selectedRoomId: null, // 선택된 채팅방 ID
+      selectedRoomId: null, 
     };
   },
   methods: {
     handleSelectRoom(roomId) {
-      this.selectedRoomId = roomId; // 채팅방 ID 변경
+      this.selectedRoomId = roomId; 
     },
   },
 };

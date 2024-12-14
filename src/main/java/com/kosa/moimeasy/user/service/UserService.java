@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -76,4 +77,16 @@ public class UserService {
         return userRepository.findById(userId);
     }
 
+
+    public List<UserDTO> getUsersByMoeimId(Long moeimId) {
+        List<User> users = userRepository.findByMoeimId(moeimId);
+        return users.stream()
+                .map(user -> UserDTO.builder()
+                        .userId(user.getUserId())
+                        .nickname(user.getNickname())
+                        .email(user.getEmail())
+                        .moeimId(user.getMoeimId())
+                        .build())
+                .collect(Collectors.toList());
+    }
 }

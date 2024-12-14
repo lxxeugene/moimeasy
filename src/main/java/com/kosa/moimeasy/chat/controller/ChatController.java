@@ -61,6 +61,7 @@ public class ChatController {
         return ResponseEntity.ok(chatRoom);
     }
 
+
     // 메시지 전송
     @PostMapping("/message")
     public ResponseEntity<ChatMessage> sendMessage(@RequestBody SendMessageDTO request, @AuthenticationPrincipal UserDetails userDetails) {
