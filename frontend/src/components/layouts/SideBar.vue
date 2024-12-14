@@ -11,12 +11,7 @@
         <PanelMenu :model="items" class="pannel-item">
           <template #item="{ item }">
             <!-- 대쉬보드 메뉴 -->
-            <router-link
-              v-if="item.route"
-              v-slot="{ href, navigate }"
-              :to="item.route"
-              custom
-            >
+            <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
               <a v-ripple class="dropmenu-item" :href="href" @click="navigate">
                 <img class="icon-dashboard" :src="item.icon" width="15px" />
                 <span class="menu-title">{{ item.label }}</span>
@@ -34,13 +29,7 @@
               <span class="menu-title">{{ item.label }}</span>
             </a>
             <!-- 기타 메뉴 -->
-            <a
-              v-else
-              v-ripple
-              class="dropmenu-item"
-              :href="item.url"
-              :target="item.target"
-            >
+            <a v-else v-ripple class="dropmenu-item" :href="item.url" :target="item.target">
               <img class="icon-dashboard" :src="item.icon" width="15px" />
               <span class="menu-title">{{ item.label }}</span>
             </a>
@@ -146,12 +135,12 @@ const items = ref([
       {
         label: '납부내역',
         icon: Notebook,
-        route: '/pay-list',
+        route: '/remittance-list',
       },
       {
         label: '거래내역',
         icon: Notebook,
-        route: '/trade-list',
+        route: '/transaction-list',
       },
     ],
   },
@@ -231,16 +220,20 @@ const items = ref([
   top: 0px;
   transition: all 0.2s;
 }
+
 .logo-background:hover {
   cursor: pointer;
   border: none;
-  box-shadow: 0 4px 15px rgba(129, 85, 165, 0.3); /* 블러 그림자 효과 */
+  box-shadow: 0 4px 15px rgba(129, 85, 165, 0.3);
+  /* 블러 그림자 효과 */
 }
+
 .logo-background:active {
   cursor: pointer;
   border: none;
   background-color: #f8f3fb;
-  box-shadow: 0 4px 15px rgba(62, 32, 84, 0.3); /* 블러 그림자 효과 */
+  box-shadow: 0 4px 15px rgba(62, 32, 84, 0.3);
+  /* 블러 그림자 효과 */
 }
 
 .logo-icon {
@@ -463,37 +456,45 @@ const items = ref([
 }
 
 .dropmenu-item {
-  display: flex; /* Flexbox 사용 */
-  align-items: center; /* 수직 중앙 정렬 */
+  display: flex;
+  /* Flexbox 사용 */
+  align-items: center;
+  /* 수직 중앙 정렬 */
   gap: 10px;
   border-radius: 8px;
   padding: 8px 8px 8px 24px;
   width: 130px;
   border: none;
   height: 53px;
-  cursor: pointer; /* 포인터 커서 */
+  cursor: pointer;
+  /* 포인터 커서 */
   color: #181616;
   text-align: left;
   font-family: 'Poppins-Medium', sans-serif;
   font-size: 16px;
   line-height: 16px;
   font-weight: 500;
-  padding: 0.5rem 1rem; /* px-4, py-2에 해당 */
+  padding: 0.5rem 1rem;
+  /* px-4, py-2에 해당 */
 }
 
 .pannel-item {
-  width: 100%; /* 기본적으로 전체 너비 */
+  width: 100%;
+  /* 기본적으로 전체 너비 */
 }
 
 @media (min-width: 768px) {
+
   /* md 브레이크포인트: 768px 이상 */
   .pannel-item {
     width: 13rem;
   }
 }
+
 @media (prefers-color-scheme: dark) {
   .pannel-item {
-    color: #ffffff; /* 다크 모드에서 텍스트 색상 (surface-0의 예) */
+    color: #ffffff;
+    /* 다크 모드에서 텍스트 색상 (surface-0의 예) */
   }
 }
 
@@ -503,6 +504,7 @@ const items = ref([
   cursor: pointer;
   width: 190px;
 }
+
 .menu-title {
   width: 75px;
 }
