@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '@/views/HomeView.vue';
 import Login from '@/views/login/LoginView.vue';
-import Signup from '@/views/login/SignupView.vue';
+import Signup from '@/views/signup/SignupView.vue';
 import MoeimSelect from '@/views/moeim/MoeimSelectView.vue';
 import CreateMoeim from '@/views/moeim/CreateMoeimView.vue';
 import EnterMoeim from '@/views/moeim/EnterMoeimView.vue';
@@ -28,16 +28,16 @@ const routes = [
   { path: '/moeim-select', name: 'MoeimSelect', component: MoeimSelect },
   { path: '/create-moeim', name: 'CreateMoeim', component: CreateMoeim },
   { path: '/enter-moeim', name: 'EnterMoeim', component: EnterMoeim },
-  { path: '/user-manage', name: 'UserManage', component: UserManage },
+  { path: '/user-manage', name: '회원관리', component: UserManage },
   {
     path: '/user-profile/:userId',
-    name: 'UserProfile',
+    name: '회원프로필',
     component: UserProfile,
   },
-  { path: '/invite-user', name: 'InviteUser', component: InviteUser },
+  { path: '/invite-user', name: '회원초대', component: InviteUser },
   {
     path: '/invitation-list',
-    name: 'InvitationList',
+    name: '초대목록',
     component: InvitationList,
   }, // 초대 목록 추가
   {
@@ -52,8 +52,13 @@ const routes = [
     component: TransactionList,
   },
   { path: '/category', name: 'Category', component: Category },
-  { path: '/chat-room-list', name: 'ChatRoomList', component: ChatRoomList },
-  { path: '/chat/:roomId', name: 'ChatView', component: ChatView },
+  { path: '/chat-room-list', name: '채팅목록', component: ChatRoomList },
+  {
+    path: '/chat/:roomId',
+    name: 'ChatView',
+    component: () => import('@/views/chat/ChatView.vue'),
+    props: true, // roomId를 컴포넌트에 props로 전달
+  },
   {
     path: '/schedule',
     name: '일정',
@@ -101,6 +106,11 @@ const routes = [
     path: '/:catchAll(.*)',
     component: () => import('@/views/Error/Error404.vue'),
   },
+  {
+    path: '/chat-layout',
+    name: '채팅',
+    component: () => import('@/views/chat/ChatLayoutView.vue'),
+  },
 ];
 
 const router = createRouter({
@@ -108,12 +118,29 @@ const router = createRouter({
   routes,
 });
 
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
+  
+//   if (to.path !== '/login' && !isAuthenticated) {
+//     next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+//   } else {
+//     next(); // 인증된 사용자는 요청한 경로로 이동
+//   }
+// });
+
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
-  if (to.path !== '/login' && !isAuthenticated) {
-    next('/login'); // 인증되지 않은 사용자는 로그인 화면으로 리다이렉트
+
+  // 로그인이 필요한 페이지를 지정 (예: /main, /moeim-select)
+  const requiresAuth = !['/login', '/signup'].includes(to.path);
+
+  if (requiresAuth && !isAuthenticated) {
+    // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+    next('/login');
   } else {
-    next(); // 인증된 사용자는 요청한 경로로 이동
+    // 인증된 사용자 또는 예외 경로는 그대로 진행
+    next();
   }
 });
+
 export default router;

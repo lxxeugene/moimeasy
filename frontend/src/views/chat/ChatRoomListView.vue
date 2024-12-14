@@ -15,16 +15,21 @@
       >
         <span class="room-name">{{ room.name }}</span>
         <hr />
-        <small class="room-users">
-          참여자: {{ room.users.map((user) => user.nickname).join(', ') }}
-        </small>
+        <p>
+          참여자:
+          {{
+            room.members
+              ? room.members.map((member) => member.userNickname).join(', ')
+              : '참여자 없음'
+          }}
+        </p>
       </li>
     </ul>
     <!-- 채팅방 생성 모달 -->
     <div v-if="isCreateRoomModalOpen" class="modal">
       <div class="modal-content">
-        <h3>채팅방 생성</h3>
-        <label for="roomName">채팅방 이름:</label>
+        <h2>채팅방 생성</h2>
+        <h3>채팅방 이름</h3>
         <input v-model="newRoomName" id="roomName" placeholder="채팅방 이름" />
 
         <h4>참여자 선택</h4>
@@ -67,9 +72,11 @@
 </template>
 
 <script>
+import { useAuthStore } from '@/stores/auth';
 import axios from 'axios';
 
 export default {
+  name: 'ChatRoomListView',
   data() {
     return {
       rooms: [],
@@ -79,22 +86,63 @@ export default {
       selectedMembers: [],
     };
   },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
   methods: {
     async fetchRooms() {
       try {
-        const response = await axios.get('/api/v1/chat/rooms', {
-          params: { userId: 2 }, // 현재 사용자 ID
+        const token = this.authStore.accessToken;
+        const userId = this.authStore.user?.userId;
+
+        if (!userId) {
+          console.error('User ID is not available in authStore.');
+          return;
+        }
+
+        console.log('Fetching rooms for userId:', userId);
+
+        const response = await axios.get(`/api/v1/chat/rooms`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: { userId }, // userId를 쿼리 파라미터로 전달
         });
+
         this.rooms = response.data;
       } catch (error) {
+        if (error.response?.status === 401) {
+          try {
+            await this.authStore.refreshAccessToken();
+            return this.fetchRooms(); // 토큰 갱신 후 다시 요청
+          } catch (refreshError) {
+            this.authStore.logout();
+            return;
+          }
+        }
         console.error('Error fetching chat rooms:', error);
       }
     },
     async fetchMembers() {
       try {
+        const token = this.authStore.accessToken;
+        const moeimId = this.authStore.user?.moeimId;
+
+        if (!moeimId) {
+          console.error('moeimId is not available in authStore.');
+          return;
+        }
+
+        console.log('Fetching members with moeimId:', moeimId);
+
         const response = await axios.get('/api/v1/users', {
-          params: { moeimId: 3 },
+          params: { moeimId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
+
         this.members = response.data;
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -110,13 +158,16 @@ export default {
     },
     async createRoom() {
       try {
+        const token = this.authStore.token;
         const payload = {
           roomName: this.newRoomName || '',
-          createdBy: 2, // 현재 사용자 ID
+          createdBy: this.authStore.user.id, // 현재 사용자 ID
           memberIds: this.selectedMembers,
         };
         const response = await axios.post('/api/v1/chat/room', payload, {
-          params: { userId: 2 }, // 현재 사용자 ID
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         this.rooms.push(response.data);
         this.closeCreateRoomModal();
@@ -125,12 +176,31 @@ export default {
       }
     },
     enterRoom(roomId) {
-      this.$router.push({ name: 'ChatView', params: { roomId } });
+      if (!roomId) {
+        console.error('Room ID is not defined.');
+        return;
+      }
+      console.log('Navigating to ChatView with roomId:', roomId);
+      this.$router.push({
+        name: 'ChatView',
+        params: { roomId: String(roomId) },
+      });
     },
   },
   mounted() {
-    this.fetchRooms();
-    this.fetchMembers();
+    console.log('AuthStore user:', this.authStore.user);
+
+    if (this.authStore.user?.moiemId) {
+      this.fetchMembers();
+    } else {
+      console.error('moiemId is not available in authStore.');
+    }
+
+    if (this.authStore.user?.userId) {
+      this.fetchRooms();
+    } else {
+      console.error('userId is not available in authStore.');
+    }
   },
 };
 </script>
@@ -156,6 +226,10 @@ export default {
 h2 {
   font-size: 24px;
   font-weight: bold;
+}
+h3,
+h4 {
+  font-size: 18px;
 }
 
 ul {
