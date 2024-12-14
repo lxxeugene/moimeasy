@@ -55,7 +55,8 @@ export default {
     return { authStore };
   },
   methods: {
-    async handleLogin() {  // 로그인 처리 코드
+    async handleLogin() {
+      // 로그인 처리 코드
       if (this.form.email.trim() === '' || this.form.password.trim() === '') {
         alert('모든 필드를 채워주세요.');
         return;
