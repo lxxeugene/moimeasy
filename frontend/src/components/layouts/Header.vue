@@ -63,7 +63,7 @@
             alt="Avatar Icon"
             height="32px"
           />
-          <p>유저407번</p>
+          <p>{{ nickName }}</p>
         </div>
       </div>
     </div>
@@ -78,6 +78,8 @@ import Breadcrumb from 'primevue/breadcrumb';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 
+const nickName = ref('');
+const userData = ref('');
 const toast = useToast();
 const route = useRoute();
 
@@ -107,6 +109,10 @@ watch(
   () => {
     updatePathInfo();
     console.log('라우트 변경됨:', items.value);
+    const userDataStorage = localStorage.getItem('user');
+    userData.value = userDataStorage ? JSON.parse(userDataStorage) : null;
+    // 닉네임 업데이트
+    nickName.value = userData.value?.nickname || '게스트';
   },
   { immediate: true } // 컴포넌트가 처음 마운트될 때도 실행
 );
