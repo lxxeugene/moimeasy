@@ -4,19 +4,21 @@
   <Dialog
     v-model:visible="visible"
     :modal="false"
-    header="일정 추가"
+    header="새 일정 "
     :style="{ width: '25rem' }"
     @hide="rejectDialog"
   >
-    <span class="add-dialog-subtitle">새 일정의 타이틀을 입력하세요</span>
+    <span class="add-dialog-subtitle"></span>
     <div class="add-dialog-inputbox">
-      <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
-      <InputText
-        id="eventTitle"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventTitle"
-      />
+      <FloatLabel variant="on">
+        <InputText
+          id="eventTitle"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventTitle"
+        />
+        <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
+      </FloatLabel>
       <FloatLabel class="float-label-container" variant="on">
         <Select
           v-model="newEventType"
@@ -29,31 +31,39 @@
           >일정 타입</label
         >
       </FloatLabel>
-      <label for="eventDescription" class="add-dialog-inputbox-label"
-        >설명</label
-      >
-      <InputText
-        id="eventDescription"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventDescription"
-      />
-      <label for="eventLocation" class="add-dialog-inputbox-label">장소</label>
-      <InputText
-        id="eventLocation"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventLocation"
-      />
-      <label for="eventAttendants" class="add-dialog-inputbox-label"
-        >참석자</label
-      >
-      <InputText
-        id="eventAttendants"
-        class="add-dialog-input"
-        autocomplete="off"
-        v-model="newEventAttendants"
-      />
+      <FloatLabel variant="on">
+        <InputText
+          id="eventDescription"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventDescription"
+        />
+        <label for="eventDescription" class="add-dialog-inputbox-label"
+          >설명</label
+        >
+      </FloatLabel>
+      <FloatLabel variant="on">
+        <InputText
+          id="eventLocation"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventLocation"
+        />
+        <label for="eventLocation" class="add-dialog-inputbox-label"
+          >장소</label
+        >
+      </FloatLabel>
+      <!-- <FloatLabel variant="on">
+        <InputText
+          id="eventAttendants"
+          class="add-dialog-input"
+          autocomplete="off"
+          v-model="newEventAttendants"
+        />
+        <label for="eventAttendants" class="add-dialog-inputbox-label"
+          >참석자</label
+        >
+      </FloatLabel> -->
     </div>
     <template #footer>
       <Button
