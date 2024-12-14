@@ -12,15 +12,9 @@ public class RemittanceDto {
     @Setter
     public static class Request {
 
-        @NotBlank(message = "보내는 계좌번호는 필수값입니다.")
-        private String sentAccountNumber;
-
-        @NotBlank(message = "받는 계좌번호는 필수값입니다.")
-        private String receivedAccountNumber;
-
         @NotNull(message = "송금액은 필수값입니다.")
         @Min(value = 1, message = "송금 최소금액은 1원입니다.")
-        private Long amount;
+        private double amount;
     }
 
     @Getter
@@ -33,6 +27,6 @@ public class RemittanceDto {
 
         private String receivedName;
 
-        private Long amount;
+        private double amount;
     }
 }

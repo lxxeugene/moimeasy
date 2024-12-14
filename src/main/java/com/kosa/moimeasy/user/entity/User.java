@@ -1,6 +1,7 @@
 package com.kosa.moimeasy.user.entity;
 
 import com.kosa.moimeasy.common.entity.BaseEntity;
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import com.kosa.moimeasy.transaction.entity.TransactionSample;
 import jakarta.persistence.*;
 import lombok.*;
@@ -50,18 +51,19 @@ public class User extends BaseEntity {
     @Column(length = 255, nullable = true)
     private String profileImage;
 
-    @Column(name = "user_account_number", nullable = false) // 길이 지정해야됌
+    @Column(name = "user_account_number", nullable = false) // 10자리 자동 생성
     private String accountNumber;
 
 //    @Column(name = "user_account_password", nullable = false) // 유효성 검사 진행
 //    private String accountPassword;
 
-    @Column(name = "user_account_amount", nullable = false)
-    private double amount;
+    // 기본 값을 0으로 설정
+    @Column(name = "user_account_amount", nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
+    private double amount = 0.0;
 
     // 거래내역 테이블
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<TransactionSample> transactionSample = new ArrayList<>();
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY)
+    private List<Transaction> transactionSample = new ArrayList<>();
 
 }
 

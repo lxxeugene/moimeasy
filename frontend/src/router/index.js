@@ -9,10 +9,10 @@ import UserManage from '@/views/user/UserManageView.vue';
 import UserProfile from '@/views/user/UserProfileView.vue';
 import InviteUser from '@/views/user/InviteUserView.vue';
 import InvitationList from '@/views/user/InvitationListView.vue'; // 초대 목록 추가
-import PayList from '@/views/pay/PayList.vue';
+import RemittanceList from '@/views/transaction/RemittanceList.vue';
 import WebSocket from '@/views/chat/WebSocketView.vue';
-import TradeList from '@/views/pay/TradeList.vue';
-import Category from '@/views/pay/Category.vue';
+import TransactionList from '@/views/transaction/TransactionList.vue';
+import Category from '@/views/transaction/Category.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
 import ChatView from '@/views/chat/ChatView.vue';
 
@@ -40,9 +40,17 @@ const routes = [
     name: 'InvitationList',
     component: InvitationList,
   }, // 초대 목록 추가
-  { path: '/pay-list', name: 'PayList', component: PayList },
+  {
+    path: '/remittance-list',
+    name: 'RemittanceList',
+    component: RemittanceList,
+  },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
-  { path: '/trade-list', name: 'TradeList', component: TradeList },
+  {
+    path: '/transaction-list',
+    name: 'TransactionList',
+    component: TransactionList,
+  },
   { path: '/category', name: 'Category', component: Category },
   { path: '/chat-room-list', name: 'ChatRoomList', component: ChatRoomList },
   { path: '/chat/:roomId', name: 'ChatView', component: ChatView },

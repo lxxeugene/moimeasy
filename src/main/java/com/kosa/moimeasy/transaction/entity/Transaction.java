@@ -1,14 +1,12 @@
 package com.kosa.moimeasy.transaction.entity;
 
+import com.kosa.moimeasy.common.entity.BaseEntity;
 import com.kosa.moimeasy.moeim.entity.Moeim;
-import com.kosa.moimeasy.transaction.type.Transaction;
+import com.kosa.moimeasy.transaction.type.TransactionType;
 import com.kosa.moimeasy.user.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,28 +14,29 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-@RequiredArgsConstructor
 @AllArgsConstructor
-@Entity(name = "TRANSACTION")
-@EntityListeners(AuditingEntityListener.class)
-public class TransactionEntity {
+@NoArgsConstructor
+@Entity
+public class Transaction extends BaseEntity {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    private Moeim moeimAccount;
+    @ManyToOne(fetch = FetchType.LAZY) // (모임 계좌와 거래내역은 1:N 관계)
+    @JoinColumn(name = "moeim_Id")
+    private Moeim moeimAccount; // 모임 계좌
 
-    @ManyToOne
-    private User userAccount;
+    @ManyToOne(fetch = FetchType.LAZY) // (회원 계좌와 거래내역은 1:N 관계)
+    @JoinColumn(name = "user_Id")
+    private User userAccount; // 유저 계좌
 
     @Enumerated(EnumType.STRING)
-    private Transaction transactionType;
+    private TransactionType transactionType;
 
     @NotNull
-    private Long amount;
+    private double amount; // 이체 금액
 
     private String depositName; // 입금자명
 
@@ -48,5 +47,5 @@ public class TransactionEntity {
     private String receivedAccount; // 송금받는 계좌번호
 
     @CreatedDate
-    private LocalDateTime transactedAt;
+    private LocalDateTime transactedAt; // 거래 시간
 }

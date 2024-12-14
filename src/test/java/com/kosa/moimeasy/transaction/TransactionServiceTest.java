@@ -6,7 +6,7 @@ import com.kosa.moimeasy.security.provider.JwtTokenProvider;
 import com.kosa.moimeasy.transaction.dto.DepositDto;
 import com.kosa.moimeasy.transaction.dto.RemittanceDto;
 import com.kosa.moimeasy.transaction.dto.WithdrawDto;
-import com.kosa.moimeasy.transaction.entity.TransactionEntity;
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import com.kosa.moimeasy.transaction.exception.CustomException;
 import com.kosa.moimeasy.transaction.repository.TransactionRepository;
 import com.kosa.moimeasy.transaction.service.TransactionService;
@@ -69,7 +69,7 @@ class TransactionServiceTest {
         assertNotNull(response);
         assertEquals("12345678", response.getAccountNumber());
         assertEquals(1000L, response.getAmount());
-        verify(transactionRepository, times(1)).save(any(TransactionEntity.class));
+        verify(transactionRepository, times(1)).save(any(Transaction.class));
     }
 
     @Test
@@ -90,7 +90,7 @@ class TransactionServiceTest {
 
         // Then
         assertEquals(ErrorCode.ACCOUNT_NOT_FOUND, exception.getErrorCode());
-        verify(transactionRepository, never()).save(any(TransactionEntity.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
     }
 
     @Test
@@ -121,7 +121,7 @@ class TransactionServiceTest {
 
         // Then
         assertEquals(ErrorCode.BALANCE_NOT_ENOUGH, exception.getErrorCode());
-        verify(transactionRepository, never()).save(any(TransactionEntity.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
     }
 
     @Test
@@ -143,6 +143,6 @@ class TransactionServiceTest {
 
         // Then
         assertEquals(ErrorCode.SENT_ACCOUNT_NOT_FOUND, exception.getErrorCode());
-        verify(transactionRepository, never()).save(any(TransactionEntity.class));
+        verify(transactionRepository, never()).save(any(Transaction.class));
     }
 }

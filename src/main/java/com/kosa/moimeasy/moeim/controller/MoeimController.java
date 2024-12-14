@@ -17,7 +17,7 @@ public class MoeimController {
 
     @PostMapping("/create")
     public ResponseEntity<Moeim> createMoeim(@RequestBody MoeimDTO request) {
-        Long userId = 2L; // 로그인된 사용자 ID (추후 인증 정보를 기반으로 설정)
+        Long userId = 1L; // 로그인된 사용자 ID (추후 인증 정보를 기반으로 설정)
         request.setUserId(userId);
 
         Moeim createdMoeim = moeimService.createMoeim(request);

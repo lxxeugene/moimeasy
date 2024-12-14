@@ -1,5 +1,6 @@
 package com.kosa.moimeasy.moeim.entity;
 
+import com.kosa.moimeasy.transaction.entity.Transaction;
 import com.kosa.moimeasy.transaction.entity.TransactionSample;
 import com.kosa.moimeasy.user.entity.User;
 import jakarta.persistence.*;
@@ -32,7 +33,8 @@ public class Moeim {
     @Column(name = "moeim_account_number", nullable = false) // 길이 지정해야됌
     private String accountNumber;
 
-    @Column(name = "moeim_account_amount", nullable = false)
+    // 기본 값을 0으로 설정
+    @Column(name = "moeim_account_amount", nullable = false, columnDefinition = "DOUBLE DEFAULT 0.0")
     private double amount;
 
     @Column(name = "CREATE_AT", nullable = false, updatable = false)
@@ -58,7 +60,7 @@ public class Moeim {
 
     // 거래내역 테이블
     // Moeim 엔티티를 저장하면 Transaction 엔티티들도 자동으로 저장된다. (삭제도 마찬가지)
-    @OneToMany(mappedBy = "moeim", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<TransactionSample> transactionSampleList = new ArrayList<>();
+    @OneToMany(mappedBy = "moeimAccount", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Transaction> transactionSampleList = new ArrayList<>();
 
 }

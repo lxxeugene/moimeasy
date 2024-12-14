@@ -18,6 +18,9 @@ public interface MoeimRepository extends JpaRepository<Moeim, Long> {
     @Query("select m from Moeim m where m.accountNumber = :accountNumber")
     Moeim findAccountNumber(@Param("accountNumber") String accountNumber);
 
-
     Optional<Moeim> findByAccountNumber(String accountNumber);
+
+    // 유저 아이디로 모임 조회
+    @Query("SELECT m FROM Moeim m WHERE m.user.userId = :userId")
+    Optional<Moeim> findByUserId(@Param("userId") Long userId);
 }

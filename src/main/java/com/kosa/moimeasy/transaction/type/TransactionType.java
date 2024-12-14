@@ -1,6 +1,6 @@
 package com.kosa.moimeasy.transaction.type;
 
-public enum Transaction {
+public enum TransactionType {
     DEPOSIT,
     WITHDRAW,
     REMITTANCE

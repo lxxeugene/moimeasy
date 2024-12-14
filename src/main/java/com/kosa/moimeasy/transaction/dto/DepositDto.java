@@ -2,6 +2,7 @@ package com.kosa.moimeasy.transaction.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,11 +15,10 @@ public class DepositDto {
     @Setter
     public static class Request {
 
-        @NotBlank(message = "계좌번호는 필수값입니다.")
-        private String accountNumber;
-        @NotBlank(message = "입금자명은 필수값입니다.")
-        private String depositName;
-        @Min(value = 1000, message = "입금 최소금액은 1000원입니다.")
+        @NotNull(message = "유저 ID는 필수 값입니다.")
+        private Long userId;
+
+        @Min(value = 1, message = "입금 최소금액은 1원입니다.")
         private Long amount;
     }
 
