@@ -26,7 +26,7 @@ public class Board extends BaseEntity {
     @Column(name = "TITLE", nullable = false)
     private String title;
 
-    @Column(name = "CONTENT" , nullable = true)
+    @Column(name = "content", columnDefinition = "LONGTEXT", nullable = true)
     private String content;
     @Column(name = "Tag" , nullable = true)
     private String tag = "일반";

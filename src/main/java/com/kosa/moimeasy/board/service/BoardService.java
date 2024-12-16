@@ -20,10 +20,10 @@ public class BoardService {
     public List<BoardDTO> getAllBoards() {
         return boardRepository.findAllBoardsWithWriterName();
     }
-
-    public Board getBoardById(Long id) {
-        return boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. ID: " + id));
+    // 게시글 상세
+    public BoardDTO getBoardById(Long boardId) {
+        return boardRepository.findByIdWithWriterName(boardId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. ID: " + boardId));
     }
 
     // 게시글 추가

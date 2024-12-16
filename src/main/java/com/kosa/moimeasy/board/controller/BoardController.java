@@ -25,8 +25,8 @@ public class BoardController {
 
     //게시글 상세
     @GetMapping("/{id}")
-    public ResponseEntity<Board> getBoardById(@PathVariable Long id) {
-        return ResponseEntity.ok(boardService.getBoardById(id));
+    public ResponseEntity<BoardDTO> getBoardById(@PathVariable("id") Long boardId) {
+        return ResponseEntity.ok(boardService.getBoardById(boardId));
     }
 
     // 게시글 추가
