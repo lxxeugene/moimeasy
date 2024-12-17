@@ -15,7 +15,7 @@ import TransactionList from '@/views/transaction/TransactionList.vue';
 import Category from '@/views/transaction/Category.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
 import ChatView from '@/views/chat/ChatView.vue';
-
+import Settlement from '@/views/moeim/SettlementView.vue';
 // 다른 뷰를 추가로 임포트
 
 import { useAuthStore } from '../stores/auth';
@@ -39,7 +39,7 @@ const routes = [
     path: '/invitation-list',
     name: '초대목록',
     component: InvitationList,
-  }, // 초대 목록 추가
+  }, 
   {
     path: '/remittance-list',
     name: 'RemittanceList',
@@ -111,6 +111,7 @@ const routes = [
     name: '채팅',
     component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
+  { path: '/settlement', name: '정산요청', component: Settlement },
 ];
 
 const router = createRouter({

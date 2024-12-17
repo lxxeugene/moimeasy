@@ -83,10 +83,14 @@ public class UserService {
         return users.stream()
                 .map(user -> UserDTO.builder()
                         .userId(user.getUserId())
+                        .userName(user.getUserName()) // userName 추가
                         .nickname(user.getNickname())
                         .email(user.getEmail())
+                        .createAt(user.getCreateAt()) // createAt 추가
+                        .roleName(user.getRole() != null ? user.getRole().getRoleName() : null) // roleName 추가
                         .moeimId(user.getMoeimId())
                         .build())
                 .collect(Collectors.toList());
     }
+
 }

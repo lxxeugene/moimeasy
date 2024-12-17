@@ -115,16 +115,17 @@ export default {
           params: { moeimId },
           headers: { Authorization: `Bearer ${token}` },
         });
+        console.log('API Response Data:', response.data);
 
-        // 응답 데이터 매핑
         this.users = response.data.map((user) => ({
-          id: user.userId, // 회원 ID
-          name: user.userName || 'N/A', // 이름
-          nickname: user.nickname || 'N/A', // 닉네임
-          role: user.roleName || 'N/A', // 권한
-          joinDate: user.createAt
-            ? new Date(user.createAt).toLocaleDateString()
-            : 'N/A', // 가입 날짜 (날짜 형식 변환)
+          id: user.userId, // userId 필드 확인
+          name: user.userName || user.name || 'N/A', // userName 또는 name 확인
+          nickname: user.nickname || 'N/A', // 닉네임 확인
+          role: user.roleName || user.role || 'N/A', // roleName 또는 role 확인
+          joinDate:
+            user.createAt || user.joinDate
+              ? new Date(user.createAt || user.joinDate).toLocaleDateString()
+              : 'N/A', // 날짜 필드 확인
         }));
 
         this.currentPage = 1;
