@@ -44,7 +44,7 @@
         <!-- 제목 컬럼 -->
         <Column field="title" header="제목" style="min-width: 14rem" sortable>
           <template #body="{ data }">
-            <router-link :to="`/schedule/post-detail/${data.boardId}`">
+            <router-link :to="`/schedule/board-detail/${data.boardId}`">
               {{ data.title }}
             </router-link>
           </template>
