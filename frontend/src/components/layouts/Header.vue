@@ -45,18 +45,13 @@
         <!-- 알림메시지  -->
         <Toast position="bottom-right" />
         <div class="notifications-box" @click="showSecondary">
-          <!-- <img
-            src="@/assets/notifications.svg?url"
-            alt="notifications Icon"
-            height="28px"
-          /> -->
           <OverlayBadge value="2" severity="danger">
             <i class="pi pi-bell" style="font-size: 24px" />
           </OverlayBadge>
         </div>
         <div class="profile-box">
           <img
-            src="@/assets/icons/Avatar.svg?url"
+            :src="profileImage ? profileImage : defaultAvatar"
             alt="Avatar Icon"
             height="32px"
             @click="toggle"
@@ -79,8 +74,11 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import TieredMenu from 'primevue/tieredmenu';
 import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
+import { fetchImageUrl } from '@/utils/image-load-utils';
+import defaultAvatar from '@/assets/icons/Avatar.svg?url'; // 이미지 가져오기
 const authStore = useAuthStore();
 const nickName = ref('');
+const profileImage = ref('');
 const userData = ref('');
 const toast = useToast();
 const route = useRoute();
@@ -110,13 +108,21 @@ updatePathInfo();
 // 라우트 변경 감지용
 watch(
   () => route.matched,
-  () => {
+  async () => {
     updatePathInfo();
     console.log('라우트 변경됨:', items.value);
+
     const userDataStorage = localStorage.getItem('user');
     userData.value = userDataStorage ? JSON.parse(userDataStorage) : null;
+
     // 닉네임 업데이트
     nickName.value = userData.value?.nickname || '게스트';
+
+    // 비동기 함수로 이미지 경로 불러오기
+    if (userData.value?.profileImage) {
+      profileImage.value = await fetchImageUrl(userData.value.profileImage);
+    }
+
     menus.value = [
       {
         label: 'Profile',
