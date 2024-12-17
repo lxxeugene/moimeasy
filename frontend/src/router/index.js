@@ -131,16 +131,21 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
 
-  // 로그인이 필요한 페이지를 지정 (예: /main, /moeim-select)
-  const requiresAuth = !['/login', '/signup'].includes(to.path);
+  // 로그인이 필요 없는 페이지 (로그인, 회원가입 등)
+  const publicPages = ['/login', '/signup'];
+  const requiresAuth = !publicPages.includes(to.path); // 인증이 필요한 페이지
 
-  if (requiresAuth && !isAuthenticated) {
-    // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
+  if (isAuthenticated && to.path === '/login') {
+    // 로그인 상태에서 로그인 페이지 접근 시 메인 페이지로 리다이렉트
+    next('/main');
+  } else if (requiresAuth && !isAuthenticated) {
+    // 인증이 필요한 페이지인데 로그인 상태가 아니라면 로그인 페이지로 이동
     next('/login');
   } else {
-    // 인증된 사용자 또는 예외 경로는 그대로 진행
+    // 그 외의 경우는 정상 진행
     next();
   }
 });
+
 
 export default router;
