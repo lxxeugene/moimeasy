@@ -1,6 +1,5 @@
 <template>
   <div class="profile-container">
-    
     <form v-if="user">
       <div class="form-group">
         <label for="userProfile">프로필이미지</label>
@@ -21,12 +20,14 @@
             class="p-button-outlined"
           />
         </div>
-
-        <!-- <input id="username" v-model="user.userName" type="text" readonly /> -->
       </div>
       <div class="form-group">
         <label for="username">유저명</label>
         <input id="username" v-model="user.userName" type="text" readonly />
+      </div>
+      <div class="form-group">
+        <label for="nickname">닉네임</label>
+        <input id="nickname" v-model="user.nickname" type="text" readonly />
       </div>
       <div class="form-group">
         <label for="email">이메일</label>
@@ -36,10 +37,7 @@
         <label for="phone">전화번호</label>
         <input id="phone" v-model="user.phone" type="text" readonly />
       </div>
-      <div class="form-group">
-        <label for="address">주소</label>
-        <input id="address" v-model="user.address" type="text" readonly />
-      </div>
+
       <div class="form-group">
         <label for="createAt">가입 날짜</label>
         <input id="createAt" v-model="user.createAt" type="text" readonly />
@@ -88,7 +86,7 @@ export default {
 <style scoped>
 .profile-container {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 10px auto;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
