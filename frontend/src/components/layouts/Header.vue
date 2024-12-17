@@ -45,7 +45,7 @@
         <!-- 알림메시지  -->
         <Toast position="bottom-right" />
         <div class="notifications-box" @click="showSecondary">
-          <OverlayBadge value="2" severity="danger">
+          <OverlayBadge :value="notificationList.length" severity="danger">
             <i class="pi pi-bell" style="font-size: 24px" />
           </OverlayBadge>
         </div>
@@ -76,6 +76,7 @@ import TieredMenu from 'primevue/tieredmenu';
 import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
 import { fetchImageUrl } from '@/utils/image-load-utils';
 import defaultAvatar from '@/assets/icons/Avatar.svg?url'; // 이미지 가져오기
+import axios from 'axios';
 const authStore = useAuthStore();
 const nickName = ref('');
 const profileImage = ref('');
@@ -85,6 +86,7 @@ const route = useRoute();
 const router = useRouter();
 const menu = ref();
 const menus = ref([]);
+const notificationList = ref([]);
 // 브레드크럼 홈경로 설정
 const home = ref({
   icon: 'pi pi-home',
@@ -105,20 +107,32 @@ const updatePathInfo = () => {
 // 초기 경로 설정
 updatePathInfo();
 
+const fetchNotification = async () => {
+  console.log('유저데이터', userData.value);
+  try {
+    const { data } = await axios.get(
+      `/api/v1/notifications?userId=${userData.value?.userId}`
+    );
+    console.log('추가된 알림정보:', data);
+    notificationList.value = data;
+  } catch (error) {}
+};
+
 // 라우트 변경 감지용
 watch(
   () => route.matched,
   async () => {
     updatePathInfo();
+    fetchNotification(); //알림 정보 가져오기
     console.log('라우트 변경됨:', items.value);
-
+    // 유저 정보가져오기
     const userDataStorage = localStorage.getItem('user');
     userData.value = userDataStorage ? JSON.parse(userDataStorage) : null;
 
     // 닉네임 업데이트
     nickName.value = userData.value?.nickname || '게스트';
 
-    // 비동기 함수로 이미지 경로 불러오기
+    // 비동기 함수로 파이어베이스의 이미지 경로 불러오기
     if (userData.value?.profileImage) {
       profileImage.value = await fetchImageUrl(userData.value.profileImage);
     }
