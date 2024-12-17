@@ -22,7 +22,7 @@
       </div>
       <div class="form-options">
     <div>
-      <a href="#" class="forgot-password" @click.prevent="forgotId"
+      <a href="#" class="forgot-password" @click.prevent="goToFindEmail"
           >아이디 찾기</a
         >
     </div>
@@ -88,8 +88,9 @@ export default {
       // 리디렉션: 홈으로 이동 (필요 시)
       this.$router.push('/main');
     },
-    forgotId() {
-      alert('아이디 찾기 기능은 아직 준비 중입니다.');
+    goToFindEmail() {
+    console.log('아이디 찾기 클릭'); // 로그로 이벤트 확인
+    this.$router.push('/find-email'); // FindEmailView로 이동
     },
     forgotPassword() {
       alert('비밀번호 찾기 기능은 아직 준비 중입니다.');

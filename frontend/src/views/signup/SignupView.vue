@@ -37,7 +37,7 @@
           placeholder="Your email"
           required/>
           <button type="button" class="check-button" @click="checkEmail" :disabled="isEmailChecked || isSubmitting">
-            중복 확인
+            Check for duplicates
           </button>
           <div :class="feedbackEmailClass">{{ feedbackEmail }}</div>
           <div v-if="errors.email" class="error-message">
@@ -55,7 +55,7 @@
           placeholder="Your nickname"
           required/>
           <button type="button" class="check-button" @click="checkNickname" :disabled="isNicknameChecked || isSubmitting">
-            중복 확인
+            Check for duplicates
           </button>
           <div :class="feedbackNicknameClass">{{ feedbackNickname }}</div>
           <div v-if="errors.nickname" class="error-message">

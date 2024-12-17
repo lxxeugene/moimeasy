@@ -15,7 +15,7 @@ import TransactionList from '@/views/transaction/TransactionList.vue';
 import Category from '@/views/transaction/Category.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
 import ChatView from '@/views/chat/ChatView.vue';
-
+import FindEmailView from '@/views/find/FindEmailView.vue';
 // 다른 뷰를 추가로 임포트
 
 import { useAuthStore } from '../stores/auth';
@@ -29,6 +29,7 @@ const routes = [
   { path: '/create-moeim', name: 'CreateMoeim', component: CreateMoeim },
   { path: '/enter-moeim', name: 'EnterMoeim', component: EnterMoeim },
   { path: '/user-manage', name: '회원관리', component: UserManage },
+  { path: '/find-email', name: 'FindEmail', component: FindEmailView },
   {
     path: '/user-profile/:userId',
     name: '회원프로필',
@@ -132,7 +133,7 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
 
   // 로그인이 필요 없는 페이지 (로그인, 회원가입 등)
-  const publicPages = ['/login', '/signup'];
+  const publicPages = ['/login', '/signup', '/find-email'];
   const requiresAuth = !publicPages.includes(to.path); // 인증이 필요한 페이지
 
   if (isAuthenticated && to.path === '/login') {
