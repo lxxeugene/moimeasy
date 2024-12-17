@@ -62,7 +62,6 @@ public class User {
         }else {
             this.createAt = createAt;
         }
-
     }
 
     @PreUpdate

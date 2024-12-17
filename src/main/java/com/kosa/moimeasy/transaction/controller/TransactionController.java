@@ -86,7 +86,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionService.getTransactionList(token, request));
     }
 
-    // 송금내역 조회
+    // 송금을 위한 기본 조회
     @GetMapping("/details")
     public ResponseEntity<DetailDTO> getDetails(
             @RequestHeader(name = "Authorization") String token
