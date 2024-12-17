@@ -368,6 +368,13 @@ async function fetchEvents() {
       },
     ];
   } catch (error) {
+    // 데이터베이스에서 가져오기 실패시 구글캘린더 공휴일만 적용
+    calendarOptions.eventSources = [
+      {
+        googleCalendarId: googleCalendarId,
+        className: 'holiday-event',
+      },
+    ];
     console.error('서버에서 이벤트를 가져오는 데 실패했습니다:', error);
   } finally {
     loadingStore.stopLoading(); // 로딩스피너 제거

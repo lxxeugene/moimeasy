@@ -36,4 +36,10 @@ public class UserDTO {
         this.roleName = user.getRole().getRoleName();
         //this.roleId = user.getRole() != null ? user.getRole().getRoleName() : null;
     }
+
+//    public UserDTO(Long userId, String nickname, String email) {
+//        this.userId = userId;
+//        this.nickname = nickname;
+//        this.email = email;
+//    }
 }
