@@ -7,34 +7,39 @@
       <!-- 입력 폼 -->
       <form @submit.prevent="submitForm" class="form">
         <div class="input-container">
-          <label for="nickname">Nickname</label>
+          <label for="nickname">닉네임</label>
           <FloatLabel>
             <InputText
               id="nickname"
               v-model="nickname"
-              placeholder="Nickname"
+              placeholder="닉네임을 입력해 주세요"
+              required
             />
           </FloatLabel>
         </div>
 
         <div class="input-container">
-          <label for="phone">Phone</label>
+          <label for="phone">연락처</label>
           <FloatLabel>
             <InputText
               id="phone"
               v-model="phone"
-              placeholder="Phone"
+              placeholder="연락처를 입력해 주세요"
+              required
             />
           </FloatLabel>
         </div>
 
         <div class="submit-button">
           <Button
-            label="Find Email"
+            label="아이디 찾기"
             type="submit"
             icon="pi pi-search"
             :loading="loading"
           />
+          <p class="footer-text">
+      로그인 페이지로 가시겠습니까? <a href="#" @click.prevent="goToLogin">Log in</a>
+    </p>
         </div>
       </form>
 
@@ -58,48 +63,51 @@
   
   <script>
   import api from '@/axios';
-  import { useAuthStore } from '@/stores/auth';
-  import { defineComponent, ref } from 'vue';
-  
-  export default defineComponent({
-    name: 'FindEmailView',
-    setup() {
-      const nickname = ref('');
-      const phone = ref('');
-      const email = ref('');
-      const error = ref('');
-      const loading = ref(false);
-  
-      const submitForm = async () => {
-        error.value = '';
-        email.value = '';
-        loading.value = true;
-  
-        try {
-          const response = await api.post('/api/v1/find/email', {
-            nickname: nickname.value,
-            phone: phone.value,
-          });
-          email.value = response.data.email;
-              // 이메일 찾기 성공 후 10초 후 로그인 페이지로 리다이렉트
-      setTimeout(() => {
-      console.log('로그인 페이지로 이동합니다.');
-      window.location.href = '/login'; // 또는 this.$router.push('/login') 사용
-    }, 10000); // 10000ms = 10초
-        } catch (err) {
-          if (err.response?.status === 404) {
-            error.value = '일치하는 이메일을 찾을 수 없습니다.';
-          } else {
-            error.value = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
-          }
-        } finally {
-          loading.value = false;
+import { defineComponent, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+export default defineComponent({
+  name: 'FindEmailView',
+  setup() {
+    const nickname = ref('');
+    const phone = ref('');
+    const email = ref('');
+    const error = ref('');
+    const loading = ref(false);
+
+    const router = useRouter(); // Vue Router 인스턴스 가져오기
+
+    const submitForm = async () => {
+      error.value = '';
+      email.value = '';
+      loading.value = true;
+
+      try {
+        const response = await api.post('/api/v1/find/email', {
+          nickname: nickname.value,
+          phone: phone.value,
+        });
+        email.value = response.data.email;
+      } catch (err) {
+        if (err.response?.status === 404) {
+          error.value = '일치하는 이메일을 찾을 수 없습니다.';
+        } else {
+          error.value = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
         }
-      };
-  
-      return { nickname, phone, email, error, loading, submitForm };
-    },
-  });
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    // 로그인 페이지로 이동
+    const goToLogin = () => {
+      router.push('/login');
+    };
+
+    return { nickname, phone, email, error, loading, submitForm, goToLogin };
+  },
+});
+
   </script>
   
   <style scoped>
@@ -115,7 +123,7 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
   text-align: center;
   margin-bottom: 1.5rem;
@@ -134,9 +142,24 @@
 }
 
 .input-container label {
-  margin-bottom: 0.5rem;
+  margin-bottom: 5px;
   font-size: 0.9rem;
-  color: #414651;
+  color: #555;
+}
+
+.input-container input {
+  width: 100%; /* 모든 input 너비를 부모 컨테이너에 맞춤 */
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box; /* padding과 border 포함 */
+}
+
+.input-container input:focus {
+  border-color: #8a4af3; /* 포커스 시 테두리 강조 */
+  outline: none;
+  box-shadow: 0 0 5px rgba(138, 74, 243, 0.3);
 }
 
 .submit-button button {
@@ -157,5 +180,20 @@
   margin-top: 1rem;
 }
 
+.footer-text {
+  color: #414651;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.footer-text a {
+  color: #7f56d9;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.footer-text a:hover {
+  text-decoration: underline;
+}
   </style>
   
