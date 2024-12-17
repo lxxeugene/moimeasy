@@ -45,7 +45,7 @@
         <!-- 알림메시지  -->
         <Toast position="bottom-right" />
         <div class="notifications-box" @click="showSecondary">
-          <OverlayBadge :value="notificationList.length" severity="danger">
+          <OverlayBadge :value="notificationInfos.length" severity="danger">
             <i class="pi pi-bell" style="font-size: 24px" />
           </OverlayBadge>
         </div>
@@ -86,7 +86,7 @@ const route = useRoute();
 const router = useRouter();
 const menu = ref();
 const menus = ref([]);
-const notificationList = ref([]);
+const notificationInfos = ref([]);
 // 브레드크럼 홈경로 설정
 const home = ref({
   icon: 'pi pi-home',
@@ -114,7 +114,14 @@ const fetchNotification = async () => {
       `/api/v1/notifications?userId=${userData.value?.userId}`
     );
     console.log('추가된 알림정보:', data);
-    notificationList.value = data;
+    notificationInfos.value = data.map((a, i) => {
+      return {
+        severity: 'secondary',
+        summary: a.header,
+        detail: a.body,
+        life: 3000,
+      };
+    });
   } catch (error) {}
 };
 
@@ -167,17 +174,8 @@ watch(
 );
 //Toast 전달 메시지 설정
 const showSecondary = () => {
-  toast.add({
-    severity: 'secondary',
-    summary: '[일정 등록]',
-    detail: ' 우리 모임의 새 일정이 등록되었습니다.',
-    life: 3000,
-  });
-  toast.add({
-    severity: 'secondary',
-    summary: '[쪽지]',
-    detail: '운영자로 부터 쪽지가 도착했습니다.',
-    life: 3000,
+  notificationInfos.value.map((a) => {
+    toast.add(a);
   });
 };
 
