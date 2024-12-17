@@ -79,6 +79,12 @@ const routes = [
         component: () => import('@/views/board/BoardPostView.vue'),
       },
       {
+        path: 'board-update/:id',
+        name: '게시물 수정',
+        component: () => import('@/views/board/BoardUpdateView.vue'),
+        props: true,
+      },
+      {
         path: 'board-detail/:id',
         name: '게시물 상세',
         component: () => import('@/views/board/BoardDetailView.vue'),

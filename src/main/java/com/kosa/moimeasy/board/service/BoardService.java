@@ -26,7 +26,7 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. ID: " + boardId));
     }
 
-    // 게시글 추가
+    // 게시글 추가 및 수정
     public Board createBoard(BoardDTO boardDTO,Long userId) {
 
         User writer = userRepository.findById(userId)

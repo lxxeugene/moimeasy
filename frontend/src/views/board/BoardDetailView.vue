@@ -46,7 +46,12 @@
     <div class="board-detail-btn-box" v-if="nickname == board.writerName">
       <Toast />
       <ConfirmPopup></ConfirmPopup>
-      <Button label="수정" variant="outlined" icon="pi pi-pen-to-square" />
+      <Button
+        label="수정"
+        variant="outlined"
+        icon="pi pi-pen-to-square"
+        @click="linkToUpdate"
+      />
       <Button
         label="삭제"
         variant="outlined"
@@ -101,6 +106,10 @@ const fetchBoardData = async () => {
   } finally {
     loadingStore.stopLoading(); // 로딩 중지
   }
+};
+
+const linkToUpdate = () => {
+  router.push(`/schedule/board-update/${boardId}`);
 };
 
 //삭제 api
