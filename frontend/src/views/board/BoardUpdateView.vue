@@ -52,9 +52,11 @@ import api from '@/axios';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 const toast = useToast();
 const route = useRoute();
+const router = useRouter();
 const loadingStore = useLoadingStore();
 const boardId = route.params.id; // 라우터의 id 파라미터
 const auth = useAuthStore();
@@ -68,7 +70,6 @@ const post = ref({
 
 // 게시글 제출 핸들러
 const submitPost = async () => {
-  console.log('ssss');
   try {
     const requestData = {
       title: post.value.title,
@@ -79,19 +80,20 @@ const submitPost = async () => {
     };
 
     //수정하기 요청
-    const response = await axios.put(
-      `/api/v1/boards/${auth.user.userId}`,
-      requestData
-    );
-    console.log('API 응답:', response.data);
-    router.push('/schedule/board');
-    toast.add({
-      severity: 'info',
-      summary: '변경 완료',
-      detail: '게시글이 성공적으로 변경되었습니다.',
-      life: 3000,
-    });
+    const response = await axios
+      .put(`/api/v1/boards/${auth.user.userId}`, requestData)
+      .then((res) => {
+        console.log('API 응답:', res.data);
+        router.push('/schedule/board');
+        toast.add({
+          severity: 'info',
+          summary: '변경 완료',
+          detail: '게시글이 성공적으로 변경되었습니다.',
+          life: 3000,
+        });
+      });
   } catch (error) {
+    alert('에러발생', error);
     toast.add({
       severity: 'error',
       summary: '수정 실패',
