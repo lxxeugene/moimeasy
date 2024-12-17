@@ -352,7 +352,7 @@ public class TransactionService {
         return getTransactionListResponse(request.getMoeimId(), startDate, endDate);
     }
 
-
+    // 모임 확인
     private Moeim getValidmoeim(Long moeimid) {
         Moeim moeim = moeimRepository.findById(moeimid)
             .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
@@ -360,7 +360,7 @@ public class TransactionService {
         return moeim;
     }
 
-
+    // 거래 유형
     private String getTransactionTargetName(Transaction transaction) {
         switch (transaction.getTransactionType()) {
             case WITHDRAW -> {
@@ -402,30 +402,27 @@ public class TransactionService {
 
         List<Transaction> resultList = transactionRepository.findAllByMoeimId(
                 moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+
         List<User> users = userRepository.findByMoeimId(moeimId);
 
         // 먼저 거래내역 있는 사용자들에 대한 DTO 변환
         List<RemittanceListDto> remittanceList = resultList.stream()
                 .map(transaction -> {
-                    // UserAccount null 체크
                     Long userId = null;
                     String userName = "알 수 없는 사용자";
                     String photo = "default-photo.png";
                     if (transaction.getUserAccount() != null) {
                         userId = transaction.getUserAccount().getUserId();
-                        userName = transaction.getUserAccount().getNickname() != null
-                                ? transaction.getUserAccount().getNickname()
-                                : userName;
+                        userName = (transaction.getUserAccount().getNickname() != null)
+                                ? transaction.getUserAccount().getNickname() : userName;
                         if (transaction.getUserAccount().getProfileImage() != null) {
                             photo = transaction.getUserAccount().getProfileImage();
                         }
                     }
 
-                    // 로그 추가
                     log.info("Processing Transaction: id={}, userId={}, userName={}, photo={}, receivedAccount={}",
                             transaction.getId(), userId, userName, photo, transaction.getReceivedAccount());
 
-                    // DTO 생성 및 반환
                     return RemittanceListDto.builder()
                             .userId(userId)
                             .receivedAccount(transaction.getReceivedAccount() != null
@@ -434,21 +431,20 @@ public class TransactionService {
                             .photo(photo)
                             .userName(userName)
                             .amount(transaction.getAmount())
-                            .transactionType(TransactionType.REMITTANCE) // 납부완료 상태로 가정
+                            .transactionType(TransactionType.REMITTANCE)
                             .transactionAt(transaction.getTransactedAt())
                             .build();
-                }).toList();
+                })
+                .collect(Collectors.toList()); // 여기서 toList() 대신 Collectors.toList() 사용
 
-        // 거래내역 있는 사용자 ID 집합 추출
         Set<Long> userWithTransactions = remittanceList.stream()
                 .map(RemittanceListDto::getUserId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        // 모든 모임 가입 사용자 중 거래내역이 없는 사용자 처리
+// 거래내역 없는 유저 추가
         for (User user : users) {
             if (!userWithTransactions.contains(user.getUserId())) {
-                // 거래내역이 없는 사용자를 기본값으로 DTO 추가
                 String userName = user.getNickname() != null ? user.getNickname() : "알 수 없는 사용자";
                 String photo = user.getProfileImage() != null ? user.getProfileImage() : "default-photo.png";
                 remittanceList.add(RemittanceListDto.builder()
@@ -456,9 +452,9 @@ public class TransactionService {
                         .receivedAccount("알 수 없는 계좌")
                         .photo(photo)
                         .userName(userName)
-                        .amount(0.0) // 납부내역 없으니 0 처리
-                        .transactionType(null) // 거래내역 없어 타입 불명확 시 null
-                        .transactionAt(null) // 거래일자 없음
+                        .amount(0.0)
+                        .transactionType(null)
+                        .transactionAt(null)
                         .build());
             }
         }

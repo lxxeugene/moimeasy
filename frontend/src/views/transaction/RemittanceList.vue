@@ -179,6 +179,8 @@ async function fetchRemittanceList() {
       },
     });
 
+    console.log('startOfMonth:', startOfMonth, startOfMonth.toISOString());
+    console.log('endOfMonth:', endOfMonth, endOfMonth.toISOString());
     // 응답 데이터 처리
     if (response.data.remittanceList) {
       members.value = response.data.remittanceList.map((remittance, index) => ({
@@ -208,7 +210,7 @@ const updateMonth = (offset) => {
   currentDate.value.setMonth(currentDate.value.getMonth() + offset);
   currentMonth.value = `${currentDate.value.getMonth() + 1}월 회비 납부내역`;
   fetchInitialData();
-  fetchRemittanceList
+  fetchRemittanceList(); // 함수 호출
 };
 
 
