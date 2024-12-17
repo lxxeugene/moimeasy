@@ -42,8 +42,19 @@
         <div class="content" v-html="board.content || '내용이 없습니다.'"></div>
       </template>
     </Card>
+    <!-- 수정삭제 버튼 (작성자에게만 표시)-->
+    <div class="board-detail-btn-box" v-if="nickname == board.writerName">
+      <Toast />
+      <ConfirmPopup></ConfirmPopup>
+      <Button label="수정" variant="outlined" icon="pi pi-pen-to-square" />
+      <Button
+        label="삭제"
+        variant="outlined"
+        icon="pi pi-trash"
+        @click="deleteConfirm($event)"
+      />
+    </div>
   </div>
-
   <div v-else class="loading">
     <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
     <p>데이터를 불러오는 중입니다...</p>
@@ -58,20 +69,82 @@ import 'primeicons/primeicons.css';
 import Tag from 'primevue/tag';
 import api from '@/axios';
 import 'quill/dist/quill.snow.css';
+import { useAuthStore } from '@/stores/auth';
+import axios from 'axios';
+import { useConfirm } from 'primevue/useconfirm';
+import { useToast } from 'primevue/usetoast';
+import ConfirmPopup from 'primevue/confirmpopup';
+import { useRouter } from 'vue-router';
+import { useLoadingStore } from '@/stores/useLoadingStore';
+const loadingStore = useLoadingStore();
 
+const router = useRouter();
+const toast = useToast();
+const confirm = useConfirm();
+const auth = useAuthStore();
 const route = useRoute();
+
+const nickname = auth.user.nickname;
 const boardId = route.params.id; // 라우터의 id 파라미터
 const board = ref(null);
 const defaultProfileImage =
   'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png';
+
 // 게시글 데이터를 불러오는 함수
 const fetchBoardData = async () => {
+  loadingStore.startLoading(); // 로딩 시작
   try {
     const response = await api.get(`/api/v1/boards/${boardId}`);
     board.value = response.data; // API 결과 저장
   } catch (error) {
     console.error('게시글 데이터를 불러오지 못했습니다.', error);
+  } finally {
+    loadingStore.stopLoading(); // 로딩 중지
   }
+};
+
+//삭제 api
+const fetchDelete = async () => {
+  try {
+    const response = await axios.delete(`/api/v1/boards/${boardId}`);
+    router.push('/schedule/board');
+    toast.add({
+      severity: 'info',
+      summary: '삭제 완료',
+      detail: '게시글을 삭제했습니다.',
+      life: 3000,
+    });
+  } catch (error) {
+    console.error('게시글 삭제 실패', error);
+    toast.add({
+      severity: 'error',
+      summary: '삭제 실패',
+      detail: '게시글 삭제에 실패했습니다.',
+      life: 3000,
+    });
+  }
+};
+
+//삭제 확인창
+const deleteConfirm = (event) => {
+  confirm.require({
+    target: event.currentTarget,
+    message: '이 게시물을 삭제하시겠습니까?',
+    icon: 'pi pi-info-circle',
+    rejectProps: {
+      label: '취소',
+      severity: 'secondary',
+      outlined: true,
+    },
+    acceptProps: {
+      label: '삭제',
+      severity: 'danger',
+    },
+    accept: () => {
+      fetchDelete(); // 확인 시 삭제 요청
+    },
+    reject: () => {},
+  });
 };
 
 onMounted(() => {
@@ -219,5 +292,14 @@ onMounted(() => {
 
 .author i {
   margin-right: 8px;
+}
+
+.board-detail-btn-box {
+  width: 100%;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
 }
 </style>

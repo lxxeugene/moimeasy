@@ -12,14 +12,14 @@ import java.util.Optional;
 
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
-    @Query("SELECT new com.kosa.moimeasy.board.dto.BoardDTO(b.boardId, b.title, b.content, b.isNotice, u.userName, u.profileImage ,b.tag, b.createAt,b.updateAt) " +
+    @Query("SELECT new com.kosa.moimeasy.board.dto.BoardDTO(b.boardId, b.title, b.content, b.isNotice, u.nickname, u.profileImage ,b.tag, b.createAt,b.updateAt) " +
             "FROM Board b " +
             "JOIN b.writer u "+ // Board와 User를 조인
             "ORDER BY b.boardId DESC")
     List<BoardDTO> findAllBoardsWithWriterName();
 
 
-    @Query("SELECT new com.kosa.moimeasy.board.dto.BoardDTO(b.boardId, b.title, b.content, b.isNotice, u.userName, u.profileImage ,b.tag, b.createAt,b.updateAt) " +
+    @Query("SELECT new com.kosa.moimeasy.board.dto.BoardDTO(b.boardId, b.title, b.content, b.isNotice, u.nickname, u.profileImage ,b.tag, b.createAt,b.updateAt) " +
             "FROM Board b " +
             "JOIN b.writer u "+ // Board와 User를 조인
             "WHERE b.boardId = :boardId " +
