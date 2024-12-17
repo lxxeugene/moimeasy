@@ -11,7 +11,6 @@
           placeholder="제목을 입력하세요."
         />
       </div>
-
       <!-- 태그 입력 -->
       <div class="form-group">
         <label for="tag">태그</label>
@@ -53,6 +52,7 @@ import api from '@/axios';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useRoute } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import axios from 'axios';
 const toast = useToast();
 const route = useRoute();
 const loadingStore = useLoadingStore();
@@ -63,6 +63,7 @@ const post = ref({
   title: '',
   tag: '',
   content: '',
+  boardId: '',
 });
 
 // 게시글 제출 핸들러
@@ -73,11 +74,12 @@ const submitPost = async () => {
       title: post.value.title,
       tag: post.value.tag,
       content: post.value.content,
+      boardId: post.value.boardId,
       isNotice: false, // 기본값 설정
     };
 
     //수정하기 요청
-    const response = await api.post(
+    const response = await axios.put(
       `/api/v1/boards/${auth.user.userId}`,
       requestData
     );
@@ -109,6 +111,7 @@ const fetchBoardData = async () => {
       title: data.title,
       tag: data.tag,
       content: data.content,
+      boardId: data.boardId,
     };
   } catch (error) {
     console.error('게시글 데이터를 불러오지 못했습니다.', error);

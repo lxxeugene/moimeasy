@@ -36,13 +36,13 @@ public class BoardService {
     }
 
     // 게시글 수정
-    public Board updateBoard(Long id, Board boardDetails) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. ID: " + id));
-
-        board.setTitle(boardDetails.getTitle());
-        board.setContent(boardDetails.getContent());
-        board.setIsNotice(boardDetails.getIsNotice());
+    public Board updateBoard( BoardDTO boardDTO,Long userId) {
+            long boardId = boardDTO.getBoardId();
+            Board board = boardRepository.findById(boardId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다. ID: " + boardId));
+            board.setTitle(boardDTO.getTitle());
+            board.setContent(boardDTO.getContent());
+            board.setIsNotice(boardDTO.getIsNotice());
         return boardRepository.save(board);
     }
 

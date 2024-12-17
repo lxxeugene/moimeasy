@@ -37,8 +37,8 @@ public class BoardController {
 
     // 게시글 수정
     @PutMapping("/{id}")
-    public ResponseEntity<Board> updateBoard(@PathVariable Long id, @RequestBody Board boardDetails) {
-        return ResponseEntity.ok(boardService.updateBoard(id, boardDetails));
+    public ResponseEntity<Board> updateBoard(@RequestBody BoardDTO boardDTO, @PathVariable("id") Long userId) {
+        return ResponseEntity.ok(boardService.updateBoard(boardDTO,userId));
     }
 
     // 게시글 삭제하기
