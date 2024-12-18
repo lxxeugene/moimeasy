@@ -13,7 +13,7 @@
   </div>
 
   <!-- 금액 입력 모달창 -->
-  <Dialog v-model:visible="visible1" modal :style="{ width: '30rem', height: '40rem' }" @hide="resetValue">
+  <Dialog v-model:visible="visible1" modal :style="{ width: '30rem', height: '40rem' }" @show="resetValue">
     <template #header>
       <div class="text-header">보낼 금액</div>
     </template>
@@ -34,7 +34,7 @@
   </Dialog>
 
   <!-- 확인 모달 -->
-  <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '25rem' }" @hide="resetValue">
+  <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '25rem' }">
     <template #header>
       <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
         <span style="font-weight: bold;">{{ moeimName }}</span> 님에게 {{ value }} 원 이체하시겠습니까?
@@ -44,13 +44,12 @@
     </template>
     <div class="button-group">
       <Button label="확인" rounded class="next-button" @click="confirmDeposit" />
-      <Button label="취소" rounded class="next-button" @click="visible2 = false" />
+      <Button label="취소" rounded class="next-button" @click="resetValue" />
     </div>
   </Dialog>
 
   <!-- 결과 모달 -->
-  <Dialog v-model:visible="visible3" modal :style="{ width: '27rem', height: '40rem' }" @hide="resetValue"
-    :closable="false">
+  <Dialog v-model:visible="visible3" modal :style="{ width: '27rem', height: '40rem' }" :closable="false">
     <template #header>
       <div
         style="display: flex; justify-content: center; align-items: center; font-size: 4em; margin-top: 50px; font-weight: bold; color: #7f56d9;">
@@ -60,46 +59,61 @@
     </template>
 
     <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
-      <p>{{ username }} 님의 계좌에서 {{ value }} 원을 성공적으로 입금하였습니다.</p>
+      <p>{{ username }} 님의 계좌에서 {{ moeimName }} 계좌에 {{ value }} 원을 입금하였습니다.</p>
       <Button label="닫기" rounded @click="visible3 = false" />
     </div>
   </Dialog>
 
   <div class="card">
-    <DataTable :value="members" paginator :rows="5" tableStyle="min-width: 60rem">
-      <!-- 번호 -->
-      <Column field="number" header="번호" style="width: 12%" />
+    <!-- 로딩 상태일 때 표시 -->
+    <template v-if="loading">
+      <p>데이터를 불러오는 중입니다...</p>
+    </template>
 
-      <!-- 사진 -->
-      <Column header="사진" style="width: 12%">
-        <template #body="slotProps">
-          <img :src="slotProps.data.photo ? `/assets/${slotProps.data.photo}` : '/assets/default-photo.png'" alt="사진"
-            style="width: 40px; height: 40px; border-radius: 50%" />
-        </template>
-      </Column>
+    <!-- 로딩이 끝났고 데이터가 있을 때 표시 -->
+    <template v-else-if="members && members.length">
+      <DataTable :value="members" paginator :rows="5" tableStyle="min-width: 60rem">
+        <!-- 번호 -->
+        <Column field="number" header="번호" style="width: 12%" />
 
-      <!-- 이름 -->
-      <Column field="userName" header="이름" style="width: 12%" />
+        <!-- 사진 -->
+        <Column header="사진" style="width: 12%">
+          <template #body="slotProps">
+            <img :src="slotProps.data.photo ? `/assets/${slotProps.data.photo}` : '/assets/default-photo.png'" alt="사진"
+              style="width: 40px; height: 40px; border-radius: 50%" />
+          </template>
+        </Column>
 
-      <!-- 금액 -->
-      <Column field="amount" header="금액" style="width: 12%" />
+        <!-- 이름 -->
+        <Column field="userName" header="이름" style="width: 12%" />
 
-      <!-- 납부일자 -->
-      <Column field="transactionAt" header="납부일자" style="width: 12%" />
+        <!-- 금액 -->
+        <Column field="amount" header="금액" style="width: 12%" />
 
-      <!-- 상태 -->
-      <Column header="상태" style="width: 12%">
-        <template #body="slotProps">
-          <span :class="getStatusClass(slotProps.data.status)">
-            {{ slotProps.data.status }}
-          </span>
-        </template>
-      </Column>
-    </DataTable>
+        <!-- 납부일자 -->
+        <Column field="transactionAt" header="납부일자" style="width: 12%" />
+
+        <!-- 상태 -->
+        <Column header="상태" style="width: 12%">
+          <template #body="slotProps">
+            <span :class="getStatusClass(slotProps.data.status)">
+              {{ slotProps.data.status }}
+            </span>
+          </template>
+        </Column>
+      </DataTable>
+    </template>
+
+    <!-- 로딩이 끝났지만 데이터가 없을 때 표시 -->
+    <template v-else>
+      <p>데이터가 없습니다.</p>
+    </template>
   </div>
 </template>
 
+
 <script setup>
+import { ref, watch, onMounted } from "vue";
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -108,7 +122,9 @@ import 'primeicons/primeicons.css';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import axios from "axios";
-import { ref, onMounted } from "vue";
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const visible1 = ref(false); // 금액 입력 모달
 const visible2 = ref(false); // 확인 모달
@@ -123,28 +139,15 @@ const userAccount = ref(""); // 사용자 계좌번호
 const moeimBank = ref("토스"); // 모임 은행 이름
 const moeimAccount = ref(""); // 모임 계좌번호
 
-
-function showNextModal() {
-  visible1.value = false;  // 첫 번째 모달 닫기
-  visible2.value = true;   // 두 번째 모달 열기
-}
-
-function showNextModal3() {
-  visible2.value = false;  // 두 번째 모달 닫기
-  visible3.value = true;   // 세 번째 모달 열기
-}
-
 // 숫자 버튼 목록
 const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'x'];
 const currentMonth = ref('');
 const currentDate = ref(new Date()); // 현재 날짜를 기준으로 동작
 const members = ref([]);
-const columns = [
-  { field: 'userName', header: '이름' },
-  { field: 'amount', header: '금액' },
-  { field: 'transactionAt', header: '납부일자' },
-  { field: 'status', header: '상태' },
-];
+
+// 로딩 상태
+const loading = ref(false);
+
 // Local Storage에서 accessToken 가져오기
 const accessToken = localStorage.getItem('accessToken');
 const userRaw = localStorage.getItem('user');
@@ -160,13 +163,13 @@ if (!accessToken || !moeimId) {
   router.push('/login'); // 로그인 화면으로 리디렉션
 }
 
-// 현재 월의 첫 번째 날짜와 마지막 날짜 계산
-const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
-const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
-
 // 송금 내역 가져오기
 async function fetchRemittanceList() {
   try {
+    // 현재 월의 첫 번째 날짜과 마지막 날짜 계산
+    const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
+
     const response = await axios.get('/api/v1/transaction/remittance-list', {
       headers: { Authorization: accessToken.trim() },
       params: {
@@ -176,6 +179,8 @@ async function fetchRemittanceList() {
       },
     });
 
+    console.log('startOfMonth:', startOfMonth, startOfMonth.toISOString());
+    console.log('endOfMonth:', endOfMonth, endOfMonth.toISOString());
     // 응답 데이터 처리
     if (response.data.remittanceList) {
       members.value = response.data.remittanceList.map((remittance, index) => ({
@@ -195,6 +200,40 @@ async function fetchRemittanceList() {
     console.error('송금 내역 조회 중 오류 발생:', error.response?.data || error.message);
     members.value = [];
   }
+  finally {
+    loading.value = false; // 로딩 종료
+  }
+}
+
+// 월 변경 및 데이터 다시 가져오기
+const updateMonth = (offset) => {
+  currentDate.value.setMonth(currentDate.value.getMonth() + offset);
+  currentMonth.value = `${currentDate.value.getMonth() + 1}월 회비 납부내역`;
+  fetchInitialData();
+  fetchRemittanceList(); // 함수 호출
+};
+
+
+
+// 유저 -> 계좌 입금을 위한 데이터
+async function fetchInitialData() {
+  loading.value = true; // 로딩 시작
+  try {
+    const response = await axios.get("/api/v1/transaction/details", {
+      headers: { Authorization: accessToken.trim() },
+    });
+
+    if (response.data) {
+      moeimName.value = response.data.moeimName;
+      moeimAccount.value = response.data.moeimAccount;
+      username.value = response.data.userName;
+      userAccount.value = response.data.userAccount;
+    }
+  } catch (error) {
+    console.error("모임 세부 정보 조회 중 오류 발생:", error.response?.data || error.message);
+  } finally {
+    loading.value = false; // 로딩 종료
+  }
 }
 
 // 버튼 클릭 시 호출
@@ -210,6 +249,10 @@ function handleButtonClick(num) {
 
 // 다음 버튼 클릭 -> 확인 모달 표시
 function depositAmount() {
+  // 현재 value 값을 depositValue에 할당
+  localStorage.setItem('value', JSON.stringify(value.value));
+
+  // 기존 로직: 모달 상태 변경
   visible1.value = false; // 금액 입력 모달 닫기
   visible2.value = true; // 확인 모달 열기
 }
@@ -240,7 +283,7 @@ async function confirmDeposit() {
     const response = await axios.put(
       "/api/v1/transaction/remittance",
       {
-        amount: Number(value.value),
+        amount: Number(value.value), // depositValue 대신 value 사용
       },
       {
         headers: {
@@ -256,43 +299,56 @@ async function confirmDeposit() {
     console.log("송금 성공:", response.data); // 응답 확인
     visible2.value = false; // 확인 모달 닫기
     visible3.value = true; // 결과 모달 열기
+
   } catch (error) {
     console.error("송금 중 오류 발생:", error.response?.data || error.message);
   }
 }
 
-
-// 초기 데이터 로드
-async function fetchInitialData() {
-
-  // 서버에서 모임 데이터 가져오기
-  const response = await axios.get("/api/v1/transaction/details", {
-    headers: { Authorization: localStorage.getItem("accessToken") },
-  });
-
-  if (response.data) {
-    moeimName.value = response.data.moeimName;
-    moeimAccount.value = response.data.moeimAccount;
-    username.value = response.data.userName;
-    userAccount.value = response.data.userAccount;
-  }
-}
-
-function resetValue() {
-  value.value = ""; // 금액 초기화
-}
 // 상태에 따라 CSS 클래스를 반환하는 함수
 function getStatusClass(status) {
   return status === '납부완료' ? 'text-green-500 font-bold' : 'text-red-500 font-bold';
 }
 
-// Mounted Hook에서 송금 내역 가져오기
+// State 관리: localStorage 저장 및 로드
+function loadStateFromLocalStorage() {
+  const storedVisible = localStorage.getItem('visible1');
+  const storedValue = localStorage.getItem('value');
+
+  if (storedVisible !== null) {
+    visible1.value = JSON.parse(storedVisible);
+  }
+
+  if (storedValue !== null) {
+    value.value = JSON.parse(storedValue);
+  }
+}
+
+// Watchers
+watch(visible1, (newVal) => {
+  localStorage.setItem('visible1', JSON.stringify(newVal));
+});
+
+watch(value, (newVal) => {
+  localStorage.setItem('value', JSON.stringify(newVal));
+});
+
+// Mounted Hook에서 송금 내역 가져오기 및 초기 데이터 로드
 onMounted(() => {
+  loadStateFromLocalStorage(); // value 로드 
+
   const date = new Date();
   currentMonth.value = `${date.getMonth() + 1}월 회비 납부내역`; // 초기 월 설정
   fetchRemittanceList();
   fetchInitialData();
 });
+
+// Reset 함수
+function resetValue() {
+  value.value = "";
+  localStorage.removeItem('value');
+  visible2.value = false;
+}
 
 </script>
 

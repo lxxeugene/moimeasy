@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TransactionDto {
+public class TransactionDto { // 거래내역 조회
 
     private Long id;
 

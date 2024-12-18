@@ -24,6 +24,8 @@ import Select from 'primevue/select';
 import FloatLabel from 'primevue/floatlabel';
 import Ripple from 'primevue/ripple';
 import Toast from 'primevue/toast';
+import Card from 'primevue/card';
+import Message from 'primevue/message';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 axios.defaults.baseURL = 'http://localhost:8088'; // 서버 URL 설정
@@ -47,6 +49,8 @@ app.component('FileUpload', FileUpload);
 app.component('ConfirmDialog', ConfirmDialog);
 app.component('Select', Select);
 app.component('FloatLabel', FloatLabel);
+app.component('Card', Card);
+app.component('Message', Message);
 // PrimeVue 플러그인 등록
 app.use(
   PrimeVue,
