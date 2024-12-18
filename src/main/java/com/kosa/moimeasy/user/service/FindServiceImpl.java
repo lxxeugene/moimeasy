@@ -37,44 +37,36 @@ public class FindServiceImpl implements FindService {
 
     @Override
     @Transactional
-    public boolean findUserByNicknameAndPhoneAndEmail(String nickname, String phone, String email) throws UserNotFoundException {
-        // 닉네임, 연락처, 이메일로 회원 찾기
-        Optional<User> user = memberRepository.findByNicknameAndPhoneAndEmail(nickname, phone, email);
-        return user.isPresent();
+    public User findUserByNicknameAndPhoneAndEmail(String nickname, String phone, String email) throws UserNotFoundException {
+        return memberRepository.findByNicknameAndPhoneAndEmail(nickname, phone, email)
+                .orElseThrow(() -> new UserNotFoundException("일치하는 회원 정보를 찾을 수 없습니다."));
     }
 
-    @Override
-    @Transactional
-    public PasswordResetResponse resetPassword(PasswordResetRequest request)
-            throws MemberNotFoundException, PasswordMismatchException, InvalidPasswordResetException {
+/**
+ * 비밀번호 초기화
+ */
+        @Override
+        @Transactional
+        public PasswordResetResponse resetPassword(PasswordResetRequest request)
+            throws UserNotFoundException, PasswordMismatchException, InvalidPasswordResetException {
 
-        List<String> errors = new ArrayList<>();
+            // 회원 찾기
+            User user = memberRepository.findByNicknameAndPhoneAndEmail(
+                    request.getNickname(),
+                    request.getPhone(),
+                    request.getEmail()
+            ).orElseThrow(() -> new UserNotFoundException("일치하는 회원을 찾을 수 없습니다."));
 
-        // 닉네임으로 회원 찾기
-        Optional<User> memberOpt = memberRepository.findByNicknameAndPhoneAndEmail(request.getNickname(), request.getPhone(), request.getEmail());
-        if (memberOpt.isEmpty()) {
-            errors.add("일치하는 회원을 찾을 수 없습니다.");
+            // 비밀번호 일치 확인
+            if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+                throw new PasswordMismatchException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            }
+
+            // 비밀번호 인코딩 후 설정
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            memberRepository.save(user);
+
+            return new PasswordResetResponse("비밀번호가 성공적으로 변경되었습니다.");
         }
-
-        if (!errors.isEmpty()) {
-            throw new InvalidPasswordResetException(errors);
-        }
-
-        // 비밀번호 일치 확인
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new PasswordMismatchException("새 비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-        }
-
-        User user = memberRepository.findByNicknameAndPhoneAndEmail(
-                request.getNickname(),
-                request.getPhone(),
-                request.getEmail()
-        ).orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
-
-        // 비밀번호 인코딩 후 설정
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        memberRepository.save(user);
-
-        return new PasswordResetResponse("비밀번호가 성공적으로 변경되었습니다.");
     }
-}
+
