@@ -67,7 +67,7 @@ export default {
         console.log('로그인 성공'); // 로그인 성공 시 필요한 로직 추가 가능
 
         // 로그인 후 moiemId 확인
-        if (this.authStore.user.moiemId === null) {
+        if (this.authStore.user.moeimId === null) {
           // moiemId가 null이면 MoeimSelectView로 이동
           this.$router.push('/moeim-select');
         } else {

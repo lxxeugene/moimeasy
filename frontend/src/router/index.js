@@ -124,6 +124,7 @@ const routes = [
     component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
   { path: '/settlement', name: '정산요청', component: Settlement },
+  { path: '/main', name: '메인', component: () => import('@/views/MainView.vue')},
 ];
 
 const router = createRouter({

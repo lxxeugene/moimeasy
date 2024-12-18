@@ -176,29 +176,31 @@ export default {
 
     // 파일 업로드
     const onFileUpload = async (event) => {
-      const file = event.files[0];
-      if (!file) {
-        console.warn('파일이 선택되지 않았습니다.');
-        return;
-      }
+  const file = event.files[0];
+  if (!file) {
+    console.warn('파일이 선택되지 않았습니다.');
+    return;
+  }
 
-      const filePath = `settlement_receipts/${authStore.user?.userId}/${file.name}`;
-      const storageRef = firebaseRef(firebaseStorage, filePath);
+  const filePath = `settlement_receipts/${authStore.user?.userId}/${file.name}`;
+  const storageRef = firebaseRef(firebaseStorage, filePath);
 
-      try {
-        console.log('Uploading file to Firebase:', file.name);
-        const snapshot = await uploadBytes(storageRef, file);
-        console.log('File uploaded successfully:', snapshot);
+  try {
+    console.log('Uploading file to Firebase:', file.name);
+    const snapshot = await uploadBytes(storageRef, file);
+    console.log('File uploaded successfully:', snapshot);
 
-        const downloadUrl = await getDownloadURL(snapshot.ref);
-        console.log('File download URL:', downloadUrl);
+    const downloadUrl = await getDownloadURL(snapshot.ref);
+    console.log('File download URL:', downloadUrl);
 
-        imageUrl.value = downloadUrl; // 이미지 URL 저장
-      } catch (error) {
-        console.error('파일 업로드 실패:', error);
-        alert('파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
-      }
-    };
+    imageUrl.value = downloadUrl; // 이미지 URL 저장
+    console.log('imageUrl 값:', imageUrl.value); // 확인
+  } catch (error) {
+    console.error('파일 업로드 실패:', error);
+    alert('파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
+  }
+};
+
 
     // 정산 요청 제출
     const submitRequest = async () => {
@@ -295,9 +297,8 @@ export default {
 
 <style scoped>
 .settlement-container {
-  width: 600px;
-  min-width: 600px;
-  margin: 0 auto;
+  width: 98%;
+  margin: 10px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
