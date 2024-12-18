@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 
-public class RemittanceDto {
+public class RemittanceDto { // 계좌 이체
 
     @Getter
     @Setter
