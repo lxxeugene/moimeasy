@@ -32,7 +32,7 @@ public class UserService {
         User user = new User();
         user.setUserName(request.getUserName());
         user.setPassword(request.getPassword());
-        user.setAddress(request.getAddress());
+        user.setProfileImage(request.getProfileImage());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());
         user.setNickname(request.getNickname());
@@ -52,8 +52,8 @@ public class UserService {
         if (request.getPassword() != null) {
             user.setPassword(request.getPassword());
         }
-        if (request.getAddress() != null) {
-            user.setAddress(request.getAddress());
+        if (request.getProfileImage() != null) {
+            user.setProfileImage(request.getProfileImage());
         }
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());

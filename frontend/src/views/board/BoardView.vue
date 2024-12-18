@@ -10,7 +10,6 @@
         dataKey="boardId"
         filterDisplay="menu"
         sortMode="single"
-        :loading="loading"
         :globalFilterFields="['title', 'writerName', 'tag']"
       >
         <!-- 테이블 헤더 -->
@@ -151,10 +150,12 @@ import MultiSelect from 'primevue/multiselect';
 import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import { FilterMatchMode } from '@primevue/core/api';
+import { useLoadingStore } from '@/stores/useLoadingStore';
+const loadingStore = useLoadingStore();
 
 const boards = ref([]);
 const filters = ref();
-const loading = ref(true);
+
 // userList를 computed로 변경
 const userList = computed(() => {
   // 중복 제거 및 고유한 작성자 목록 생성
@@ -218,6 +219,7 @@ const onWriterFilter = (event) => {
 
 // 게시판 데이터 가져오기
 const fetchBoards = async () => {
+  loadingStore.startLoading(); // 로딩 시작
   try {
     const response = await axios.get('/api/v1/boards');
     boards.value = response.data;
@@ -227,7 +229,7 @@ const fetchBoards = async () => {
   } catch (error) {
     console.error('Error fetching boards:', error);
   } finally {
-    loading.value = false;
+    loadingStore.stopLoading(); // 로딩 중지
   }
 };
 

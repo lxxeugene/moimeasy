@@ -47,7 +47,7 @@ const routes = [
     path: '/invitation-list',
     name: '초대목록',
     component: InvitationList,
-  }, 
+  },
   {
     path: '/remittance-list',
     name: 'RemittanceList',

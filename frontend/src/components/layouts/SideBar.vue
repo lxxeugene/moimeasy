@@ -48,21 +48,6 @@
         </PanelMenu>
       </div>
     </div>
-    <!-- 사이드바 메뉴 끝 -->
-    <!-- <div class="bottom-menu-container">
-      <div class="more-settings">
-        <div class="settings-group">
-          <div class="settings-item">
-            <img class="icon-users" src="@/assets/usersIcon.svg?url" />
-            <div class="settings-text">Users</div>
-          </div>
-          <div class="settings-item">
-            <img class="icon-settings" src="@/assets/settingsIcon.svg?url" />
-            <div class="settings-text">Settings</div>
-          </div>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -78,8 +63,6 @@ import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
 import NavLogo from './NavLogo.vue';
 import ChatIcon from '@/assets/icons/chatIcon.svg?url';
 
-// Pinia auth 스토어 사용
-const authStore = useAuthStore();
 
 //사이드바 메뉴구성 아이템
 const items = ref([
@@ -96,14 +79,6 @@ const items = ref([
         label: 'Dash-2',
         icon: OutlineIcon,
         route: '/theming/unstyled',
-      },
-      {
-        label: '로그아웃',
-        icon: OutlineIcon,
-        command: () => {
-          console.log('로그아웃 실행'); // 디버깅 로그
-          authStore.logout(); // Pinia auth 스토어의 logout 호출
-        },
       },
     ],
   },

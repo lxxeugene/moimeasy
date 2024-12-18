@@ -18,6 +18,7 @@ public class UserDTO {
     private String email;
     private String phone;
     private String nickname;
+    private String profileImage;
     private LocalDateTime createAt;
     private Long moeimId;
     private Long roleId; // Role ID 추가
@@ -29,7 +30,7 @@ public class UserDTO {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.nickname = user.getNickname();
-        this.address = user.getAddress();
+        this.profileImage=user.getProfileImage();
         this.createAt = user.getCreateAt();
         this.moeimId = user.getMoeimId();
         this.roleId = user.getRole().getRoleId();

@@ -22,15 +22,18 @@ export const useAuthStore = defineStore('auth', {
         this.user = {
           userId: response.data.userId,
           moeimId: response.data.moeimId,
+          profileImage: response.data.profileImage,
           name: response.data.name,
           email: response.data.email,
           nickname: response.data.nickname,
           roleId: response.data.roleId,
+          profileImage: response.data.profileImage,
         };
         localStorage.setItem('user', JSON.stringify(this.user));
 
         // 로그인 성공 시 리디렉션
-        const redirectPath = router.currentRoute.value.query.redirect || '/main';
+        const redirectPath =
+          router.currentRoute.value.query.redirect || '/main';
         router.push(redirectPath); // 원하는 페이지로 변경 가능
       } catch (error) {
         if (error.response && error.response.data) {
