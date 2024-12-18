@@ -28,7 +28,7 @@
 
     <!-- 내용 -->
     <div class="content" v-html="board.content || '내용이 없습니다.'"></div>
-    <Card class="content-card">
+    <!-- <Card class="content-card">
       <template #title>
         <div class="content-header">
           <i
@@ -41,7 +41,7 @@
       <template #content>
         <div class="content" v-html="board.content || '내용이 없습니다.'"></div>
       </template>
-    </Card>
+    </Card> -->
     <!-- 수정삭제 버튼 (작성자에게만 표시)-->
     <div class="board-detail-btn-box" v-if="nickname == board.writerName">
       <Toast />

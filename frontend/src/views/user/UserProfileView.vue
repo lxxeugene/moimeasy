@@ -159,7 +159,13 @@ export default {
           this.profileImage
         );
         this.src = await fetchImageUrl(uploadedFileUrl); // 3. 파이어베이스 스토리지에서 이미지 로드 가능한 변환된 경로 가져오기
+        const userInStorage = JSON.parse(localStorage.getItem('user'));
+        // console.log(
+        //   '로컬스토리지 profileImage: ' + userInStorage?.profileImage
+        // );
         // 저장 완료 시 토스트메시지 띄우기
+        userInStorage.profileImage = this.profileImage.profileImage;
+        localStorage.setItem('user', JSON.stringify(userInStorage)); // 스토리지 업데이트
         this.toast.add({
           severity: 'success',
           summary: '등록 완료',

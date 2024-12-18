@@ -61,7 +61,7 @@
           <template #body="{ data }">
             <div class="flex items-center gap-2">
               <img
-                :src="data.profileUrl || defaultProfileImage"
+                :src="data.profileImage || defaultProfileImage"
                 :alt="data.writerName"
                 class="profile-image"
                 style="width: 32px"
@@ -151,6 +151,7 @@ import IconField from 'primevue/iconfield';
 import InputIcon from 'primevue/inputicon';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import { fetchImageUrl } from '@/utils/image-load-utils';
 const loadingStore = useLoadingStore();
 
 const boards = ref([]);
@@ -163,7 +164,7 @@ const userList = computed(() => {
     (name) => ({
       name: name,
       image:
-        boards.value.find((board) => board.writerName === name)?.profileUrl ||
+        boards.value.find((board) => board.writerName === name)?.profileImage ||
         defaultProfileImage,
     })
   );
@@ -222,7 +223,12 @@ const fetchBoards = async () => {
   loadingStore.startLoading(); // 로딩 시작
   try {
     const response = await axios.get('/api/v1/boards');
-    boards.value = response.data;
+    boards.value = await Promise.all(
+      response.data.map(async (board) => ({
+        ...board,
+        profileImage: await changeImageUrl(board.profileImage),
+      }))
+    );
     // 데이터에서 고유한 태그 추출
     const uniqueTags = [...new Set(response.data.map((board) => board.tag))];
     tagOptions.value = uniqueTags;
@@ -236,6 +242,11 @@ const fetchBoards = async () => {
 // 필터 초기화 버튼
 const clearFilter = () => {
   initFilters();
+};
+
+/**  파이어베이스 스토리지의 url로 변환*/
+const changeImageUrl = async (imageUrl) => {
+  return await fetchImageUrl(imageUrl);
 };
 
 onMounted(() => {
