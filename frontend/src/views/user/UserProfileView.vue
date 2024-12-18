@@ -165,7 +165,7 @@ export default {
         // );
         // 저장 완료 시 토스트메시지 띄우기
         userInStorage.profileImage = this.profileImage.profileImage;
-        localStorage.setItem('user', JSON.stringify(userInStorage)); // 스토리지 업데이트
+        localStorage.setItem('user', JSON.stringify(userInStorage)); // 4. 스토리지 업데이트
         this.toast.add({
           severity: 'success',
           summary: '등록 완료',
