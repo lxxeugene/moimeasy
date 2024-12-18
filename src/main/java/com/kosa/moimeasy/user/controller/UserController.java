@@ -51,6 +51,7 @@ public class UserController {
     //요청한 정보만 수정가능
     @PutMapping("/update/{userId}")
     public User updateUser(@PathVariable Long userId, @RequestBody UserDTO request) {
+        System.out.println("전달된 데이터 "+userId+" 프로필: "+request.getProfileImage());
         return userService.updateUser(userId, request);
     }
 
@@ -85,5 +86,7 @@ public class UserController {
 
         return ResponseEntity.ok(members);
     }
+
+
 
 }

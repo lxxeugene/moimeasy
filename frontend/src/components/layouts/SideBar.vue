@@ -48,21 +48,6 @@
         </PanelMenu>
       </div>
     </div>
-    <!-- 사이드바 메뉴 끝 -->
-    <!-- <div class="bottom-menu-container">
-      <div class="more-settings">
-        <div class="settings-group">
-          <div class="settings-item">
-            <img class="icon-users" src="@/assets/usersIcon.svg?url" />
-            <div class="settings-text">Users</div>
-          </div>
-          <div class="settings-item">
-            <img class="icon-settings" src="@/assets/settingsIcon.svg?url" />
-            <div class="settings-text">Settings</div>
-          </div>
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
