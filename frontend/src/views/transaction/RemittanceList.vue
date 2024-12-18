@@ -152,9 +152,11 @@ const loading = ref(false);
 const accessToken = localStorage.getItem('accessToken');
 const userRaw = localStorage.getItem('user');
 let moeimId = null;
+let userId = null;
 
 if (userRaw) {
   const user = JSON.parse(userRaw); // JSON 파싱
+  userId = user?.userId || null;
   moeimId = user?.moeimId || null; // `moeimId` 키로 가져오기
 }
 
@@ -167,11 +169,11 @@ if (!accessToken || !moeimId) {
 async function fetchRemittanceList() {
   try {
     // 현재 월의 첫 번째 날짜과 마지막 날짜 계산
-    const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
-    const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
+    const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
+    const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
 
     const response = await axios.get('/api/v1/transaction/remittance-list', {
-      headers: { Authorization: accessToken.trim() },
+      headers: { Authorization: `Bearer ${accessToken}` },
       params: {
         moeimId: moeimId,
         startDate: startOfMonth.toISOString().split('T')[0],
@@ -220,7 +222,11 @@ async function fetchInitialData() {
   loading.value = true; // 로딩 시작
   try {
     const response = await axios.get("/api/v1/transaction/details", {
-      headers: { Authorization: accessToken.trim() },
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: {
+        userId: userId,
+        moeimId: moeimId,
+      }
     });
 
     if (response.data) {
@@ -283,12 +289,12 @@ async function confirmDeposit() {
     const response = await axios.put(
       "/api/v1/transaction/remittance",
       {
+        userId: userId,
         amount: Number(value.value), // depositValue 대신 value 사용
+        moeimId: moeimId,
       },
       {
-        headers: {
-          Authorization: accessToken.trim(),
-        },
+        headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
     console.log("요청 데이터:", {

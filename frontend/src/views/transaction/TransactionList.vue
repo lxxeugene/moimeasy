@@ -70,11 +70,11 @@ const fetchTransactions = async () => {
       return;
     }
 
-    const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
-    const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
+    const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
+    const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
 
     const response = await axios.get('/api/v1/transaction/transaction-list', {
-      headers: { Authorization: accessToken.trim() },
+      headers: { Authorization: `Bearer ${accessToken}` },
       params: {
         moeimId: moeimId,
         startDate: startOfMonth.toISOString().split('T')[0],

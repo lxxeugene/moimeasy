@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
@@ -19,10 +20,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query("SELECT t FROM Transaction t JOIN t.userAccount u where u.moeimId = :moeimId AND t.transactedAt " +
             "BETWEEN :startDate AND :endDate ORDER BY t.transactedAt DESC")
-    List<Transaction> findAllByMoeimId(Long moeimId, LocalDateTime startDate, LocalDateTime endDate);
+    List<Transaction> findAllByMoeimId(Long moeimId,  LocalDateTime  startDate, LocalDateTime  endDate);
 
 
     @Query("SELECT t FROM Transaction t where t.moeimAccount.moeimId = :moeimId AND t.categoryName is not null " +
             "AND t.transactedAt BETWEEN :startDate AND :endDate")
     List<Transaction> findCategoryNameByMoeimId(Long moeimId, LocalDateTime  startDate, LocalDateTime  endDate);
+
+    @Query("SELECT t FROM Transaction t where t.moeimAccount.moeimId = :moeimId ")
+    List<Transaction> findByMoeimId(Long moeimId);
 }

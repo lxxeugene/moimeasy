@@ -6,7 +6,7 @@
 
         <!-- 차트 부분 제목과 아이콘을 왼쪽 아래로 배치 -->
         <div class="card" style="height: 100%; width: 100%;">
-            <div class="title">{{ currentMonth }} 조회 기간: {{ startDate }} ~ {{ endDate }} </div>
+            <div class="title">{{ currentMonth }}</div>
             <div class="icon-button-group">
                 <i class="pi pi-caret-left" style="font-size: 1rem" @click="updateMonth(-1)"></i>
                 <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
@@ -184,17 +184,19 @@ const currentMonth = ref('');
 const currentDate = ref(new Date()); // 현재 날짜
 const hasData = ref(false); // 데이터 존재 여부
 const loading = ref(true); // 로딩 상태 추가
-const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
-const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
+const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
+const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
 
 
 // Local Storage에서 accessToken, user 정보 가져오기
 const accessToken = localStorage.getItem('accessToken');
 const userRaw = localStorage.getItem('user');
+let userId = null;
 let moeimId = null;
 
 if (userRaw) {
     const user = JSON.parse(userRaw); // JSON 파싱
+    userId = user?.userId || null;
     moeimId = user?.moeimId || null; // moeimId
 }
 
@@ -219,6 +221,7 @@ async function fetchInitialData() {
         const response = await axios.get("/api/v1/transaction/category", {
             headers: { Authorization: accessToken.trim() },
             params: {
+                userId: userId,
                 startDate: startOfMonth.toISOString().split('T')[0],
                 endDate: endOfMonth.toISOString().split('T')[0],
             },
@@ -237,15 +240,12 @@ async function fetchInitialData() {
         chartOptions.value = setChartOptions();
         transformChartData();                // chartData 기반 비율 계산
 
-        // if (response.data) {
-        //     moeimName.value = response.data.moeimName;
-        //     moeimAccount.value = response.data.moeimAccount;
-        //     userName.value = response.data.userName;
-        //     userAccount.value = response.data.userAccount;
-
-        //     categoryData.value = response.data.categories;
-        //     hasData.value = categoryData.value.length > 0; // 데이터 존재 여부 다시 확인
-        // }
+        if (response.data) {
+            moeimName.value = response.data.moeimName;
+            moeimAccount.value = response.data.moeimAccount;
+            userName.value = response.data.userName;
+            userAccount.value = response.data.userAccount;
+        }
         console.log(response.data);
     }
     catch (error) {
@@ -335,6 +335,7 @@ async function confirmExpense() {
         const response = await axios.put(
             "/api/v1/transaction/withdraw",
             {
+                userId: userId,
                 accountNumber: moeimAccount.value,
                 withdrawName: userName.value,
                 amount: Number(value.value),
