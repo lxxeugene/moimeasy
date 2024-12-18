@@ -29,7 +29,7 @@ public class NotificationController {
     }
 
     // 알림 확인 시간 업데이트
-    @PutMapping("/update-viewed-time")
+    @PatchMapping("/update-viewed-time")
     public ResponseEntity<String> updateLastNotificationViewedAt(@RequestParam Long userId) {
         notificationService.updateLastNotificationViewedAt(userId);
         return ResponseEntity.ok("알림 확인 시간 업데이트 완료");

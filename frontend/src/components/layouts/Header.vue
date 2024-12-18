@@ -107,6 +107,7 @@ const updatePathInfo = () => {
 // 초기 경로 설정
 updatePathInfo();
 
+// 모임 알림 가져오기
 const fetchNotification = async () => {
   console.log('유저데이터', userData.value);
   try {
@@ -114,6 +115,7 @@ const fetchNotification = async () => {
       `/api/v1/notifications?userId=${userData.value?.userId}`
     );
     console.log('추가된 알림정보:', data);
+    // 알림 내역 저장
     notificationInfos.value = data.map((a, i) => {
       return {
         severity: 'secondary',
@@ -123,6 +125,18 @@ const fetchNotification = async () => {
       };
     });
   } catch (error) {}
+};
+
+// 마지막으로 알림을 본 시간 업데이트
+const fetchUpdateLastViewedAt = async () => {
+  try {
+    const response = await axios.patch(
+      `/api/v1/notifications/update-viewed-time?userId=${userData.value?.userId}`
+    );
+    console.log('응답 :', response.data);
+  } catch (error) {
+    console.error;
+  }
 };
 
 // 라우트 변경 감지용
@@ -149,7 +163,7 @@ watch(
         label: 'Profile',
         icon: 'pi pi-user-edit',
         command: () => {
-          router.push(`/user-profile/${userData.value.userId}`);
+          router.push(`/user-profile/${userData.value?.userId}`);
         },
       },
       nickName.value != '게스트'
@@ -175,8 +189,10 @@ watch(
 //Toast 전달 메시지 설정
 const showSecondary = () => {
   notificationInfos.value.map((a) => {
-    toast.add(a);
+    toast.add(a); // 알림데이터 토스트에 추가
   });
+  fetchUpdateLastViewedAt(); // 알림 확인 시각 업데이트
+  notificationInfos.value = []; // 알림데이터 초기화
 };
 
 const toggle = (event) => {
