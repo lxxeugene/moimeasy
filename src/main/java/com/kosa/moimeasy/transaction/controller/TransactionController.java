@@ -83,10 +83,9 @@ public class TransactionController {
     // 카테고리를 위한 기본 조회
     @GetMapping("/category")
     public ResponseEntity<InitialDataDto> getTransactionDetails(
-            @RequestHeader(name = "Authorization") String token
+            @RequestHeader(name = "Authorization") String token,
+            InitialDataDto request
     ) {
-        InitialDataDto initialData = transactionService.getInitialData(token);
-        log.info("initialData{}",initialData);
-        return ResponseEntity.ok(initialData);
+        return ResponseEntity.ok(transactionService.getInitialData(token, request));
     }
 }

@@ -307,8 +307,6 @@ public class TransactionService {
         int defaultDateRange = 7;
         int maxDateRange = 40;
 
-        log.info("StartDate: {}, EndDate: {}, MoeimId: {}", startDate, endDate, request.getMoeimId());
-
         // 시작 날짜와 끝 날짜가 null 인 경우 (조회일 포함 일주일 내역 반환)
         if (startDate == null && endDate == null) {
             LocalDate weekAgoDate = nowDate.minusDays(defaultDateRange - 1);
@@ -458,7 +456,7 @@ public class TransactionService {
 
 
     // 카테고리 반환
-    public InitialDataDto getInitialData(String token) {
+    public InitialDataDto getInitialData(String token, InitialDataDto request) {
         Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
 
         // accessToken을 사용하여 사용자 조회
@@ -469,8 +467,17 @@ public class TransactionService {
         Moeim moeim = moeimRepository.findByUserId(user.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("모임을 찾을 수 없습니다."));
 
+
+        LocalDate startDate = request.getStartDate(); // 월의 시작일 2024-12-01T00:00
+        LocalDate endDate = request.getEndDate(); // 월의 마지막일 2024-12-31T23:59:59
+
+        // 레포지토리에서 사용하기 위해 LocalDateTime 변환
+        LocalDateTime startDateTime = startDate.atStartOfDay(); // 2024-12-01T00:00:00
+        LocalDateTime endDateTime = endDate.atTime(23, 59, 59); // 2024-12-31T23:59:59
+
+
         // 모임에 해당하는 거래 데이터 조회 (모임 ID를 기반으로)
-        List<Transaction> transactions = transactionRepository.findByMoeimId(moeim.getMoeimId());
+        List<Transaction> transactions = transactionRepository.findCategoryNameByMoeimId(moeim.getMoeimId(), startDateTime, endDateTime);
 
         // double 타입으로 합산
         Map<String, Double> categoryMap = transactions.stream()
@@ -491,13 +498,14 @@ public class TransactionService {
                 .collect(Collectors.toList());
 
         // 초기 데이터 DTO 생성 및 반환
-        InitialDataDto initialData = InitialDataDto.builder()
+        return InitialDataDto.builder()
                 .userName(user.getUserName())
                 .userAccount(user.getAccountNumber())
                 .moeimName(moeim.getMoeimName())
                 .moeimAccount(moeim.getAccountNumber())
+                .startDate(startDate)
+                .endDate(endDate)
                 .categories(categories)
                 .build();
-        return initialData;
     }
 }
