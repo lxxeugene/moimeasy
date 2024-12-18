@@ -113,6 +113,8 @@ import { useLoadingStore } from '@/stores/useLoadingStore';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from 'primevue/useconfirm';
+import { useAuthStore } from '@/stores/auth';
+const auth = useAuthStore();
 const toast = useToast();
 const primeConfirm = useConfirm();
 
@@ -128,6 +130,7 @@ const loadingStore = useLoadingStore();
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
+import { fetchAddNotification } from '@/utils/notification-add-utils';
 
 // 구글 캘린더 API 설정
 const googleCalendarApiKey = import.meta.env.VITE_GOOGLE_API_KEY;
@@ -308,6 +311,13 @@ async function handleEventAdd(eventInfo) {
     });
     console.log('이벤트 추가 성공:', response.data);
     showSuccess();
+
+    // 알림 추가
+    fetchAddNotification(
+      'new 일정',
+      '우리 모임의 새 일정이 등록되었습니다.',
+      auth?.user?.moeimId
+    );
   } catch (error) {
     console.error('이벤트 추가 실패:', error);
   }
