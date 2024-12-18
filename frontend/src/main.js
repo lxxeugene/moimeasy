@@ -23,6 +23,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import Select from 'primevue/select';
 import FloatLabel from 'primevue/floatlabel';
 import Ripple from 'primevue/ripple';
+import Toast from 'primevue/toast';
 import Card from 'primevue/card';
 import Message from 'primevue/message';
 import EmojiPicker from 'vue3-emoji-picker';

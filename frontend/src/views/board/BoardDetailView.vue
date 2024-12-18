@@ -60,10 +60,6 @@
       />
     </div>
   </div>
-  <div v-else class="loading">
-    <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
-    <p>데이터를 불러오는 중입니다...</p>
-  </div>
 </template>
 
 <script setup>
