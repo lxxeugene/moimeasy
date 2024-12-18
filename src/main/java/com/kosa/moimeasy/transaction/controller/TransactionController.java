@@ -1,21 +1,12 @@
 package com.kosa.moimeasy.transaction.controller;
 
-import com.kosa.moimeasy.moeim.entity.Moeim;
-import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.transaction.dto.*;
 import com.kosa.moimeasy.transaction.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,7 +33,6 @@ public class TransactionController {
             @RequestHeader(name = "Authorization") String token,
             @RequestBody @Valid DepositDto.Request request
     ) {
-        log.info("token:{}, Received Request: {}",token, request.getUserId());
         return ResponseEntity.ok(transactionService.moeimDeposit(token, request));
     }
 
@@ -52,7 +42,6 @@ public class TransactionController {
             @RequestHeader(name = "Authorization") String token,
             @RequestBody @Valid WithdrawDto.Request request
     ) {
-        log.info("token:{}, Received Request: {}",token, request);
         return ResponseEntity.ok(transactionService.withdraw(token, request));
     }
 
@@ -62,7 +51,6 @@ public class TransactionController {
             @RequestHeader(name = "Authorization") String token,
             @RequestBody @Valid RemittanceDto.Request request
     ) {
-        log.info("token:{}, Received Request: {}",token, request);
         return ResponseEntity.ok(transactionService.remittance(token, request));
     }
 
@@ -72,7 +60,6 @@ public class TransactionController {
             @RequestHeader(name = "Authorization") String token,
             @Valid TransactionListDto.Request request
     ) {
-        log.info("token:{}, Received Request: {}",token, request);
         return ResponseEntity.ok(transactionService.getRemittanceList(token, request));
     }
 
@@ -82,18 +69,24 @@ public class TransactionController {
             @RequestHeader(name = "Authorization") String token,
             @Valid TransactionListDto.Request request
     ) {
-        log.info("token:{}, Received Request: {}",token, request);
         return ResponseEntity.ok(transactionService.getTransactionList(token, request));
     }
 
     // 송금을 위한 기본 조회
     @GetMapping("/details")
-    public ResponseEntity<DetailDTO> getDetails(
+    public ResponseEntity<DetailDto> getDetails(
             @RequestHeader(name = "Authorization") String token
     ) {
-        log.info("token:{}",token);
         return ResponseEntity.ok(transactionService.getDetials(token));
     }
 
-
+    // 카테고리를 위한 기본 조회
+    @GetMapping("/category")
+    public ResponseEntity<InitialDataDto> getTransactionDetails(
+            @RequestHeader(name = "Authorization") String token
+    ) {
+        InitialDataDto initialData = transactionService.getInitialData(token);
+        log.info("initialData{}",initialData);
+        return ResponseEntity.ok(initialData);
+    }
 }

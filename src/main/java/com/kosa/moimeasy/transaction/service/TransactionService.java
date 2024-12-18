@@ -1,14 +1,6 @@
 package com.kosa.moimeasy.transaction.service;
 
-import static com.kosa.moimeasy.transaction.type.ErrorCode.ACCOUNT_NOT_FOUND;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.BALANCE_NOT_ENOUGH;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.INVALID_DATE;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.INVALID_DATE_RANGE;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.NOT_EQUAL_ID_AND_ACCOUNT_NUMBER;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.RECEIVED_ACCOUNT_NOT_FOUND;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.SENT_ACCOUNT_NOT_FOUND;
-import static com.kosa.moimeasy.transaction.type.ErrorCode.TOKEN_NOT_MATCH_USER;
-
+import com.kosa.moimeasy.common.exception.ResourceNotFoundException;
 import com.kosa.moimeasy.moeim.entity.Moeim;
 import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.security.provider.JwtTokenProvider;
@@ -25,16 +17,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.naming.directory.ModificationItem;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.kosa.moimeasy.transaction.type.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -83,7 +76,6 @@ public class TransactionService {
                 .build();
     }
 
-
     // 모임 계좌 입금
     @Transactional
     public DepositDto.Response moeimDeposit(String token, DepositDto.Request request) {
@@ -127,7 +119,7 @@ public class TransactionService {
     }
 
     // 토큰으로 모임, 유저 정보 반환
-    public DetailDTO getDetials(String token){
+    public DetailDto getDetials(String token){
         Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
 
         User user = userRepository.findById(tokenUserId)
@@ -136,7 +128,7 @@ public class TransactionService {
         Moeim moeim = moeimRepository.findByUserId(tokenUserId)
                 .orElseThrow(() -> new CustomException(RECEIVED_ACCOUNT_NOT_FOUND));
 
-        return DetailDTO.builder()
+        return DetailDto.builder()
                 .userAccount(user.getAccountNumber())
                 .userName(user.getUserName())
                 .moeimName(moeim.getMoeimName())
@@ -173,13 +165,15 @@ public class TransactionService {
                 .transactionType(TransactionType.WITHDRAW)
                 .amount(request.getAmount())
                 .withdrawName(request.getWithdrawName())
+                    .categoryName(request.getCategoryName())
                 .build()
         );
-
+        // 반환
         return WithdrawDto.Response.builder()
             .accountNumber(request.getAccountNumber())
             .withdrawName(request.getWithdrawName())
             .amount(request.getAmount())
+                .categoryName(request.getCategoryName())
             .transacted_at(LocalDateTime.now())
             .build();
     }
@@ -287,8 +281,6 @@ public class TransactionService {
         // 두 날짜 전부 제대로 조회한 경우
         return getRemittanceListResponse(request.getMoeimId(), startDate, endDate);
     }
-
-
 
     // 거래내역 조회
     @Transactional
@@ -462,5 +454,50 @@ public class TransactionService {
         return TransactionListDto.RemittanceListResponse.builder()
                 .remittanceList(remittanceList)
                 .build();
+    }
+
+
+    // 카테고리 반환
+    public InitialDataDto getInitialData(String token) {
+        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
+
+        // accessToken을 사용하여 사용자 조회
+        User user = userRepository.findById(tokenUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
+
+        // 사용자에 해당하는 모임 조회 (사용자의 ID를 기반으로)
+        Moeim moeim = moeimRepository.findByUserId(user.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("모임을 찾을 수 없습니다."));
+
+        // 모임에 해당하는 거래 데이터 조회 (모임 ID를 기반으로)
+        List<Transaction> transactions = transactionRepository.findByMoeimId(moeim.getMoeimId());
+
+        // double 타입으로 합산
+        Map<String, Double> categoryMap = transactions.stream()
+                .collect(Collectors.groupingBy(
+                        tr -> tr.getCategoryName(),
+                        Collectors.mapping(
+                                tr -> tr.getAmount(), // 이미 double 반환
+                                Collectors.reducing(0.0, (a, b) -> a + b) // double 덧셈
+                        )
+                ));
+
+        // 카테고리별 DTO 리스트 생성
+        List<CategoryDto> categories = categoryMap.entrySet().stream()
+                .map(entry -> CategoryDto.builder()
+                        .categoryName(entry.getKey())
+                        .categoryMoney(entry.getValue())
+                        .build())
+                .collect(Collectors.toList());
+
+        // 초기 데이터 DTO 생성 및 반환
+        InitialDataDto initialData = InitialDataDto.builder()
+                .userName(user.getUserName())
+                .userAccount(user.getAccountNumber())
+                .moeimName(moeim.getMoeimName())
+                .moeimAccount(moeim.getAccountNumber())
+                .categories(categories)
+                .build();
+        return initialData;
     }
 }
