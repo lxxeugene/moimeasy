@@ -34,7 +34,7 @@
 <script setup>
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import PayMenuList from './PayMenuList.vue';
+import PayMenuList from './TransactionMenuList.vue';
 import Button from 'primevue/button';
 import axios from "axios";
 import 'primeicons/primeicons.css';

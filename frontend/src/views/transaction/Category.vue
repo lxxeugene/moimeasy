@@ -6,59 +6,64 @@
 
         <!-- 차트 부분 제목과 아이콘을 왼쪽 아래로 배치 -->
         <div class="card" style="height: 100%; width: 100%;">
-            <div class="title">{{ currentMonth }}</div>
+            <div class="title">{{ currentMonth }} 조회 기간: {{ startDate }} ~ {{ endDate }} </div>
             <div class="icon-button-group">
                 <i class="pi pi-caret-left" style="font-size: 1rem" @click="updateMonth(-1)"></i>
                 <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
                 <i class="pi pi-caret-right" style="font-size: 1rem" @click="updateMonth(1)"></i>
             </div>
+            <div v-if="loading">데이터를 불러오는 중...</div>
+            <div v-else-if="hasData">
+                <Splitter style="width: 80%; height: 80vh; margin: 20px" class="mb-8">
+                    <SplitterPanel :size="50" :minSize="30" class="flex items-center justify-center full-size-panel">
+                        <div class="chart-wrapper">
+                            <Chart type="doughnut" :data="chartData" :options="chartOptions" class="chart-container"
+                                style="width: 100%; height: 100%;" />
+                        </div>
+                    </SplitterPanel>
 
-
-            <Splitter style="width: 80%; height: 60vh; margin: 20px" class="mb-8">
-                <SplitterPanel :size="50" :minSize="30" class="flex items-center justify-center full-size-panel">
-                    <div class="chart-wrapper">
-                        <Chart type="doughnut" :data="chartData" :options="chartOptions" class="chart-container"
-                            style="width: 100%; height: 100%;" />
-                    </div>
-                </SplitterPanel>
-
-                <SplitterPanel :size="50" :minSize="20" class="flex items-center justify-center full-size-panel">
-                    <div class="card datatable-card">
-                        <DataTable :value="categoryData" ref="dt" class="centered-datatable"
-                            tableStyle="min-width: 20rem">
-                            <Column header="비율">
-                                <template #body="slotProps">
-                                    <div style="position: relative; width: 6rem; height: 6rem;">
-                                        <div :style="{
-                                            backgroundColor: slotProps.data.categoryColor,
-                                            width: '100%',
-                                            height: '100%',
-                                            borderRadius: '50%',
-                                            display: 'flex',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            color: 'white',
-                                            fontSize: '1rem'
-                                        }">
-                                            <span>{{ slotProps.data.categoryPercentage }}%</span>
+                    <SplitterPanel :size="50" :minSize="20" class="flex items-center justify-center full-size-panel">
+                        <div class="card datatable-card">
+                            <DataTable :value="categoryData" ref="dt" class="centered-datatable"
+                                tableStyle="min-width: 20rem">
+                                <Column header="비율">
+                                    <template #body="slotProps">
+                                        <div style="position: relative; width: 6rem; height: 6rem;">
+                                            <div :style="{
+                                                backgroundColor: slotProps.data.categoryColor,
+                                                width: '100%',
+                                                height: '100%',
+                                                borderRadius: '50%',
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                alignItems: 'center',
+                                                color: 'white',
+                                                fontSize: '1rem'
+                                            }">
+                                                <span>{{ slotProps.data.categoryPercentage }}%</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </template>
-                            </Column>
-                            <Column :field="'categoryList'" header="항목">
-                                <template #body="slotProps">
-                                    <span>{{ slotProps.data.categoryList }}</span>
-                                </template>
-                            </Column>
-                            <Column :field="'categoryMoney'" header="금액">
-                                <template #body="slotProps">
-                                    <span>{{ slotProps.data.categoryMoney }}</span>
-                                </template>
-                            </Column>
-                        </DataTable>
-                    </div>
-                </SplitterPanel>
-            </Splitter>
+                                    </template>
+                                </Column>
+                                <Column :field="'categoryList'" header="항목">
+                                    <template #body="slotProps">
+                                        <span>{{ slotProps.data.categoryList }}</span>
+                                    </template>
+                                </Column>
+                                <Column :field="'categoryMoney'" header="금액">
+                                    <template #body="slotProps">
+                                        <span>{{ slotProps.data.categoryMoney }}</span>
+                                    </template>
+                                </Column>
+                            </DataTable>
+                        </div>
+                    </SplitterPanel>
+                </Splitter>
+            </div>
+            <div v-else>
+                <!-- 데이터가 없을 때 표시 -->
+                <p>데이터가 없습니다.</p>
+            </div>
         </div>
     </div>
     <div>
@@ -134,9 +139,9 @@
 </template>
 
 <script setup>
-import {onMounted, ref, watch} from "vue";
+import { onMounted, ref, watch } from "vue";
 import Chart from 'primevue/chart';
-import PayMenuList from './PayMenuList.vue';
+import PayMenuList from './TransactionMenuList.vue';
 import Button from 'primevue/button';
 import Splitter from 'primevue/splitter';
 import SplitterPanel from 'primevue/splitterpanel';
@@ -147,7 +152,7 @@ import InputText from 'primevue/inputtext';
 import SplitButton from 'primevue/splitbutton';
 import axios from "axios";
 import 'primeicons/primeicons.css';
-import {useRouter} from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
@@ -177,9 +182,11 @@ const sortOptions = [
 const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'x'];
 const currentMonth = ref('');
 const currentDate = ref(new Date()); // 현재 날짜
+const hasData = ref(false); // 데이터 존재 여부
+const loading = ref(true); // 로딩 상태 추가
+const startOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1);
+const endOfMonth = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0);
 
-// 로딩 상태
-const loading = ref(false);
 
 // Local Storage에서 accessToken, user 정보 가져오기
 const accessToken = localStorage.getItem('accessToken');
@@ -207,32 +214,46 @@ function handleButtonClick(num) {
 
 // 백엔드로부터 초기 데이터 가져오기
 async function fetchInitialData() {
+    loading.value = true;
     try {
         const response = await axios.get("/api/v1/transaction/category", {
             headers: { Authorization: accessToken.trim() },
+            params: {
+                startDate: startOfMonth.toISOString().split('T')[0],
+                endDate: endOfMonth.toISOString().split('T')[0],
+            },
         });
-        if (response.data && Array.isArray(response.data.categoryData)) {
-            categoryData.value = response.data.categoryData;
+        if (response.data && Array.isArray(response.data.categories)) {
+            categoryData.value = response.data.categories;
+            hasData.value = categoryData.value.length > 0; // 데이터 존재 여부 설정
         } else {
             categoryData.value = [];
+            hasData.value = false; // 데이터가 없을 경우
             console.error("categoryData가 응답에 없음");
         }
-        if (response.data) {
-            moeimName.value = response.data.moeimName;
-            moeimAccount.value = response.data.moeimAccount;
-            userName.value = response.data.userName;
-            userAccount.value = response.data.userAccount;
-            categoryData.value = response.data.categories;
-            // categoryData는 [{categoryName: string, categoryMoney: number}, ...]
 
-            // 백엔드 데이터 받아온 후 chartData, categoryData 변환
-            chartData.value = setChartData();    // categoryData.value 기반으로 chartData 설정
-            chartOptions.value = setChartOptions();
-            transformChartData();                // chartData 기반 비율 계산
-        }
+        //차트 데이터 설정
+        chartData.value = setChartData();    // categoryData.value 기반으로 chartData 설정
+        chartOptions.value = setChartOptions();
+        transformChartData();                // chartData 기반 비율 계산
+
+        // if (response.data) {
+        //     moeimName.value = response.data.moeimName;
+        //     moeimAccount.value = response.data.moeimAccount;
+        //     userName.value = response.data.userName;
+        //     userAccount.value = response.data.userAccount;
+
+        //     categoryData.value = response.data.categories;
+        //     hasData.value = categoryData.value.length > 0; // 데이터 존재 여부 다시 확인
+        // }
         console.log(response.data);
-    } catch (error) {
+    }
+    catch (error) {
+        hasData.value = false; // 오류 발생 시 데이터가 없다고 설정
         console.error("모임 세부 정보 조회 중 오류 발생:", error.response?.data || error.message);
+    }
+    finally {
+        loading.value = false;
     }
 }
 
@@ -251,9 +272,11 @@ function selectExpense(option) {
 
 // 월 변경 및 데이터 다시 가져오기
 const updateMonth = (offset) => {
+
     currentDate.value.setMonth(currentDate.value.getMonth() + offset);
-    currentMonth.value = `${currentDate.value.getMonth() + 1}월 회비 납부내역`;
-    // 월 변경 시 데이터 재조회
+    currentMonth.value = `${currentDate.value.getMonth() + 1}월 거래내역`;
+
+    // 새로운 기간으로 데이터 재조회
     fetchInitialData();
 };
 
@@ -343,7 +366,7 @@ async function confirmExpense() {
 onMounted(() => {
     loadStateFromLocalStorage();
     const date = new Date();
-    currentMonth.value = `${date.getMonth() + 1}월 회비 납부내역`;
+    currentMonth.value = `${date.getMonth() + 1}월 카테고리별 지출내역`;
     fetchInitialData(); // 데이터 조회 후 chartData, categoryData 설정
 });
 

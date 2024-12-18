@@ -117,7 +117,7 @@ import { ref, watch, onMounted } from "vue";
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
-import PayMenuList from './PayMenuList.vue';
+import PayMenuList from './TransactionMenuList.vue';
 import 'primeicons/primeicons.css';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
@@ -463,7 +463,7 @@ function resetValue() {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px 20;
+  margin: 20px 20px;
   /* 위아래 간격 */
 }
 
