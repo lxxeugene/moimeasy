@@ -18,6 +18,7 @@
           />
           <!-- 파일 업로드 버튼 -->
           <FileUpload
+            v-if="user.userName == loginUser.name"
             mode="basic"
             @select="onFileSelect"
             customUpload
@@ -76,6 +77,7 @@ export default {
   data() {
     return {
       user: null, // 사용자 데이터
+      loginUser: null, // 현재 로그인 유저 데이터
       src: null, // 이미지 소스
       profileImage: {},
     };
@@ -90,7 +92,8 @@ export default {
       try {
         const response = await axios.get(`/api/v1/users/${userId}`);
         this.user = response.data; // 응답 데이터를 user에 저장
-        this.src = await fetchImageUrl(response.data.profileImage);
+        this.src = await fetchImageUrl(response.data.profileImage); // 프로필 이미지 저장
+        this.loginUser = JSON.parse(localStorage.getItem('user'));
       } catch (error) {
         console.error('사용자 정보를 불러오는데 실패했습니다:', error);
         alert('사용자 정보를 불러오는데 실패했습니다.');
@@ -162,7 +165,7 @@ export default {
         const userInStorage = JSON.parse(localStorage.getItem('user'));
         // console.log(
         //   '로컬스토리지 profileImage: ' + userInStorage?.profileImage
-        // );
+        // ); 확인용 로그
         // 저장 완료 시 토스트메시지 띄우기
         userInStorage.profileImage = this.profileImage.profileImage;
         localStorage.setItem('user', JSON.stringify(userInStorage)); // 4. 스토리지 업데이트
