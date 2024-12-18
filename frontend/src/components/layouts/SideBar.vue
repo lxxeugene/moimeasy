@@ -63,24 +63,12 @@ import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
 import NavLogo from './NavLogo.vue';
 import ChatIcon from '@/assets/icons/chatIcon.svg?url';
 
-
 //사이드바 메뉴구성 아이템
 const items = ref([
   {
     label: 'Dashboard',
     icon: OutlineIcon,
-    items: [
-      {
-        label: 'Dash-1',
-        icon: OutlineIcon,
-        route: '/theming/styled',
-      },
-      {
-        label: 'Dash-2',
-        icon: OutlineIcon,
-        route: '/theming/unstyled',
-      },
-    ],
+    route: '/main',
   },
   {
     label: '회원관리',

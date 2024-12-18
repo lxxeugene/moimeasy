@@ -15,13 +15,22 @@
         <!-- 테이블 헤더 -->
         <template #header>
           <div class="filter-header">
-            <Button
-              type="button"
-              icon="pi pi-filter-slash"
-              label="Clear"
-              outlined
-              @click="clearFilter()"
-            />
+            <div class="filter-header-btn-box">
+              <Button
+                type="button"
+                icon="pi pi-filter-slash"
+                label="Clear"
+                outlined
+                @click="clearFilter()"
+              />
+              <Button
+                type="button"
+                icon="pi pi-pencil"
+                label="Post"
+                outlined
+                @click="router.push('/schedule/board-post')"
+              />
+            </div>
             <IconField>
               <InputIcon>
                 <i class="pi pi-search" />
@@ -152,8 +161,9 @@ import InputIcon from 'primevue/inputicon';
 import { FilterMatchMode } from '@primevue/core/api';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { fetchImageUrl } from '@/utils/image-load-utils';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const loadingStore = useLoadingStore();
-
 const boards = ref([]);
 const filters = ref();
 
@@ -293,4 +303,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
 } */
+
+.filter-header-btn-box {
+  display: flex;
+  gap: 10px;
+}
 </style>
