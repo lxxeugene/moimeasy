@@ -1,8 +1,9 @@
 package com.kosa.moimeasy.user.controller;
 
 
-import com.kosa.moimeasy.user.dto.EmailFindRequest;
-import com.kosa.moimeasy.user.dto.EmailFindResponse;
+import com.kosa.moimeasy.user.dto.*;
+import com.kosa.moimeasy.user.exception.InvalidPasswordResetException;
+import com.kosa.moimeasy.user.exception.PasswordMismatchException;
 import com.kosa.moimeasy.user.exception.UserNotFoundException;
 import com.kosa.moimeasy.user.service.FindService;
 import jakarta.validation.Valid;
@@ -37,4 +38,37 @@ public class FindController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    /**
+     * 회원 조회
+     */
+    @PostMapping("/find/user")
+    public ResponseEntity<?> findEmail(@Valid @RequestBody FindUserRequest request) {
+        try {
+            return ResponseEntity.ok(findService.findUserByNicknameAndPhoneAndEmail(request.getNickname(), request.getPhone(), request.getEmail()));
+        } catch (UserNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    /**
+     * 비밀번호 초기화
+     */
+    @PostMapping("/reset/password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest request) {
+        try {
+            PasswordResetResponse response = findService.resetPassword(request);
+            return ResponseEntity.ok(response);
+        } catch (InvalidPasswordResetException ex) {
+            throw ex;
+        } catch (PasswordMismatchException ex) {
+            throw ex;
+        } catch (UserNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw ex;
+        }
+    }
+
 }
