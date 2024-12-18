@@ -78,28 +78,32 @@ export default {
   },
   methods: {
     async handleFindUser() {
-      this.error = "";
-      this.success = false;
-      this.loading = true;
+  this.error = "";
+  this.success = false;
+  this.loading = true;
 
-      try {
-        const response = await axios.post("/api/v1/find/user", this.form);
-        if (response.status === 200) {
-          this.success = true;
+  try {
+    // 백엔드에 회원정보 일치 여부 확인 요청
+    const response = await axios.post("/api/v1/find/user", this.form);
 
-          // 2초 후 ResetPassword 페이지로 이동
-          setTimeout(() => {
-            this.$router.push({
-              name: "ResetPassword",
-              query: this.form,
-            });
-          }, 2000);
-        }
-      } catch (err) {
-        this.error = "일치하는 회원 정보를 찾을 수 없습니다.";
-      } finally {
-        this.loading = false;
-      }
+    // 서버에서 exists가 true인 경우
+    if (response.data.exists) {
+      this.success = true;
+      setTimeout(() => {
+        this.$router.push({
+          name: "ResetPassword",
+          query: this.form,
+        });
+      }, 2000);
+    } else {
+      throw new Error(response.data.message || "회원 정보가 일치하지 않습니다.");
+    }
+  } catch (err) {
+    // 에러 메시지 처리
+    this.error = err.response?.data?.message || err.message || "서버 오류가 발생했습니다.";
+  } finally {
+    this.loading = false;
+  }
     },
     goToLogin() {
       // 로그인 페이지로 이동
@@ -107,7 +111,6 @@ export default {
     },
   },
 };
-
   </script>
   
   <style scoped>

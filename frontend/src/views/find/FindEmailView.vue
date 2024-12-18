@@ -12,7 +12,7 @@
             <InputText
               id="nickname"
               v-model="nickname"
-              placeholder="닉네임을 입력해 주세요"
+              placeholder="가입 시 입력한 닉네임을 입력해 주세요."
               required
             />
           </FloatLabel>
@@ -24,7 +24,7 @@
             <InputText
               id="phone"
               v-model="phone"
-              placeholder="연락처를 입력해 주세요"
+              placeholder="'-'를 포함한 연락처를 입력해 주세요."
               required
             />
           </FloatLabel>
@@ -47,9 +47,6 @@
       <div v-if="email" class="result">
         <Message severity="success">
           Your Email: <strong>{{ email }}</strong>
-          <div style="margin-top: 10px; color: gray;">
-            10초 후에 로그인 페이지로 이동합니다...
-          </div>
         </Message>
       </div>
 

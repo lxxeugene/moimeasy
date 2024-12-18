@@ -22,6 +22,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = {
           userId: response.data.userId,
           moeimId: response.data.moeimId,
+          profileImage: response.data.profileImage,
           name: response.data.name,
           email: response.data.email,
           nickname: response.data.nickname,
