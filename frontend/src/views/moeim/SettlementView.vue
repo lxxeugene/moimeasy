@@ -71,7 +71,6 @@
             mode="basic"
             name="file"
             accept="image/*"
-            customUpload
             @uploader="onFileUpload"
             chooseLabel="파일 선택"
           />
@@ -89,7 +88,7 @@
           icon="pi pi-check"
           class="p-button-primary"
           @click="submitRequest"
-          :disabled="!imageUrl"
+          :disabled="!title || !amount || !imageUrl"
         />
       </template>
     </Dialog>
@@ -176,31 +175,35 @@ export default {
 
     // 파일 업로드
     const onFileUpload = async (event) => {
-  const file = event.files[0];
-  if (!file) {
-    console.warn('파일이 선택되지 않았습니다.');
-    return;
-  }
+      const file = event.files[0]; // PrimeVue의 FileUpload는 event.files를 사용합니다.
+      if (!file) {
+        console.warn('파일이 선택되지 않았습니다.');
+        return;
+      }
 
-  const filePath = `settlement_receipts/${authStore.user?.userId}/${file.name}`;
-  const storageRef = firebaseRef(firebaseStorage, filePath);
+      const maxFileSize = 1 * 1024 * 1024; // 1MB 파일 크기 제한
+      if (file.size > maxFileSize) {
+        alert('파일 크기는 1MB 이하만 가능합니다.');
+        return;
+      }
 
-  try {
-    console.log('Uploading file to Firebase:', file.name);
-    const snapshot = await uploadBytes(storageRef, file);
-    console.log('File uploaded successfully:', snapshot);
+      const filePath = `settlement_receipts/${authStore.user?.userId}/${Date.now()}_${file.name}`;
+      const storageRef = firebaseRef(firebaseStorage, filePath);
 
-    const downloadUrl = await getDownloadURL(snapshot.ref);
-    console.log('File download URL:', downloadUrl);
+      try {
+        console.log('Uploading file to Firebase:', file.name);
+        const snapshot = await uploadBytes(storageRef, file);
+        console.log('File uploaded successfully:', snapshot);
 
-    imageUrl.value = downloadUrl; // 이미지 URL 저장
-    console.log('imageUrl 값:', imageUrl.value); // 확인
-  } catch (error) {
-    console.error('파일 업로드 실패:', error);
-    alert('파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
-  }
-};
+        const downloadUrl = await getDownloadURL(snapshot.ref);
+        console.log('File download URL:', downloadUrl);
 
+        imageUrl.value = downloadUrl; // Vue 반응형 상태 업데이트
+      } catch (error) {
+        console.error('파일 업로드 실패:', error);
+        alert('파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    };
 
     // 정산 요청 제출
     const submitRequest = async () => {
