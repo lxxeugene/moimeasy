@@ -26,6 +26,8 @@ import Ripple from 'primevue/ripple';
 import Toast from 'primevue/toast';
 import Card from 'primevue/card';
 import Message from 'primevue/message';
+import EmojiPicker from 'vue3-emoji-picker';
+import 'vue3-emoji-picker/css';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 axios.defaults.baseURL = 'http://localhost:8088'; // 서버 URL 설정
@@ -51,6 +53,7 @@ app.component('Select', Select);
 app.component('FloatLabel', FloatLabel);
 app.component('Card', Card);
 app.component('Message', Message);
+app.component('EmojiPicker', EmojiPicker);
 // PrimeVue 플러그인 등록
 app.use(
   PrimeVue,

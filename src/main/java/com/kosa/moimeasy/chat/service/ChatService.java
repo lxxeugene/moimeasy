@@ -17,8 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -97,8 +100,15 @@ public class ChatService {
 
         if (request.getMessageType().equalsIgnoreCase("TEXT")) {
             message.setContent(request.getContent());
-        } else {
-            message.setFileUrl(request.getFileUrl()); // 파일 경로 저장
+        } else if (request.getMessageType().equalsIgnoreCase("IMAGE") || request.getMessageType().equalsIgnoreCase("VIDEO")) {
+            if (request.getFileUrl() == null || request.getFileUrl().isEmpty()) {
+                throw new IllegalArgumentException("파일 URL이 제공되지 않았습니다.");
+            }
+            message.setContent(request.getFileUrl()); // URL 저장
+            message.setFileUrl(request.getFileUrl());
+        }
+        else {
+            throw new IllegalArgumentException("지원되지 않는 메시지 타입입니다.");
         }
 
         return chatMessageRepository.save(message);
@@ -110,9 +120,35 @@ public class ChatService {
     }
 
 
-    public List<ChatMessage> getMessagesSince(Long roomId, Long lastMessageId) {
-        return chatMessageRepository.findByChatRoomIdAndIdGreaterThanOrderByCreatedAtAsc(roomId, lastMessageId);
+    public List<Map<String, Object>> getMessagesSince(Long roomId, Long lastMessageId) {
+        List<ChatMessage> messages = chatMessageRepository
+                .findByChatRoomIdAndIdGreaterThanOrderByCreatedAtAsc(roomId, lastMessageId);
+
+        return messages.stream().map(message -> {
+            // senderId로 닉네임 조회
+            String senderNickname = userRepository.findById(message.getSender())
+                    .map(User::getNickname)
+                    .orElse("알 수 없는 사용자");
+
+            // 결과를 Map으로 반환
+            Map<String, Object> messageData = new HashMap<>();
+            messageData.put("id", message.getId());
+            messageData.put("content", message.getContent());
+            messageData.put("senderId", message.getSender());
+            messageData.put("senderNickname", senderNickname);
+            messageData.put("messageType", message.getMessageType().toString());
+            messageData.put("timestamp", message.getCreatedAt());
+            return messageData;
+        }).collect(Collectors.toList());
     }
+
+    public String getUserNicknameById(Long userId) {
+        return userRepository.findById(userId)
+                .map(User::getNickname)
+                .orElse("알 수 없는 사용자");
+    }
+
+
 
     @Transactional
     public List<String> getMemberNicknames(List<Long> memberIds) {

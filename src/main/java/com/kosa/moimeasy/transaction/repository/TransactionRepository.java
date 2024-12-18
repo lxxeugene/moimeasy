@@ -21,6 +21,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             "BETWEEN :startDate AND :endDate ORDER BY t.transactedAt DESC")
     List<Transaction> findAllByMoeimId(Long moeimId, LocalDateTime startDate, LocalDateTime endDate);
 
-    @Query("SELECT t FROM Transaction t where t.moeimAccount.moeimId = :moeimId AND t.categoryName is not null")
-    List<Transaction> findByMoeimId(Long moeimId);
+
+    @Query("SELECT t FROM Transaction t where t.moeimAccount.moeimId = :moeimId AND t.categoryName is not null " +
+            "AND t.transactedAt BETWEEN :startDate AND :endDate")
+    List<Transaction> findCategoryNameByMoeimId(Long moeimId, LocalDateTime  startDate, LocalDateTime  endDate);
 }
