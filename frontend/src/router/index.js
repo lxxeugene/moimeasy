@@ -19,6 +19,7 @@ import FindEmailView from '@/views/find/FindEmailView.vue';
 import FindUserInfoView from '@/views/find/FindUserInfoView.vue';
 import ResetPasswordView from '@/views/find/ResetPasswordView.vue';
 
+import Settlement from '@/views/moeim/SettlementView.vue';
 // 다른 뷰를 추가로 임포트
 
 import { useAuthStore } from '../stores/auth';
@@ -46,7 +47,7 @@ const routes = [
     path: '/invitation-list',
     name: '초대목록',
     component: InvitationList,
-  }, // 초대 목록 추가
+  }, 
   {
     path: '/remittance-list',
     name: 'RemittanceList',
@@ -81,9 +82,21 @@ const routes = [
         component: () => import('@/views/board/BoardView.vue'),
       },
       {
-        path: 'post',
-        name: '게시글작성',
+        path: 'board-post',
+        name: '게시물 작성',
         component: () => import('@/views/board/BoardPostView.vue'),
+      },
+      {
+        path: 'board-update/:id',
+        name: '게시물 수정',
+        component: () => import('@/views/board/BoardUpdateView.vue'),
+        props: true,
+      },
+      {
+        path: 'board-detail/:id',
+        name: '게시물 상세',
+        component: () => import('@/views/board/BoardDetailView.vue'),
+        props: true,
       },
       {
         path: 'chte',
@@ -118,6 +131,7 @@ const routes = [
     name: '채팅',
     component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
+  { path: '/settlement', name: '정산요청', component: Settlement },
 ];
 
 const router = createRouter({

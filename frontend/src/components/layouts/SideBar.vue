@@ -11,7 +11,12 @@
         <PanelMenu :model="items" class="pannel-item">
           <template #item="{ item }">
             <!-- 대쉬보드 메뉴 -->
-            <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+            <router-link
+              v-if="item.route"
+              v-slot="{ href, navigate }"
+              :to="item.route"
+              custom
+            >
               <a v-ripple class="dropmenu-item" :href="href" @click="navigate">
                 <img class="icon-dashboard" :src="item.icon" width="15px" />
                 <span class="menu-title">{{ item.label }}</span>
@@ -29,7 +34,13 @@
               <span class="menu-title">{{ item.label }}</span>
             </a>
             <!-- 기타 메뉴 -->
-            <a v-else v-ripple class="dropmenu-item" :href="item.url" :target="item.target">
+            <a
+              v-else
+              v-ripple
+              class="dropmenu-item"
+              :href="item.url"
+              :target="item.target"
+            >
               <img class="icon-dashboard" :src="item.icon" width="15px" />
               <span class="menu-title">{{ item.label }}</span>
             </a>
@@ -141,6 +152,11 @@ const items = ref([
         label: '거래내역',
         icon: Notebook,
         route: '/transaction-list',
+      },
+      {
+        label: '정산요청',
+        icon: Notebook,
+        route: '/settlement',
       },
     ],
   },
@@ -484,7 +500,6 @@ const items = ref([
 }
 
 @media (min-width: 768px) {
-
   /* md 브레이크포인트: 768px 이상 */
   .pannel-item {
     width: 13rem;
