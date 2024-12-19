@@ -21,7 +21,7 @@ public class TransactionDto { // 거래내역 조회
 
     private double amount;
 
-    private TransactionType type;
+    private String type;
 
     @JsonFormat(shape = Shape.STRING,  pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private LocalDateTime transactedAt;

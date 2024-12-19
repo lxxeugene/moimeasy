@@ -35,8 +35,6 @@ public class TransactionService {
     private final MoeimRepository moeimRepository;
     private final TransactionRepository transactionRepository;
 
-    private final JwtTokenProvider tokenProvider;
-
     // 유저 계좌 입금
     @Transactional
     public DepositDto.Response userDeposit(DepositDto.Request request) {
@@ -186,6 +184,7 @@ public class TransactionService {
                 .userAccount(sentAccount)
                 .transactionType(TransactionType.REMITTANCE)
                 .amount(request.getAmount())
+                    .depositName(sentAccount.getUserName())
                 .receivedName(receivedAccount.getMoeimName())
                 .receivedAccount(receivedAccount.getAccountNumber())
                 .build()
@@ -193,6 +192,7 @@ public class TransactionService {
 
         return RemittanceDto.Response.builder()
             .sentAccountNumber(sentAccount.getAccountNumber())
+                .sentName(sentAccount.getUserName())
             .receivedAccountNumber(receivedAccount.getAccountNumber())
             .receivedName(receivedAccount.getMoeimName())
             .amount(request.getAmount())
@@ -315,13 +315,13 @@ public class TransactionService {
     private String getTransactionTargetName(Transaction transaction) {
         switch (transaction.getTransactionType()) {
             case WITHDRAW -> {
-                return transaction.getWithdrawName();
+                return transaction.getCategoryName();
             }
             case DEPOSIT -> {
                 return transaction.getDepositName();
             }
             case REMITTANCE -> {
-                return transaction.getReceivedName();
+                return transaction.getDepositName();
             }
         }
         return ErrorCode.TRANSACTION_TYPE_NOT_FOUND.getDescription();
@@ -340,13 +340,20 @@ public class TransactionService {
                                         .id(transaction.getId())
                                         .transactionTargetName(getTransactionTargetName(transaction))
                                         .amount(transaction.getAmount())
-                                        .type(transaction.getTransactionType())
+                                        .type(determineTransactionType(transaction))
                                         .transactedAt(transaction.getTransactedAt())
                                     .build()
                 ).toList())
             .build();
     }
 
+    private String determineTransactionType(Transaction transaction) {
+        if (transaction.getTransactionType()== TransactionType.WITHDRAW) {
+            return "출금";
+        } else {
+            return "입금";
+        }
+    }
     // 송금 내역 조회 Response Dto 반환
     public TransactionListDto.RemittanceListResponse getRemittanceListResponse(
             Long moeimId, LocalDate startDate, LocalDate endDate) {

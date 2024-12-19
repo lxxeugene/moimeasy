@@ -8,10 +8,67 @@
         <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
         <i class="pi pi-caret-right" style="font-size: 1rem" @click="updateMonth(1)"></i>
       </div>
-      <Button label="납부하기" icon="pi pi-check" iconPos="right" rounded class="pay-button" @click="visible1 = true" />
+      <Button label="회비 납부" icon="pi pi-check" iconPos="right" rounded class="pay-button" @click="visible1 = true" />
+    </div>
+    <div>
+      <Button label="계좌 입금" icon="pi pi-paypal" iconPos="right" rounded class="pay-button" @click="visible4 = true" />
     </div>
   </div>
 
+  <!-- 계좌 입금-->
+  <!-- 금액 입력 모달창 -->
+  <Dialog v-model:visible="visible4" modal :style="{ width: '30rem', height: '40rem' }" @show="resetValue">
+    <template #header>
+      <div class="text-header">입금 금액</div>
+    </template>
+    <div class="text-display">
+      <InputText type="text" v-model="value" readonly class="text-input" />
+    </div>
+    <div class="number-buttons">
+      <Button v-for="num in numbers" :key="num" rounded class="number-button" @click="handleButtonClick(num)">
+        <template v-if="num === 'x'">
+          <i class="pi pi-times-circle" style="font-size: 1.5rem"></i>
+        </template>
+        <template v-else>
+          {{ num }}
+        </template>
+      </Button>
+    </div>
+    <Button label="다음" rounded class="next-button" @click="depositAmount" />
+  </Dialog>
+
+  <!-- 확인 모달 -->
+  <Dialog v-model:visible="visible5" modal :style="{ width: '30rem', height: '25rem' }">
+    <template #header>
+      <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
+        <span style="font-weight: bold; color:purple;">{{ userAccount }}</span> 계좌에
+        <span style="font-weight: bold; color:purple;">{{ value }}</span>원 입금하시겠습니까?
+        <p>입금계좌 : {{ userBank }}({{ username }}) {{ userAccount }}</p>
+      </div>
+    </template>
+    <div class="button-group">
+      <Button label="확인" rounded class="next-button" @click="confirmDeposit" />
+      <Button label="취소" rounded class="next-button" @click="resetValue" />
+    </div>
+  </Dialog>
+
+  <!-- 결과 모달 -->
+  <Dialog v-model:visible="visible6" modal :style="{ width: '27rem', height: '40rem' }" :closable="false">
+    <template #header>
+      <div
+        style="display: flex; justify-content: center; align-items: center; font-size: 4em; margin-top: 50px; font-weight: bold; color: #7f56d9;">
+        <i class="pi pi-check-circle" style="font-size: 8rem; margin-right: 20px;"></i>
+        <div style="margin-top: 30px;">입금</div>
+      </div>
+    </template>
+
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+      <p>{{ username }} 님의 {{ userAccount }} 계좌에 {{ value }} 원을 입금하였습니다.</p>
+      <Button label="닫기" rounded @click="visible6 = false" />
+    </div>
+  </Dialog>
+
+  <!-- 회비 납부-->
   <!-- 금액 입력 모달창 -->
   <Dialog v-model:visible="visible1" modal :style="{ width: '30rem', height: '40rem' }" @show="resetValue">
     <template #header>
@@ -43,7 +100,7 @@
       </div>
     </template>
     <div class="button-group">
-      <Button label="확인" rounded class="next-button" @click="confirmDeposit" />
+      <Button label="확인" rounded class="next-button" @click="confirmremittance" />
       <Button label="취소" rounded class="next-button" @click="resetValue" />
     </div>
   </Dialog>
@@ -65,13 +122,7 @@
   </Dialog>
 
   <div class="card">
-    <!-- 로딩 상태일 때 표시 -->
-    <template v-if="loading">
-      <p>데이터를 불러오는 중입니다...</p>
-    </template>
-
-    <!-- 로딩이 끝났고 데이터가 있을 때 표시 -->
-    <template v-else-if="members && members.length">
+    <template v-if="members && members.length">
       <DataTable :value="members" paginator :rows="5" tableStyle="min-width: 60rem">
         <!-- 번호 -->
         <Column field="number" header="번호" style="width: 12%" />
@@ -103,11 +154,6 @@
         </Column>
       </DataTable>
     </template>
-
-    <!-- 로딩이 끝났지만 데이터가 없을 때 표시 -->
-    <template v-else>
-      <p>데이터가 없습니다.</p>
-    </template>
   </div>
 </template>
 
@@ -123,12 +169,17 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import axios from "axios";
 import { useRouter } from 'vue-router';
+import { useLoadingStore } from '@/stores/useLoadingStore';
 
 const router = useRouter();
+const loadingStore = useLoadingStore();
 
-const visible1 = ref(false); // 금액 입력 모달
+const visible1 = ref(false); // 회비 금액 입력 모달
 const visible2 = ref(false); // 확인 모달
 const visible3 = ref(false); // 결과 모달
+const visible4 = ref(false); // 계좌 입금 입력 모달
+const visible5 = ref(false); // 확인 모달
+const visible6 = ref(false); // 결과 모달
 
 // 송금 데이터
 const value = ref(""); // 입력한 금액
@@ -144,9 +195,6 @@ const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'x'];
 const currentMonth = ref('');
 const currentDate = ref(new Date()); // 현재 날짜를 기준으로 동작
 const members = ref([]);
-
-// 로딩 상태
-const loading = ref(false);
 
 // Local Storage에서 accessToken 가져오기
 const accessToken = localStorage.getItem('accessToken');
@@ -168,6 +216,7 @@ if (!accessToken || !moeimId) {
 // 송금 내역 가져오기
 async function fetchRemittanceList() {
   try {
+    loadingStore.startLoading();  // 로딩 시작
     // 현재 월의 첫 번째 날짜과 마지막 날짜 계산
     const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
     const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
@@ -203,7 +252,7 @@ async function fetchRemittanceList() {
     members.value = [];
   }
   finally {
-    loading.value = false; // 로딩 종료
+    loadingStore.stopLoading(); // 로딩 중지
   }
 }
 
@@ -219,7 +268,7 @@ const updateMonth = (offset) => {
 
 // 유저 -> 계좌 입금을 위한 데이터
 async function fetchInitialData() {
-  loading.value = true; // 로딩 시작
+  loadingStore.startLoading();  // 로딩 시작
   try {
     const response = await axios.get("/api/v1/transaction/details", {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -238,7 +287,7 @@ async function fetchInitialData() {
   } catch (error) {
     console.error("모임 세부 정보 조회 중 오류 발생:", error.response?.data || error.message);
   } finally {
-    loading.value = false; // 로딩 종료
+    loadingStore.stopLoading(); // 로딩 중지
   }
 }
 
@@ -258,14 +307,19 @@ function depositAmount() {
   // 현재 value 값을 depositValue에 할당
   localStorage.setItem('value', JSON.stringify(value.value));
 
-  // 기존 로직: 모달 상태 변경
-  visible1.value = false; // 금액 입력 모달 닫기
-  visible2.value = true; // 확인 모달 열기
+  if (visible1.value == true) {
+    visible1.value = false; // 회비 금액 입력 모달 닫기
+    visible2.value = true; // 확인 모달 열기
+  }
+  else {
+    visible4.value = false; // 입금 입력 모달 닫기
+    visible5.value = true; // 확인 모달 열기
+  }
 }
 
 // 확인 버튼 클릭 -> 송금 처리
-async function confirmDeposit() {
-  console.log("확인 버튼 클릭"); // 호출 여부 확인
+async function confirmremittance() {
+  loadingStore.startLoading();  // 로딩 시작
   try {
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
@@ -305,9 +359,58 @@ async function confirmDeposit() {
     console.log("송금 성공:", response.data); // 응답 확인
     visible2.value = false; // 확인 모달 닫기
     visible3.value = true; // 결과 모달 열기
-
   } catch (error) {
     console.error("송금 중 오류 발생:", error.response?.data || error.message);
+  } finally {
+    loadingStore.stopLoading(); // 로딩 중지
+  }
+}
+
+// 확인 버튼 클릭 -> 입금 처리
+async function confirmDeposit() {
+  loadingStore.startLoading();  // 로딩 시작
+  try {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      console.error("Access token이 없습니다.");
+      return;
+    }
+
+    const userRaw = localStorage.getItem("user");
+    let userId = null;
+
+    if (userRaw) {
+      const user = JSON.parse(userRaw);
+      userId = user?.userId || null;
+    }
+
+    if (!userId) {
+      console.error("userId가 없습니다.");
+      return;
+    }
+
+    const response = await axios.put(
+      "/api/v1/transaction/userDeposit",
+      {
+        userId: userId,
+        amount: Number(value.value), // depositValue 대신 value 사용
+      },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
+    console.log("요청 데이터:", {
+      userId: userId,
+      amount: Number(value.value),
+    });
+
+    console.log("입금 성공:", response.data); // 응답 확인
+    visible5.value = false; // 확인 모달 닫기
+    visible6.value = true; // 결과 모달 열기
+  } catch (error) {
+    console.error("입금 중 오류 발생:", error.response?.data || error.message);
+  } finally {
+    loadingStore.stopLoading(); // 로딩 중지
   }
 }
 
@@ -318,11 +421,17 @@ function getStatusClass(status) {
 
 // State 관리: localStorage 저장 및 로드
 function loadStateFromLocalStorage() {
-  const storedVisible = localStorage.getItem('visible1');
+  const storedVisible1 = localStorage.getItem('visible1');
+  const storedVisible4 = localStorage.getItem('visible4');
+
   const storedValue = localStorage.getItem('value');
 
-  if (storedVisible !== null) {
-    visible1.value = JSON.parse(storedVisible);
+  if (storedVisible1 !== null) {
+    visible1.value = JSON.parse(storedVisible1);
+  }
+
+  if (storedVisible4 !== null) {
+    visible4.value = JSON.parse(storedVisible4);
   }
 
   if (storedValue !== null) {
@@ -333,6 +442,10 @@ function loadStateFromLocalStorage() {
 // Watchers
 watch(visible1, (newVal) => {
   localStorage.setItem('visible1', JSON.stringify(newVal));
+});
+
+watch(visible4, (newVal) => {
+  localStorage.setItem('visible4', JSON.stringify(newVal));
 });
 
 watch(value, (newVal) => {
@@ -354,6 +467,7 @@ function resetValue() {
   value.value = "";
   localStorage.removeItem('value');
   visible2.value = false;
+  visible5.value = false;
 }
 
 </script>

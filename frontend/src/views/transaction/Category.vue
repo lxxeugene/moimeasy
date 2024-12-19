@@ -12,8 +12,7 @@
                 <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
                 <i class="pi pi-caret-right" style="font-size: 1rem" @click="updateMonth(1)"></i>
             </div>
-            <div v-if="loading">데이터를 불러오는 중...</div>
-            <div v-else-if="hasData">
+            <div v-if="hasData">
                 <Splitter style="width: 80%; height: 80vh; margin: 20px" class="mb-8">
                     <SplitterPanel :size="50" :minSize="30" class="flex items-center justify-center full-size-panel">
                         <div class="chart-wrapper">
@@ -105,15 +104,16 @@
         </Dialog>
 
         <!-- 회비 사용 확인 모달 -->
-        <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '25rem' }" @hide="resetValue">
+        <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '25rem' }">
             <template #header>
                 <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
-                    <span style="font-weight: bold;">{{ selectedExpense }} 항목에 {{ value }} 원 사용하시겠습니까?
-                        <p>출금계좌 : {{ moeimBank }}({{ moeimAccount }}) {{ moeimName }}</p>
-                    </span>
+                    <span style="font-weight: bold; color: purple;">{{ selectedExpense }}</span> 항목에 {{ value }} 원
+                    사용하시겠습니까?
+                    <p>출금계좌 : {{ moeimBank }}({{ moeimAccount }})</p>
+                    <p>모임명 : {{ moeimName }}</p>
                 </div>
             </template>
-            <div class="button-group">
+            <div class=" button-group">
                 <Button label="확인" rounded class="next-button" @click="confirmExpense" />
                 <Button label="취소" rounded class="next-button" @click="resetValue" />
             </div>
@@ -128,10 +128,9 @@
                     <div style="margin-top: 30px;">모임비 지출</div>
                 </div>
             </template>
-
             <div
                 style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
-                <p>{{ selectedExpense }} 항목에 {{ value }} 원을 사용하였습니다.</p>
+                <p>{{ selectedExpense }} 항목에 {{ value }} 원 사용하였습니다.</p>
                 <Button label="닫기" rounded @click="visible4 = false" />
             </div>
         </Dialog>
@@ -153,7 +152,9 @@ import SplitButton from 'primevue/splitbutton';
 import axios from "axios";
 import 'primeicons/primeicons.css';
 import { useRouter } from 'vue-router';
+import { useLoadingStore } from '@/stores/useLoadingStore';
 
+const loadingStore = useLoadingStore();
 const router = useRouter();
 
 const visible1 = ref(false); // 지출 금액 입력 모달
@@ -183,10 +184,6 @@ const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'x'];
 const currentMonth = ref('');
 const currentDate = ref(new Date()); // 현재 날짜
 const hasData = ref(false); // 데이터 존재 여부
-const loading = ref(true); // 로딩 상태 추가
-const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
-const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
-
 
 // Local Storage에서 accessToken, user 정보 가져오기
 const accessToken = localStorage.getItem('accessToken');
@@ -216,10 +213,28 @@ function handleButtonClick(num) {
 
 // 백엔드로부터 초기 데이터 가져오기
 async function fetchInitialData() {
-    loading.value = true;
+    loadingStore.startLoading();  // 로딩 시작
     try {
+        const accessToken = localStorage.getItem('accessToken');
+        const userRaw = localStorage.getItem('user');
+        let moeimId = null;
+
+        if (userRaw) {
+            const user = JSON.parse(userRaw); // JSON 파싱
+            moeimId = user?.moeimId || null; // `moeimId` 키로 가져오기
+        }
+
+        if (!accessToken || !moeimId) {
+            console.error('필수 데이터(accessToken 또는 moeimId)가 누락되었습니다.');
+            router.push('/login'); // 로그인 화면으로 리디렉션
+            return;
+        }
+
+        const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
+        const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
+
         const response = await axios.get("/api/v1/transaction/category", {
-            headers: { Authorization: accessToken.trim() },
+            headers: { Authorization: `Bearer ${accessToken}` },
             params: {
                 userId: userId,
                 startDate: startOfMonth.toISOString().split('T')[0],
@@ -227,6 +242,11 @@ async function fetchInitialData() {
             },
         });
         if (response.data && Array.isArray(response.data.categories)) {
+            moeimName.value = response.data.moeimName;
+            moeimAccount.value = response.data.moeimAccount;
+            userName.value = response.data.userName;
+            userAccount.value = response.data.userAccount;
+
             categoryData.value = response.data.categories;
             hasData.value = categoryData.value.length > 0; // 데이터 존재 여부 설정
         } else {
@@ -240,12 +260,6 @@ async function fetchInitialData() {
         chartOptions.value = setChartOptions();
         transformChartData();                // chartData 기반 비율 계산
 
-        if (response.data) {
-            moeimName.value = response.data.moeimName;
-            moeimAccount.value = response.data.moeimAccount;
-            userName.value = response.data.userName;
-            userAccount.value = response.data.userAccount;
-        }
         console.log(response.data);
     }
     catch (error) {
@@ -253,7 +267,7 @@ async function fetchInitialData() {
         console.error("모임 세부 정보 조회 중 오류 발생:", error.response?.data || error.message);
     }
     finally {
-        loading.value = false;
+        loadingStore.stopLoading(); // 로딩 중지
     }
 }
 
@@ -272,10 +286,8 @@ function selectExpense(option) {
 
 // 월 변경 및 데이터 다시 가져오기
 const updateMonth = (offset) => {
-
     currentDate.value.setMonth(currentDate.value.getMonth() + offset);
-    currentMonth.value = `${currentDate.value.getMonth() + 1}월 거래내역`;
-
+    currentMonth.value = `${currentDate.value.getMonth() + 1}월 카테고리별 지출내역`;
     // 새로운 기간으로 데이터 재조회
     fetchInitialData();
 };
@@ -304,9 +316,11 @@ watch(value, (newVal) => {
 
 // Reset 함수
 function resetValue() {
-    value.value = "";
     localStorage.removeItem('value');
-    visible2.value = false;
+    value.value = "";
+    selectedExpense.value = "지출항목";
+
+    visible3.value = false;
 }
 
 // 지출 확인 버튼 클릭 -> 지출 처리

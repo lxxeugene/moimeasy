@@ -31,6 +31,8 @@ public class RemittanceDto { // 계좌 이체
 
         private String receivedName;
 
+        private String sentName;
+
         private double amount;
     }
 }
