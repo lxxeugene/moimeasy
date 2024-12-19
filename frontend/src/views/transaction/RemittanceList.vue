@@ -98,6 +98,7 @@
         <p>출금계좌 : {{ userBank }}({{ username }}) {{ userAccount }}</p>
         <p>입금계좌 : {{ moeimBank }}({{ moeimName }}) {{ moeimAccount }}</p>
       </div>
+      <ConfirmDialog></ConfirmDialog>
     </template>
     <div class="button-group">
       <Button label="확인" rounded class="next-button" @click="confirmremittance" />
@@ -170,6 +171,9 @@ import InputText from 'primevue/inputtext';
 import axios from "axios";
 import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import { useConfirm } from "primevue/useconfirm";
+
+const confirm = useConfirm();
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
@@ -365,6 +369,7 @@ async function confirmremittance() {
     loadingStore.stopLoading(); // 로딩 중지
   }
 }
+
 
 // 확인 버튼 클릭 -> 입금 처리
 async function confirmDeposit() {

@@ -173,6 +173,11 @@ public class TransactionService {
             throw new CustomException(BALANCE_NOT_ENOUGH);
         }
 
+        // 회비를 이미 납부했으면 납부했다는 메시지 반환
+        if(transactionRepository.findByUserId(request.getUserId()).getTransactionType() == TransactionType.REMITTANCE){
+            throw new CustomException(USER_ALREADY_PAID);
+        }
+
         // 보내는 계좌, 받는 계좌의 잔액 변경
         sentAccount.setAmount(sentAccount.getAmount() - request.getAmount());
         receivedAccount.setAmount(receivedAccount.getAmount() + request.getAmount());
@@ -181,22 +186,22 @@ public class TransactionService {
         transactionRepository.save(
             Transaction.builder()
                     .moeimAccount(receivedAccount)
-                .userAccount(sentAccount)
-                .transactionType(TransactionType.REMITTANCE)
-                .amount(request.getAmount())
+                    .userAccount(sentAccount)
+                    .transactionType(TransactionType.REMITTANCE)
+                    .amount(request.getAmount())
                     .depositName(sentAccount.getUserName())
-                .receivedName(receivedAccount.getMoeimName())
-                .receivedAccount(receivedAccount.getAccountNumber())
-                .build()
+                    .receivedName(receivedAccount.getMoeimName())
+                    .receivedAccount(receivedAccount.getAccountNumber())
+                    .build()
         );
 
         return RemittanceDto.Response.builder()
-            .sentAccountNumber(sentAccount.getAccountNumber())
+                .sentAccountNumber(sentAccount.getAccountNumber())
                 .sentName(sentAccount.getUserName())
-            .receivedAccountNumber(receivedAccount.getAccountNumber())
-            .receivedName(receivedAccount.getMoeimName())
-            .amount(request.getAmount())
-            .build();
+                .receivedAccountNumber(receivedAccount.getAccountNumber())
+                .receivedName(receivedAccount.getMoeimName())
+                .amount(request.getAmount())
+                .build();
     }
 
     // 유저 -> 모임 송금내역 조회
@@ -355,15 +360,15 @@ public class TransactionService {
         }
     }
     // 송금 내역 조회 Response Dto 반환
-    public TransactionListDto.RemittanceListResponse getRemittanceListResponse(
-            Long moeimId, LocalDate startDate, LocalDate endDate) {
+    public TransactionListDto.RemittanceListResponse getRemittanceListResponse(Long moeimId, LocalDate startDate, LocalDate endDate) {
 
-        List<Transaction> resultList = transactionRepository.findAllByMoeimId(
-                moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        // 모임 거래내역
+        List<Transaction> resultList = transactionRepository.findAllByMoeimId(moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
+        // 모임에 가입된 유저
         List<User> users = userRepository.findByMoeimId(moeimId);
 
-        // 먼저 거래내역 있는 사용자들에 대한 DTO 변환
+        // 송금내역 있는 사용자들에 대한 DTO 변환
         List<RemittanceListDto> remittanceList = resultList.stream()
                 .map(transaction -> {
                     Long userId = null;
@@ -371,21 +376,13 @@ public class TransactionService {
                     String photo = "default-photo.png";
                     if (transaction.getUserAccount() != null) {
                         userId = transaction.getUserAccount().getUserId();
-                        userName = (transaction.getUserAccount().getNickname() != null)
-                                ? transaction.getUserAccount().getNickname() : userName;
-                        if (transaction.getUserAccount().getProfileImage() != null) {
-                            photo = transaction.getUserAccount().getProfileImage();
-                        }
+                        userName = transaction.getUserAccount().getUserName();
+                        photo = transaction.getUserAccount().getProfileImage();
                     }
-
-                    log.info("Processing Transaction: id={}, userId={}, userName={}, photo={}, receivedAccount={}",
-                            transaction.getId(), userId, userName, photo, transaction.getReceivedAccount());
 
                     return RemittanceListDto.builder()
                             .userId(userId)
-                            .receivedAccount(transaction.getReceivedAccount() != null
-                                    ? transaction.getReceivedAccount()
-                                    : "알 수 없는 계좌")
+                            .receivedAccount(transaction.getReceivedAccount())
                             .photo(photo)
                             .userName(userName)
                             .amount(transaction.getAmount())
@@ -393,7 +390,7 @@ public class TransactionService {
                             .transactionAt(transaction.getTransactedAt())
                             .build();
                 })
-                .collect(Collectors.toList()); // 여기서 toList() 대신 Collectors.toList() 사용
+                .collect(Collectors.toList());
 
         Set<Long> userWithTransactions = remittanceList.stream()
                 .map(RemittanceListDto::getUserId)
