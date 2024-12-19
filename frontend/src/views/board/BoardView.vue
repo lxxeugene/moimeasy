@@ -230,14 +230,38 @@ const onWriterFilter = (event) => {
 
 // 게시판 데이터 가져오기
 const fetchBoards = async () => {
-  loadingStore.startLoading(); // 로딩 시작
+  loadingStore.startLoading();
   try {
     const response = await axios.get('/api/v1/boards');
     boards.value = await Promise.all(
-      response.data.map(async (board) => ({
-        ...board,
-        profileImage: await changeImageUrl(board.profileImage),
-      }))
+      response.data.map(async (board) => {
+        let profileImage = null;
+
+        // profileImage가 유효한 문자열인지 확인
+        if (
+          board.profileImage &&
+          typeof board.profileImage === 'string' &&
+          board.profileImage.trim() !== ''
+        ) {
+          try {
+            profileImage = await changeImageUrl(board.profileImage);
+          } catch (error) {
+            console.error('이미지 변환 실패:', error);
+            profileImage = defaultProfileImage;
+          }
+        } else {
+          profileImage = defaultProfileImage;
+          console.warn(
+            `profileImage이 유효하지 않음 => ${board.writerName}의 profileImage: `,
+            board.profileImage
+          );
+        }
+
+        return {
+          ...board,
+          profileImage: profileImage,
+        };
+      })
     );
     // 데이터에서 고유한 태그 추출
     const uniqueTags = [...new Set(response.data.map((board) => board.tag))];
@@ -245,7 +269,7 @@ const fetchBoards = async () => {
   } catch (error) {
     console.error('Error fetching boards:', error);
   } finally {
-    loadingStore.stopLoading(); // 로딩 중지
+    loadingStore.stopLoading();
   }
 };
 
