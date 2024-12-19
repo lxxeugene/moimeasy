@@ -53,17 +53,23 @@ const routes = [
     component: InvitationList,
   },
   {
-    path: '/remittance-list',
-    name: 'RemittanceList',
-    component: RemittanceList,
+    path: '/transaction',
+    name: '회비',
+    children: [
+      {
+        path: '/remittance-list',
+        name: '회비납부',
+        component: RemittanceList,
+      },
+      {
+        path: '/transaction-list',
+        name: '거래내역',
+        component: TransactionList,
+      },
+    ],
   },
+  { path: '/category', name: '카테고리별 소비내역', component: Category },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
-  {
-    path: '/transaction-list',
-    name: 'TransactionList',
-    component: TransactionList,
-  },
-  { path: '/category', name: 'Category', component: Category },
   { path: '/chat-room-list', name: '채팅목록', component: ChatRoomList },
   {
     path: '/chat/:roomId',

@@ -31,6 +31,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT t FROM Transaction t where t.moeimAccount.moeimId = :moeimId ")
     List<Transaction> findByMoeimId(Long moeimId);
 
-    @Query("SELECT t FROM Transaction t where t.userAccount.userId = :userId")
+    @Query("SELECT t FROM Transaction t where t.userAccount.userId = :userId " +
+            "AND t.transactionType = 'REMITTANCE'")
     Transaction findByUserId(Long userId);
 }

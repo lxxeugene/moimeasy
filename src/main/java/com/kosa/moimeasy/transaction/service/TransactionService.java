@@ -174,7 +174,8 @@ public class TransactionService {
         }
 
         // 회비를 이미 납부했으면 납부했다는 메시지 반환
-        if(transactionRepository.findByUserId(request.getUserId()).getTransactionType() == TransactionType.REMITTANCE){
+        Transaction transaction = transactionRepository.findByUserId(request.getUserId());
+        if(transaction.getTransactionType() == TransactionType.REMITTANCE){
             throw new CustomException(USER_ALREADY_PAID);
         }
 
@@ -401,7 +402,7 @@ public class TransactionService {
         for (User user : users) {
             if (!userWithTransactions.contains(user.getUserId())) {
                 String userName = user.getNickname() != null ? user.getNickname() : "알 수 없는 사용자";
-                String photo = user.getProfileImage() != null ? user.getProfileImage() : "default-photo.png";
+                String photo = user.getProfileImage();
                 remittanceList.add(RemittanceListDto.builder()
                         .userId(user.getUserId())
                         .receivedAccount("알 수 없는 계좌")

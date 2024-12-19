@@ -14,8 +14,8 @@
       <Button label="계좌 입금" icon="pi pi-paypal" iconPos="right" rounded class="pay-button" @click="visible4 = true" />
     </div>
   </div>
-
   <!-- 계좌 입금-->
+
   <!-- 금액 입력 모달창 -->
   <Dialog v-model:visible="visible4" modal :style="{ width: '30rem', height: '40rem' }" @show="resetValue">
     <template #header>
@@ -128,13 +128,11 @@
         <!-- 번호 -->
         <Column field="number" header="번호" style="width: 12%" />
 
-        <!-- 사진 -->
-        <Column header="사진" style="width: 12%">
+        <!-- <Column header="회원사진" style="width: 12%">
           <template #body="slotProps">
-            <img :src="slotProps.data.photo ? `/assets/${slotProps.data.photo}` : '/assets/default-photo.png'" alt="사진"
-              style="width: 40px; height: 40px; border-radius: 50%" />
+            <img :src="slotProps.data.photo" alt="사진" style="width: 40px; height: 40px; border-radius: 50%;" />
           </template>
-        </Column>
+  </Column> -->
 
         <!-- 이름 -->
         <Column field="userName" header="이름" style="width: 12%" />
@@ -172,8 +170,11 @@ import axios from "axios";
 import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import { useConfirm } from "primevue/useconfirm";
+import { useToast } from "primevue/usetoast";
+import { fetchImageUrl } from "@/utils/image-load-utils";
 
 const confirm = useConfirm();
+const toast = useToast();
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
@@ -205,6 +206,7 @@ const accessToken = localStorage.getItem('accessToken');
 const userRaw = localStorage.getItem('user');
 let moeimId = null;
 let userId = null;
+let photo = null;
 
 if (userRaw) {
   const user = JSON.parse(userRaw); // JSON 파싱
@@ -365,6 +367,7 @@ async function confirmremittance() {
     visible3.value = true; // 결과 모달 열기
   } catch (error) {
     console.error("송금 중 오류 발생:", error.response?.data || error.message);
+    confirm1(error.response?.data || error.message);
   } finally {
     loadingStore.stopLoading(); // 로딩 중지
   }
@@ -474,6 +477,29 @@ function resetValue() {
   visible2.value = false;
   visible5.value = false;
 }
+
+const confirm1 = (message) => {
+  confirm.require({
+    message: message || '회비를 이미 납부하였습니다.',
+    header: 'Confirmation',
+    icon: 'pi pi-exclamation-triangle',
+    rejectProps: {
+      label: '취소',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: '확인'
+    },
+    accept: () => {
+      visible2.value = false;
+    },
+    reject: () => {
+      toast.add({ severity: 'error', summary: '이체취소', detail: '이체가 취소되었습니다.', life: 3000 });
+      visible2.value = false;
+    }
+  });
+};
 
 </script>
 
