@@ -35,7 +35,11 @@ const routes = [
   { path: '/user-manage', name: '회원관리', component: UserManage },
   { path: '/find-email', name: 'FindEmail', component: FindEmailView },
   { path: '/finduser', name: 'FindUserInfo', component: FindUserInfoView },
-  { path: '/resetpassword', name: 'ResetPassword', component: ResetPasswordView},
+  {
+    path: '/resetpassword',
+    name: 'ResetPassword',
+    component: ResetPasswordView,
+  },
 
   {
     path: '/user-profile/:userId',
@@ -124,7 +128,7 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
-    component: () => import('@/views/Error/Error404.vue'),
+    component: () => import('@/views/error/Error404.vue'),
   },
   {
     path: '/chat-layout',
@@ -132,7 +136,16 @@ const routes = [
     component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
   { path: '/settlement', name: '정산요청', component: Settlement },
-  { path: '/main', name: '메인', component: () => import('@/views/MainView.vue')},
+  {
+    path: '/main',
+    name: '메인',
+    component: () => import('@/views/MainView.vue'),
+  },
+  {
+    path: '/gallery',
+    name: '갤러리',
+    component: () => import('@/views/gallery/GalleryView.vue'),
+  },
 ];
 
 const router = createRouter({
@@ -154,7 +167,13 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('accessToken'); // 인증 상태 확인
 
   // 로그인이 필요 없는 페이지 (로그인, 회원가입 등)
-  const publicPages = ['/login', '/signup', '/find-email', '/finduser','/resetpassword'];
+  const publicPages = [
+    '/login',
+    '/signup',
+    '/find-email',
+    '/finduser',
+    '/resetpassword',
+  ];
   const requiresAuth = !publicPages.includes(to.path); // 인증이 필요한 페이지
 
   if (isAuthenticated && to.path === '/login') {
@@ -168,6 +187,5 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
-
 
 export default router;

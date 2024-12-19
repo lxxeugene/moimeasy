@@ -59,28 +59,16 @@ import Notebook from '@/assets/icons/notebook.svg?url';
 import GraphIcon from '@/assets/icons/graphIcon.svg?url';
 import PanelMenu from 'primevue/panelmenu';
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
 import NavLogo from './NavLogo.vue';
 import ChatIcon from '@/assets/icons/chatIcon.svg?url';
-
+import albumIcon from '@/assets/icons/albumIcon.svg?url';
 
 //사이드바 메뉴구성 아이템
 const items = ref([
   {
     label: 'Dashboard',
     icon: OutlineIcon,
-    items: [
-      {
-        label: 'Dash-1',
-        icon: OutlineIcon,
-        route: '/theming/styled',
-      },
-      {
-        label: 'Dash-2',
-        icon: OutlineIcon,
-        route: '/theming/unstyled',
-      },
-    ],
+    route: '/main',
   },
   {
     label: '회원관리',
@@ -161,6 +149,11 @@ const items = ref([
         url: '/chat-layout',
       },
     ],
+  },
+  {
+    label: '갤러리',
+    icon: albumIcon,
+    url: '/gallery',
   },
 ]);
 </script>
@@ -454,7 +447,7 @@ const items = ref([
   gap: 10px;
   border-radius: 8px;
   padding: 8px 8px 8px 24px;
-  width: 130px;
+  width: 135px;
   border: none;
   height: 53px;
   cursor: pointer;
