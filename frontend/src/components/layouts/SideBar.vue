@@ -59,9 +59,9 @@ import Notebook from '@/assets/icons/notebook.svg?url';
 import GraphIcon from '@/assets/icons/graphIcon.svg?url';
 import PanelMenu from 'primevue/panelmenu';
 import { ref } from 'vue';
-import { useAuthStore } from '@/stores/auth'; // Pinia auth 스토어
 import NavLogo from './NavLogo.vue';
 import ChatIcon from '@/assets/icons/chatIcon.svg?url';
+import albumIcon from '@/assets/icons/albumIcon.svg?url';
 
 //사이드바 메뉴구성 아이템
 const items = ref([
@@ -149,6 +149,11 @@ const items = ref([
         url: '/chat-layout',
       },
     ],
+  },
+  {
+    label: '갤러리',
+    icon: albumIcon,
+    url: '/gallery',
   },
 ]);
 </script>

@@ -141,6 +141,11 @@ const routes = [
     name: '메인',
     component: () => import('@/views/MainView.vue'),
   },
+  {
+    path: '/gallery',
+    name: '갤러리',
+    component: () => import('@/views/gallery/GalleryView.vue'),
+  },
 ];
 
 const router = createRouter({

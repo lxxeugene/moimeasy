@@ -96,7 +96,6 @@ export default {
         this.loginUser = JSON.parse(localStorage.getItem('user'));
       } catch (error) {
         console.error('사용자 정보를 불러오는데 실패했습니다:', error);
-        alert('사용자 정보를 불러오는데 실패했습니다.');
       }
     },
 

@@ -119,10 +119,11 @@ const toast = useToast();
 const primeConfirm = useConfirm();
 
 const types = ref([
-  { name: '기본이벤트', type: 'custom-event1' },
-  { name: '공휴일이벤트 ', type: 'holiday-event' },
-  { name: '중요이벤트', type: 'important-event' },
-  { name: '일반이벤트', type: '' },
+  { name: '타입A', type: 'custom-event1' },
+  { name: '타입B ', type: 'holiday-event' },
+  { name: '타입C', type: 'important-event' },
+  { name: '타입D', type: '' },
+  { name: '타입E', type: 'custom-event2' },
 ]);
 // 스토어
 const loadingStore = useLoadingStore();
