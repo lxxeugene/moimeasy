@@ -173,10 +173,13 @@ public class TransactionService {
             throw new CustomException(BALANCE_NOT_ENOUGH);
         }
 
-        // 회비를 이미 납부했으면 납부했다는 메시지 반환
-        Transaction transaction = transactionRepository.findByUserId(request.getUserId());
-        if(transaction.getTransactionType() == TransactionType.REMITTANCE){
-            throw new CustomException(USER_ALREADY_PAID);
+        // 이미 납부했으면 납부했다는 알림
+        List<Transaction> transactions = transactionRepository.findByUserId(request.getUserId());
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getTransactionType().equals(TransactionType.REMITTANCE)) {
+                throw new CustomException(USER_ALREADY_PAID);
+            }
         }
 
         // 보내는 계좌, 받는 계좌의 잔액 변경

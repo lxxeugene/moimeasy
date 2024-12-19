@@ -1,19 +1,20 @@
 <template>
     <div class="total-frame">
-        <PayMenuList /> <!-- 메뉴 위치 -->
-        <div class="title">모임명 : {{ moeimName }}</div>
-        <Button label="회비사용" icon="pi pi-dollar" iconPos="right" rounded class="pay-button" @click="visible1 = true" />
-
+        <!-- <PayMenuList /> 메뉴 위치 -->
         <!-- 차트 부분 제목과 아이콘을 왼쪽 아래로 배치 -->
-        <div class="card" style="height: 100%; width: 100%;">
-            <div class="title">{{ currentMonth }}</div>
+        <div class="card" style="height: 100%; width: 100%; margin-left: 50px;">
+            <!-- <div class=" title">모임명 : {{ moeimName }}</div> -->
+            <div class=" title"> {{ currentMonth }} </div>
+            <div class="expenseButton"> <Button label="회비사용" icon="pi pi-dollar" iconPos="right" rounded
+                    class="pay-button" @click="visible1 = true" />
+            </div>
             <div class="icon-button-group">
                 <i class="pi pi-caret-left" style="font-size: 1rem" @click="updateMonth(-1)"></i>
                 <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
                 <i class="pi pi-caret-right" style="font-size: 1rem" @click="updateMonth(1)"></i>
             </div>
             <div v-if="hasData">
-                <Splitter style="width: 80%; height: 80vh; margin: 20px" class="mb-8">
+                <Splitter style="width: 90%; height: 80vh; margin: 20px" class="mb-8">
                     <SplitterPanel :size="50" :minSize="30" class="flex items-center justify-center full-size-panel">
                         <div class="chart-wrapper">
                             <Chart type="doughnut" :data="chartData" :options="chartOptions" class="chart-container"
@@ -44,12 +45,12 @@
                                         </div>
                                     </template>
                                 </Column>
-                                <Column :field="'categoryList'" header="항목">
+                                <Column :field="'categoryList'" header="항목" style="font-size: 1.5em;">
                                     <template #body="slotProps">
                                         <span>{{ slotProps.data.categoryList }}</span>
                                     </template>
                                 </Column>
-                                <Column :field="'categoryMoney'" header="금액">
+                                <Column :field="'categoryMoney'" header="금액" style="font-size: 1.5em;">
                                     <template #body="slotProps">
                                         <span>{{ slotProps.data.categoryMoney }}</span>
                                     </template>
@@ -88,15 +89,14 @@
         </Dialog>
 
         <!-- 지출 항목 입력 모달창 -->
-        <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '40rem' }">
+        <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '30rem' }">
             <template #header>
-                <div class="text-header">지출 항목</div>
+                <div class="sortButton">
+                    <SplitButton :model="sortOptions" severity="contrast">
+                        <span>{{ selectedExpense }}</span>
+                    </SplitButton>
+                </div>
             </template>
-            <SplitButton :model="sortOptions" severity="contrast">
-                <span class="flex items-center font-bold">
-                    <span>{{ selectedExpense }}</span>
-                </span>
-            </SplitButton>
             <div class="text-display">
                 <InputText type="text" v-model="value" readonly class="text-input" />
             </div>
@@ -106,9 +106,9 @@
         <!-- 회비 사용 확인 모달 -->
         <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '25rem' }">
             <template #header>
-                <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
-                    <span style="font-weight: bold; color: purple;">{{ selectedExpense }}</span> 항목에 {{ value }} 원
-                    사용하시겠습니까?
+                <div style="font-size: 1.2em; margin: auto;  margin-top: 30px; color: black;">
+                    <span style="font-weight: bold; color: blue;">{{ selectedExpense }}</span> 항목에
+                    <span style="font-weight: bold; color: blue;"> {{ value }}</span>원 사용하시겠습니까?
                     <p>출금계좌 : {{ moeimBank }}({{ moeimAccount }})</p>
                     <p>모임명 : {{ moeimName }}</p>
                 </div>
@@ -120,17 +120,20 @@
         </Dialog>
 
         <!-- 회비 사용 결과 모달 -->
-        <Dialog v-model:visible="visible4" modal :style="{ width: '27rem', height: '40rem' }" :closable="false">
+        <Dialog v-model:visible="visible4" modal :style="{ width: '27rem', height: '359rem' }" :closable="false">
             <template #header>
                 <div
-                    style="display: flex; justify-content: center; align-items: center; font-size: 4em; margin-top: 50px; font-weight: bold; color: #7f56d9;">
-                    <i class="pi pi-minus-circle" style="font-size: 8rem; margin-right: 20px;"></i>
-                    <div style="margin-top: 30px;">모임비 지출</div>
+                    style="text-align: center; font-size: 3em; margin:auto; margin-top: 50px; font-weight: bold; color: #7f56d9;">
+                    <i class="pi pi-minus-circle" style="font-size: 8rem; margin-bottom: 20px;"></i>
+                    <div>모임비 지출</div>
                 </div>
             </template>
             <div
                 style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
-                <p>{{ selectedExpense }} 항목에 {{ value }} 원 사용하였습니다.</p>
+                <p style="margin-top: 20px; margin-bottom: 20px;">
+                    <span style="font-weight: bold; color: blue;">{{ selectedExpense }}</span> 항목에
+                    <span style="font-weight: bold; color: blue;"> {{ value }}</span>원 사용하였습니다.
+                </p>
                 <Button label="닫기" rounded @click="visible4 = false" />
             </div>
         </Dialog>
@@ -172,11 +175,11 @@ const userName = ref("");
 const userAccount = ref("");
 
 const sortOptions = [
-    { label: "식비", icon: "pi pi-utensils", command: () => selectExpense("식비") },
-    { label: "음료", icon: "pi pi-coffee", command: () => selectExpense("음료") },
-    { label: "운영비", icon: "pi pi-briefcase", command: () => selectExpense("운영비") },
+    { label: "식비", icon: "pi pi-apple", command: () => selectExpense("식비") },
+    { label: "음료", icon: "pi pi-bolt", command: () => selectExpense("음료") },
+    { label: "운영비", icon: "pi pi-shopping-cart", command: () => selectExpense("운영비") },
     { label: "시설대여", icon: "pi pi-briefcase", command: () => selectExpense("시설대여") },
-    { label: "기타", icon: "pi pi-ellipsis-h", command: () => selectExpense("기타") },
+    { label: "기타", icon: "pi pi-gift", command: () => selectExpense("기타") },
 ];
 
 // 숫자 버튼 목록
@@ -467,6 +470,7 @@ const transformChartData = () => {
 </script>
 
 <style scoped>
+/* 레이아웃 및 정렬 */
 .total-frame {
     display: flex;
     flex-direction: column;
@@ -478,45 +482,32 @@ const transformChartData = () => {
 }
 
 .title {
-    font-size: 2em;
+    font-size: 1.5em;
     font-weight: bold;
     width: 100%;
     display: flex;
     justify-content: center;
     position: relative;
-    left: -150px;
+    left: -100px;
+    margin-bottom: 20px;
     /* 텍스트를 살짝 왼쪽으로 이동 */
 }
 
-.sub-title {
+.expenseButton {
     display: flex;
-    align-items: center;
-    /* 수직 정렬: 텍스트와 아이콘을 동일 선상에 배치 */
-    justify-content: flex-start;
     position: relative;
-    left: 300px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    gap: 100px;
-    /* 텍스트와 아이콘 간의 간격 */
+    left: -100px;
 }
 
 .icon-button-group {
     display: flex;
+    align-items: center;
     gap: 20px;
-    /* 아이콘 간의 간격 */
+    /* 아이콘과 버튼 사이 여백 */
 }
 
-.chart-container {
-    width: 100%;
-    height: 100%;
-}
-
-.full-size-panel {
-    width: 100%;
-    height: 100%;
-}
-
+.chart-container,
+.full-size-panel,
 .chart-wrapper {
     width: 100%;
     height: 100%;
@@ -525,53 +516,32 @@ const transformChartData = () => {
     align-items: center;
 }
 
-.icon-button-group {
-    display: flex;
-    /* 아이콘과 버튼을 가로로 배치 */
-    align-items: center;
-    /* 세로 가운데 정렬 */
-    gap: 20px;
-    /* 아이콘과 버튼 사이 여백 */
-}
-
 .number-buttons {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* 3개의 열로 배치 */
     gap: 10px;
-    /* 버튼 사이의 간격 */
     margin-top: 20px;
 }
 
 .number-button {
     width: 70px;
-    /* 버튼의 너비 */
     height: 70px;
-    /* 버튼의 높이 */
     background-color: white;
-    /* 버튼 배경색 */
     color: black;
-    /* 버튼 텍스트 색상 */
     font-size: 1.2em;
-    /* 텍스트 크기 */
     border: none;
-    /* 테두리 제거 */
     border-radius: 10px;
-    /* 둥근 모서리 */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 20px;
 }
 
 .number-button:hover {
     background-color: #333333;
-    /* 호버 시 색상 변경 */
 }
 
 .number-button:active {
     background-color: #555555;
-    /* 클릭 시 색상 변경 */
 }
 
 .next-button {
@@ -580,41 +550,27 @@ const transformChartData = () => {
 }
 
 .text-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    /* 텍스트 가운데 정렬 */
     font-size: 2em;
-    margin-top: 20px;
-    margin-left: 150px;
+    margin: 20px 0;
     font-weight: bold;
     color: lightgrey;
+    margin: auto;
 }
 
 .text-display {
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin: 20px;
-    /* 위아래 간격 */
+    margin: 50px;
 }
 
 .text-input {
     font-size: 2rem;
-    /* 텍스트 크기 */
     font-weight: bold;
-    /* 텍스트 굵게 */
     text-align: center;
-    /* 텍스트 가운데 정렬 */
     border: none;
-    /* 테두리 제거 */
     outline: none;
-    /* 포커스 시 외곽선 제거 */
     background: transparent;
-    /* 배경 투명 */
     width: 100%;
-    /* 너비를 부모에 맞춤 */
 }
 
 /* 버튼 스타일 */
@@ -625,7 +581,19 @@ const transformChartData = () => {
     border-radius: 20px !important;
     font-size: 0.9rem !important;
     margin-right: 50px;
+    margin-left: auto;
 }
+
+:deep(.p-button-contrast) {
+    background: #7f56d9 !important;
+    border: 1px solid #7f56d9 !important;
+    color: var(--p-button-contrast-color);
+}
+
+:deep(.p-button-contrast:hover) {
+    background: #5a37a7 !important;
+}
+
 
 :deep(.pay-button.p-button:hover) {
     background-color: #6c44c3 !important;
@@ -635,94 +603,24 @@ const transformChartData = () => {
     background-color: #5a37a7 !important;
 }
 
-/* 버튼 레이블 */
 :deep(.pay-button .p-button-label) {
     font-weight: bold !important;
 }
 
-.total-frame {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: flex-start;
-    padding: 1rem;
-    margin: 10px;
+:deep(.p-dialog-header) {
+    left: 100px;
 }
 
 .title-bar {
     display: flex;
-    /* Flexbox 사용 */
     justify-content: space-between;
-    /* 양쪽 정렬 */
     align-items: center;
-    /* 세로 가운데 정렬 */
     margin-bottom: 1rem;
-    /* 아래쪽 여백 */
-    width: 100%;
-    /* 부모의 전체 폭 사용 */
-}
-
-.icon-button-group {
-    display: flex;
-    /* 아이콘과 버튼을 가로로 배치 */
-    align-items: center;
-    /* 세로 가운데 정렬 */
-    gap: 20px;
-    /* 아이콘과 버튼 사이 여백 */
-}
-
-.number-buttons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* 3개의 열로 배치 */
-    gap: 10px;
-    /* 버튼 사이의 간격 */
-    margin-top: 20px;
-}
-
-.number-button {
-    width: 70px;
-    /* 버튼의 너비 */
-    height: 70px;
-    /* 버튼의 높이 */
-    background-color: white;
-    /* 버튼 배경색 */
-    color: black;
-    /* 버튼 텍스트 색상 */
-    font-size: 1.2em;
-    /* 텍스트 크기 */
-    border: none;
-    /* 테두리 제거 */
-    border-radius: 10px;
-    /* 둥근 모서리 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 20px;
-}
-
-.number-button:hover {
-    background-color: #333333;
-    /* 호버 시 색상 변경 */
-}
-
-.number-button:active {
-    background-color: #555555;
-    /* 클릭 시 색상 변경 */
-}
-
-.next-button {
-    margin-top: 20px;
     width: 100%;
 }
 
 .card {
     width: 100%;
-}
-
-.title {
-    font-size: 1.5rem;
-    font-weight: bold;
 }
 
 .text-green-500 {
@@ -733,41 +631,12 @@ const transformChartData = () => {
     color: #ef4444;
 }
 
-.text-header {
+.right-align {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    /* 텍스트 가운데 정렬 */
-    font-size: 2em;
-    margin-top: 20px;
-    margin-left: 150px;
-    font-weight: bold;
-    color: lightgrey;
+    justify-content: flex-end;
 }
 
-.text-display {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 20px 20px;
-    /* 위아래 간격 */
-}
-
-.text-input {
-    font-size: 2rem;
-    /* 텍스트 크기 */
-    font-weight: bold;
-    /* 텍스트 굵게 */
-    text-align: center;
-    /* 텍스트 가운데 정렬 */
-    border: none;
-    /* 테두리 제거 */
-    outline: none;
-    /* 포커스 시 외곽선 제거 */
-    background: transparent;
-    /* 배경 투명 */
-    width: 100%;
-    /* 너비를 부모에 맞춤 */
+.sortButton {
+    justify-self: center;
 }
 </style>
