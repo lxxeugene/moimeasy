@@ -447,7 +447,7 @@ const items = ref([
   gap: 10px;
   border-radius: 8px;
   padding: 8px 8px 8px 24px;
-  width: 130px;
+  width: 135px;
   border: none;
   height: 53px;
   cursor: pointer;
