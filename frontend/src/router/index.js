@@ -18,6 +18,7 @@ import ChatView from '@/views/chat/ChatView.vue';
 import FindEmailView from '@/views/find/FindEmailView.vue';
 import FindUserInfoView from '@/views/find/FindUserInfoView.vue';
 import ResetPasswordView from '@/views/find/ResetPasswordView.vue';
+import EditProfileView from '@/views/user/EditProfileView.vue';
 
 import Settlement from '@/views/moeim/SettlementView.vue';
 // 다른 뷰를 추가로 임포트
@@ -45,6 +46,12 @@ const routes = [
     path: '/user-profile/:userId',
     name: '회원프로필',
     component: UserProfile,
+  },
+  {
+    path: '/edit-profile/:userId',
+    name: '회원정보수정',
+    component: EditProfileView, // EditProfileView 추가
+    props: true, // userId를 props로 전달
   },
   { path: '/invite-user', name: '회원초대', component: InviteUser },
   {
@@ -134,7 +141,7 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
-    component: () => import('@/views/error/Error404.vue'),
+    component: () => import('@/views/error/Error404View.vue'),
   },
   {
     path: '/chat-layout',

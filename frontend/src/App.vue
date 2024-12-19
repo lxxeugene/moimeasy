@@ -51,6 +51,19 @@ watch(
   flex: 0.58; /* 펼쳐진 상태 */
 }
 
+@media (min-width: 1490px) {
+  /* md 브레이크포인트: 1490px 이상 */
+  .sidebar.expanded {
+    flex: 0.5; /* 펼쳐진 상태 */
+  }
+}
+@media (min-width: 1600px) {
+  /* md 브레이크포인트: 1600px 이상 */
+  .sidebar.expanded {
+    flex: 0.42; /* 펼쳐진 상태 */
+  }
+}
+
 .contents-wrapper {
   flex: 3;
   background-color: #f8f9fa;
