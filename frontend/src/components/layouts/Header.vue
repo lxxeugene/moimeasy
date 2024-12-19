@@ -49,6 +49,7 @@
             <i class="pi pi-bell" style="font-size: 24px" />
           </OverlayBadge>
         </div>
+        <!-- 유저 프로필 영역 -->
         <div class="profile-box">
           <img
             :src="profileImage ? profileImage : defaultAvatar"
@@ -57,7 +58,10 @@
             @click="toggle"
           />
           <p>{{ nickName }}</p>
-          <TieredMenu ref="menu" id="overlay_tmenu" :model="menus" popup />
+          <!-- 프로필이미지 클릭시 드롭다운 메뉴 -->
+          <div class="tiered-menu-box">
+            <TieredMenu ref="menu" id="overlay_tmenu" :model="menus" popup />
+          </div>
         </div>
       </div>
     </div>

@@ -21,10 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.kosa.moimeasy.transaction.type.ErrorCode.*;
@@ -38,27 +35,21 @@ public class TransactionService {
     private final MoeimRepository moeimRepository;
     private final TransactionRepository transactionRepository;
 
-    private final JwtTokenProvider tokenProvider;
-
     // 유저 계좌 입금
     @Transactional
-    public DepositDto.Response userDeposit(String token, DepositDto.Request request) {
-        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
+    public DepositDto.Response userDeposit(DepositDto.Request request) {
 
-        // 동일한 회원인지
-        if (!Objects.equals(tokenUserId, userRepository.findById(tokenUserId))) {
-            throw new CustomException(TOKEN_NOT_MATCH_USER);
+        // 유저 찾기
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        // 계좌 금액 변경
+        if (request.getAmount() <= 0) {
+            throw new CustomException(BALANCE_NOT_ENOUGH); // 예외 처리: 잘못된 금액
         }
-
-        // 토큰으로 회원 아이디 확인
-        User user = userRepository
-                .findById(tokenUserId)
-                .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
-        // 계좌가 있다면 입금 금액만큼 잔액 변경
         user.setAmount(user.getAmount() + request.getAmount());
 
-        // 거래 내역 테이블에 거래추가
+        // 거래 내역 저장
         transactionRepository.save(
                 Transaction.builder()
                         .userAccount(user)
@@ -68,6 +59,7 @@ public class TransactionService {
                         .build()
         );
 
+        // 응답 생성 및 반환
         return DepositDto.Response.builder()
                 .accountNumber(user.getAccountNumber())
                 .depositName(user.getUserName())
@@ -78,22 +70,17 @@ public class TransactionService {
 
     // 모임 계좌 입금
     @Transactional
-    public DepositDto.Response moeimDeposit(String token, DepositDto.Request request) {
-        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
-
-        // 회원의 토큰값과 모임의 유저아이디가 같은지
-        if (!Objects.equals(tokenUserId, moeimRepository.findByUserId(tokenUserId))) {
-            throw new CustomException(TOKEN_NOT_MATCH_USER);
-        }
+    public DepositDto.Response moeimDeposit(DepositDto.Request request) {
+        Long userId = request.getUserId();
 
         // 계좌번호 존재(삭제 여부) 확인
         Moeim moeim = moeimRepository
-            .findByUserId(tokenUserId)
+            .findByUserId(userId)
             .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
         // 계좌번호 존재(삭제 여부) 확인
         User user = userRepository
-                .findById(tokenUserId)
+                .findById(userId)
                 .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
 
 
@@ -118,14 +105,13 @@ public class TransactionService {
             .build();
     }
 
-    // 토큰으로 모임, 유저 정보 반환
-    public DetailDto getDetials(String token){
-        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
+    // 유저 정보 반환
+    public DetailDto getDetials(Long userId, Long moeimId){
 
-        User user = userRepository.findById(tokenUserId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(SENT_ACCOUNT_NOT_FOUND));
 
-        Moeim moeim = moeimRepository.findByUserId(tokenUserId)
+        Moeim moeim = moeimRepository.findById(moeimId)
                 .orElseThrow(() -> new CustomException(RECEIVED_ACCOUNT_NOT_FOUND));
 
         return DetailDto.builder()
@@ -138,17 +124,11 @@ public class TransactionService {
 
     // 모임 계좌 출금
     @Transactional
-    public WithdrawDto.Response withdraw(String token, WithdrawDto.Request request) {
+    public WithdrawDto.Response withdraw(WithdrawDto.Request request) {
         // 출금 요청한 계좌의 존재 여부 확인
-        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
         Moeim moeim = moeimRepository.findByAccountNumber(
                 request.getAccountNumber())
             .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
-        // 토큰의 사용자와 출금 요청 계좌의 소유주 일치 여부 확인
-        if (!Objects.equals(tokenUserId, moeim.getUser().getUserId())) {
-            throw new CustomException(TOKEN_NOT_MATCH_USER);
-        }
 
         // (출금 요청 금액 > 잔액)의 경우 예외 발생
         if (request.getAmount() > moeim.getAmount()) {
@@ -180,20 +160,13 @@ public class TransactionService {
 
     // 유저에서 모임으로 송금
     @Transactional
-    public RemittanceDto.Response remittance(String token, RemittanceDto.Request request) {
-        // 토큰의 사용자와 보내는 계좌의 사용자 확인
-        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
-        log.info("tokenUserId:{}", tokenUserId);
+    public RemittanceDto.Response remittance(RemittanceDto.Request request) {
 
-        User sentAccount = userRepository.findById(tokenUserId)
+        User sentAccount = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new CustomException(SENT_ACCOUNT_NOT_FOUND));
 
-        Moeim receivedAccount = moeimRepository.findByUserId(tokenUserId)
+        Moeim receivedAccount = moeimRepository.findById(request.getMoeimId())
             .orElseThrow(() -> new CustomException(RECEIVED_ACCOUNT_NOT_FOUND));
-
-        if (!Objects.equals(tokenUserId, sentAccount.getUserId())) {
-            throw new CustomException(TOKEN_NOT_MATCH_USER);
-        }
 
         // (송금 요청 금액 > 보내는 계좌의 잔액)의 경우 예외 발생
         if (request.getAmount() > sentAccount.getAmount()) {
@@ -211,6 +184,7 @@ public class TransactionService {
                 .userAccount(sentAccount)
                 .transactionType(TransactionType.REMITTANCE)
                 .amount(request.getAmount())
+                    .depositName(sentAccount.getUserName())
                 .receivedName(receivedAccount.getMoeimName())
                 .receivedAccount(receivedAccount.getAccountNumber())
                 .build()
@@ -218,6 +192,7 @@ public class TransactionService {
 
         return RemittanceDto.Response.builder()
             .sentAccountNumber(sentAccount.getAccountNumber())
+                .sentName(sentAccount.getUserName())
             .receivedAccountNumber(receivedAccount.getAccountNumber())
             .receivedName(receivedAccount.getMoeimName())
             .amount(request.getAmount())
@@ -226,15 +201,11 @@ public class TransactionService {
 
     // 유저 -> 모임 송금내역 조회
     @Transactional
-    public TransactionListDto.RemittanceListResponse getRemittanceList(String token, TransactionListDto.Request request) {
+    public TransactionListDto.RemittanceListResponse getRemittanceList(TransactionListDto.Request request) {
 
         // 모임 아이디 받아서 확인
         Moeim moeim = getValidmoeim(request.getMoeimId());
 
-        // 토큰의 사용자 id와 거래내역을 조회할 계좌의 userId 확인
-        if (!Objects.equals(tokenProvider.getUserIdFromJWT(token), moeim.getUser().getUserId())) {
-            throw new CustomException(TOKEN_NOT_MATCH_USER);
-        }
         // 조회 계좌 존재/삭제 여부 확인
         if(moeimRepository.findByAccountNumber(moeim.getAccountNumber()).isEmpty())
             throw new CustomException(ACCOUNT_NOT_FOUND);
@@ -284,20 +255,12 @@ public class TransactionService {
 
     // 거래내역 조회
     @Transactional
-    public TransactionListDto.Response getTransactionList(String token, TransactionListDto.Request request) {
+    public TransactionListDto.Response getTransactionList(TransactionListDto.Request request) {
+
         // 조회 계좌 존재/삭제 여부 확인
         Moeim moeim = getValidmoeim(request.getMoeimId());
-
-        // 토큰의 사용자 id와 거래내역을 조회할 계좌의 userId 확인
-        if (!Objects.equals(tokenProvider.getUserIdFromJWT(token), moeim.getUser().getUserId())) {
-            throw new CustomException(TOKEN_NOT_MATCH_USER);
-        }
-
-        // 계좌 id 와 계좌번호의 계좌 id 일치 여부 확인
-        Transaction transaction = transactionRepository.findById(request.getMoeimId())
-            .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-        if (!request.getMoeimId().equals(transaction.getMoeimAccount().getMoeimId())) {
-            throw new CustomException(NOT_EQUAL_ID_AND_ACCOUNT_NUMBER);
+        if(moeim.getMoeimId() == null){
+            throw new CustomException(ACCOUNT_NOT_FOUND);
         }
 
         // 올바르게 요청된 날짜 형식: "yyyy-MM-dd"
@@ -339,28 +302,26 @@ public class TransactionService {
         }
 
         // 두 날짜 전부 제대로 조회한 경우
-        return getTransactionListResponse(request.getMoeimId(), startDate, endDate);
+        return getTransactionListResponse(moeim.getMoeimId(), startDate, endDate);
     }
 
     // 모임 확인
     private Moeim getValidmoeim(Long moeimid) {
-        Moeim moeim = moeimRepository.findById(moeimid)
+        return moeimRepository.findById(moeimid)
             .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-
-        return moeim;
     }
 
     // 거래 유형
     private String getTransactionTargetName(Transaction transaction) {
         switch (transaction.getTransactionType()) {
             case WITHDRAW -> {
-                return transaction.getWithdrawName();
+                return transaction.getCategoryName();
             }
             case DEPOSIT -> {
                 return transaction.getDepositName();
             }
             case REMITTANCE -> {
-                return transaction.getReceivedName();
+                return transaction.getDepositName();
             }
         }
         return ErrorCode.TRANSACTION_TYPE_NOT_FOUND.getDescription();
@@ -379,13 +340,20 @@ public class TransactionService {
                                         .id(transaction.getId())
                                         .transactionTargetName(getTransactionTargetName(transaction))
                                         .amount(transaction.getAmount())
-                                        .type(transaction.getTransactionType())
+                                        .type(determineTransactionType(transaction))
                                         .transactedAt(transaction.getTransactedAt())
                                     .build()
                 ).toList())
             .build();
     }
 
+    private String determineTransactionType(Transaction transaction) {
+        if (transaction.getTransactionType()== TransactionType.WITHDRAW) {
+            return "출금";
+        } else {
+            return "입금";
+        }
+    }
     // 송금 내역 조회 Response Dto 반환
     public TransactionListDto.RemittanceListResponse getRemittanceListResponse(
             Long moeimId, LocalDate startDate, LocalDate endDate) {
@@ -456,17 +424,15 @@ public class TransactionService {
 
 
     // 카테고리 반환
-    public InitialDataDto getInitialData(String token, InitialDataDto request) {
-        Long tokenUserId = tokenProvider.getUserIdFromJWT(token);
+    public InitialDataDto getInitialData(InitialDataDto request) {
 
-        // accessToken을 사용하여 사용자 조회
-        User user = userRepository.findById(tokenUserId)
+        //사용자 조회
+        User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
 
         // 사용자에 해당하는 모임 조회 (사용자의 ID를 기반으로)
-        Moeim moeim = moeimRepository.findByUserId(user.getUserId())
+        Moeim moeim = moeimRepository.findByUserId(user.getMoeimId())
                 .orElseThrow(() -> new ResourceNotFoundException("모임을 찾을 수 없습니다."));
-
 
         LocalDate startDate = request.getStartDate(); // 월의 시작일 2024-12-01T00:00
         LocalDate endDate = request.getEndDate(); // 월의 마지막일 2024-12-31T23:59:59
