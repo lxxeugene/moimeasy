@@ -491,4 +491,10 @@ const items = ref([
 .menu-title {
   width: 75px;
 }
+
+.p-panelmenu-item-content {
+  span {
+    font-size: 14px;
+  }
+}
 </style>
