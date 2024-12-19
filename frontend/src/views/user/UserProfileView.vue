@@ -18,7 +18,7 @@
           />
           <!-- 파일 업로드 버튼 -->
           <FileUpload
-            v-if="user.userName == loginUser.name"
+            v-if="user.userName == loginUserName"
             mode="basic"
             @select="onFileSelect"
             customUpload
@@ -78,6 +78,7 @@ export default {
     return {
       user: null, // 사용자 데이터
       loginUser: null, // 현재 로그인 유저 데이터
+      loginUserName: null, // 현재 로그인 유저 네임
       src: null, // 이미지 소스
       profileImage: {},
     };
@@ -94,6 +95,7 @@ export default {
         this.user = response.data; // 응답 데이터를 user에 저장
         this.src = await fetchImageUrl(response.data.profileImage); // 프로필 이미지 저장
         this.loginUser = JSON.parse(localStorage.getItem('user'));
+        this.loginUserName = JSON.parse(localStorage.getItem('user')).name;
       } catch (error) {
         console.error('사용자 정보를 불러오는데 실패했습니다:', error);
       }
