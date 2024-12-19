@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class InitialDataDto { // 초기 데이터
 
+    private Long userId;
     private String userName;
     private String userAccount;
     private String moeimName;

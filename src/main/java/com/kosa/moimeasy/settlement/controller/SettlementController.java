@@ -52,8 +52,11 @@ public class SettlementController {
 
         Long userId = Long.valueOf(userDetails.getUsername());
         settlementService.createRequest(requestDTO, userId);
+
         return ResponseEntity.ok("정산 요청이 성공적으로 제출되었습니다.");
     }
+
+
 
     /**
      * 정산 요청 승인

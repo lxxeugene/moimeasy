@@ -29,6 +29,7 @@ import Message from 'primevue/message';
 import EmojiPicker from 'vue3-emoji-picker';
 import 'vue3-emoji-picker/css';
 import ThemeSwitcher from './components/ThemeSwitcher.vue';
+import Dialog from 'primevue/dialog';
 
 // axios 기본 설정 (Spring Boot 백엔드가 8088 포트라 가정)
 axios.defaults.baseURL = 'http://localhost:8088'; // 서버 URL 설정
@@ -72,6 +73,7 @@ app.use(
   },
   { ripple: true }
 );
+app.component('Dialog', Dialog);
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);

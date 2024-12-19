@@ -38,6 +38,11 @@ public class ChatService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         Long userMoeimId = currentUser.getMoeimId();
 
+        // 요청된 멤버 ID 리스트에 현재 로그인된 사용자 ID를 추가
+        if (!request.getMemberIds().contains(userId)) {
+            request.getMemberIds().add(userId);
+        }
+
         // `moeimId`를 기반으로 멤버 필터링
         List<User> members = userRepository.findAllById(request.getMemberIds())
                 .stream()
