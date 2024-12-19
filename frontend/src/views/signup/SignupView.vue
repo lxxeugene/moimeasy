@@ -124,6 +124,18 @@
       </div>
     </form>
 
+    <!-- 성공 모달 -->
+    <Modal
+      :isVisible="showSuccessModal"
+      title="MoeimEasy"
+      modalMessage="회원가입이 성공적으로 완료되었습니다!"
+      @close="goToLogin"
+    >
+      <template #footer>
+        <button @click="goToLogin" class="confirm-button">로그인하기</button>
+      </template>
+    </Modal>
+
     <!-- 로그인 페이지 이동 -->
     <p class="footer-text">
       이미 계정이 있으신가요?
@@ -132,24 +144,23 @@
   </div>
 </template>
 
-
 <script>
-
 import { formatDate } from '@fullcalendar/core';
-import api from '@/axios'
-
+import Modal from '@/components/Modal.vue';
+import api from '@/axios';
 
 export default {
-  name: "Signup",
+  name: 'Signup',
+  components: { Modal },
   data() {
     return {
       form: {
-        username: "",
-        email: "",
-        nickname:"",
-        phone:"",
-        password: "",
-        confirmPassword: "",
+        username: '',
+        email: '',
+        nickname: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
         acceptTerms: false,
       },
       errors: {},
@@ -162,8 +173,9 @@ export default {
       isSubmitting: false,
       passwordMismatch: false,
       isNicknameChecked: false,
-      isEmailChecked: false
-    }
+      isEmailChecked: false,
+      showSuccessModal: false,
+    };
   },
   mounted() {
     const isAuthenticated = localStorage.getItem('accessToken');
@@ -175,24 +187,24 @@ export default {
     /**
      * 회원가입 처리
      */
-     async handleRegister() {
-      this.errorMessage = ''
-      this.successMessage = ''
-      this.errors = {}
-      this.passwordMismatch = false
+    async handleRegister() {
+      this.errorMessage = '';
+      this.successMessage = '';
+      this.errors = {};
+      this.passwordMismatch = false;
 
       // 비밀번호 일치 여부 확인
       if (this.form.password !== this.form.confirmPassword) {
-        this.passwordMismatch = true
+        this.passwordMismatch = true;
         return;
       }
       // 중복 확인 여부 확인
       if (!this.isNicknameChecked || !this.isEmailChecked) {
-        this.errorMessage = '닉네임과 이메일 중복 확인을 완료해 주세요.'
-        return
+        this.errorMessage = '닉네임과 이메일 중복 확인을 완료해 주세요.';
+        return;
       }
 
-      this.isSubmitting = true
+      this.isSubmitting = true;
 
       try {
         // 회원가입 API 호출: POST /api/v1/signup
@@ -201,180 +213,180 @@ export default {
           nickname: this.form.nickname,
           email: this.form.email,
           phone: this.form.phone,
-          password: this.form.password
-        })
+          password: this.form.password,
+        });
 
         if (response.status === 201) {
-          this.successMessage = response.data.message
-          this.resetForm(true) // 성공 시 폼 초기화 유지
-          alert('회원가입이 성공적으로 완료되었습니다!'); // 알림창 표시
-          this.$router.push('/login') // 로그인 페이지로 이동
+          this.successMessage = response.data.message;
+          this.resetForm(true); // 성공 시 폼 초기화 유지
+          this.showSuccessModal = true;
         } else {
-          this.errorMessage = '회원가입에 실패했습니다. 다시 시도해 주세요.'
+          this.errorMessage = '회원가입에 실패했습니다. 다시 시도해 주세요.';
         }
       } catch (error) {
         if (error.response) {
           if (error.response.status === 400) {
             // Validation 에러
-            this.errors = error.response.data
+            this.errors = error.response.data;
           } else if (error.response.status === 409) {
             // 중복된 이메일 또는 닉네임
-            this.errorMessage = error.response.data.error
+            this.errorMessage = error.response.data.error;
           } else {
             // 기타 에러
-            this.errorMessage = error.response.data.error || '회원가입 중 오류가 발생했습니다.'
+            this.errorMessage =
+              error.response.data.error || '회원가입 중 오류가 발생했습니다.';
           }
         } else {
-          this.errorMessage = '서버와의 연결이 원활하지 않습니다.'
+          this.errorMessage = '서버와의 연결이 원활하지 않습니다.';
         }
-        console.error('회원가입 오류:', error)
+        console.error('회원가입 오류:', error);
       } finally {
-        this.isSubmitting = false
+        this.isSubmitting = false;
       }
     },
 
     /**
      * 로그인 페이지로 이동
      */
-     goToLogin() {
-      this.$router.push("/login");
+    goToLogin() {
+      this.$router.push('/login');
     },
-        /**
+    /**
      * 폼 초기화
      * @param {boolean} keepSuccess - 성공 메시지를 유지할지 여부
      */
-     resetForm(keepSuccess = false) {
+    resetForm(keepSuccess = false) {
       this.form = {
         name: '',
         nickname: '',
         email: '',
         phone: '',
         password: '',
-        confirmPassword: ''
-      }
-      this.errors = {}
+        confirmPassword: '',
+      };
+      this.errors = {};
       if (!keepSuccess) {
-        this.errorMessage = ''
-        this.successMessage = ''
+        this.errorMessage = '';
+        this.successMessage = '';
       }
-      this.feedbackNickname = ''
-      this.feedbackEmail = ''
-      this.feedbackNicknameClass = ''
-      this.feedbackEmailClass = ''
-      this.passwordMismatch = false
-      this.isNicknameChecked = false
-      this.isEmailChecked = false
+      this.feedbackNickname = '';
+      this.feedbackEmail = '';
+      this.feedbackNicknameClass = '';
+      this.feedbackEmailClass = '';
+      this.passwordMismatch = false;
+      this.isNicknameChecked = false;
+      this.isEmailChecked = false;
       // 리디렉션: 로그인 페이지로 이동 (필요 시 수정)
       // this.$router.push('/login')
     },
 
-      /**
+    /**
      * 닉네임 중복 확인
      */
-     async checkNickname() {
-      const nickname = this.form.nickname.trim()
+    async checkNickname() {
+      const nickname = this.form.nickname.trim();
       if (nickname === '') {
-        this.feedbackNicknameClass = 'feedback-message error'
-        this.feedbackNickname = '닉네임을 입력해 주세요.'
-        this.isNicknameChecked = false
-        return
+        this.feedbackNicknameClass = 'feedback-message error';
+        this.feedbackNickname = '닉네임을 입력해 주세요.';
+        this.isNicknameChecked = false;
+        return;
       }
 
       try {
         const response = await api.get('/api/v1/signup/check-nickname', {
-          params: { nickname }
-        })
-        const data = response.data
+          params: { nickname },
+        });
+        const data = response.data;
 
         if (data.exists) {
-          this.feedbackNicknameClass = 'feedback-message error'
-          this.feedbackNickname = '이미 사용 중인 닉네임입니다.'
-          this.isNicknameChecked = false
+          this.feedbackNicknameClass = 'feedback-message error';
+          this.feedbackNickname = '이미 사용 중인 닉네임입니다.';
+          this.isNicknameChecked = false;
         } else {
-          this.feedbackNicknameClass = 'feedback-message success'
-          this.feedbackNickname = '사용 가능한 닉네임입니다.'
-          this.isNicknameChecked = true
+          this.feedbackNicknameClass = 'feedback-message success';
+          this.feedbackNickname = '사용 가능한 닉네임입니다.';
+          this.isNicknameChecked = true;
         }
       } catch (error) {
-        this.feedbackNicknameClass = 'feedback-message error'
-        this.feedbackNickname = '닉네임 중복 확인 중 오류가 발생했습니다.'
-        this.isNicknameChecked = false
-        console.error('닉네임 중복 확인 오류:', error)
+        this.feedbackNicknameClass = 'feedback-message error';
+        this.feedbackNickname = '닉네임 중복 확인 중 오류가 발생했습니다.';
+        this.isNicknameChecked = false;
+        console.error('닉네임 중복 확인 오류:', error);
       }
     },
 
     /**
      * 이메일 중복 확인
      */
-     async checkEmail() {
-      const email = this.form.email.trim()
+    async checkEmail() {
+      const email = this.form.email.trim();
       if (email === '') {
-        this.feedbackEmailClass = 'feedback-message error'
-        this.feedbackEmail = '이메일을 입력해 주세요.'
-        this.isEmailChecked = false
-        return
+        this.feedbackEmailClass = 'feedback-message error';
+        this.feedbackEmail = '이메일을 입력해 주세요.';
+        this.isEmailChecked = false;
+        return;
       }
 
       try {
         const response = await api.get('/api/v1/signup/check-email', {
-          params: { email }
-        })
-        const data = response.data
+          params: { email },
+        });
+        const data = response.data;
 
         if (data.exists) {
-          this.feedbackEmailClass = 'feedback-message error'
-          this.feedbackEmail = '이미 사용 중인 이메일입니다.'
-          this.isEmailChecked = false
+          this.feedbackEmailClass = 'feedback-message error';
+          this.feedbackEmail = '이미 사용 중인 이메일입니다.';
+          this.isEmailChecked = false;
         } else {
-          this.feedbackEmailClass = 'feedback-message success'
-          this.feedbackEmail = '사용 가능한 이메일입니다.'
-          this.isEmailChecked = true
+          this.feedbackEmailClass = 'feedback-message success';
+          this.feedbackEmail = '사용 가능한 이메일입니다.';
+          this.isEmailChecked = true;
         }
       } catch (error) {
-        this.feedbackEmailClass = 'feedback-message error'
-        this.feedbackEmail = '이메일 중복 확인 중 오류가 발생했습니다.'
-        this.isEmailChecked = false
-        console.error('이메일 중복 확인 오류:', error)
+        this.feedbackEmailClass = 'feedback-message error';
+        this.feedbackEmail = '이메일 중복 확인 중 오류가 발생했습니다.';
+        this.isEmailChecked = false;
+        console.error('이메일 중복 확인 오류:', error);
       }
     },
 
     /**
      * 닉네임 입력 시 중복 확인 상태 리셋
      */
-     resetNicknameCheck() {
+    resetNicknameCheck() {
       if (this.isNicknameChecked) {
-        this.isNicknameChecked = false
-        this.feedbackNickname = '닉네임 중복 확인을 다시 해주세요.'
-        this.feedbackNicknameClass = 'feedback-message warning'
+        this.isNicknameChecked = false;
+        this.feedbackNickname = '닉네임 중복 확인을 다시 해주세요.';
+        this.feedbackNicknameClass = 'feedback-message warning';
       }
     },
 
     /**
      * 이메일 입력 시 중복 확인 상태 리셋
      */
-     resetEmailCheck() {
+    resetEmailCheck() {
       if (this.isEmailChecked) {
-        this.isEmailChecked = false
-        this.feedbackEmail = '이메일 중복 확인을 다시 해주세요.'
-        this.feedbackEmailClass = 'feedback-message warning'
+        this.isEmailChecked = false;
+        this.feedbackEmail = '이메일 중복 확인을 다시 해주세요.';
+        this.feedbackEmailClass = 'feedback-message warning';
       }
     },
     //   console.log("회원가입 성공:", this.form.username);
     //   // 회원가입 완료 후 로그인 페이지로 이동
     //   this.$router.push("/login");
     // },
-  /**
+    /**
      * 비밀번호 일치 여부 확인
      */
     checkPasswordMatch() {
       if (this.form.password !== this.form.confirmPassword) {
-        this.passwordMismatch = true
+        this.passwordMismatch = true;
       } else {
-        this.passwordMismatch = false
+        this.passwordMismatch = false;
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -514,6 +526,17 @@ export default {
 .footer-text a:hover {
   text-decoration: underline;
 }
+.confirm-button {
+  background-color: #8a4af3;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.confirm-button:hover {
+  background-color: #6c38cc;
+}
 </style>
-
-
