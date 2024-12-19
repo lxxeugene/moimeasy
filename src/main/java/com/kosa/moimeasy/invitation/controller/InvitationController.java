@@ -41,7 +41,6 @@ public class InvitationController {
         ));
     }
 
-
     @GetMapping
     public ResponseEntity<List<Invitation>> getInvitations(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
