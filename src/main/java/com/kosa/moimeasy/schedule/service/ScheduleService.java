@@ -76,7 +76,7 @@ public class ScheduleService {
             schedule.setDescription(partialUpdateDto.getDescription());
         }
 
-        // 필요한 필드만 선택적으로 업데이트한 뒤, JPA 영속성 컨텍스트에 의해 자동으로 flush될 것이옵나이다.
-        // @Transactional로 인해 메서드 종료 시점에 변경사항이 반영되옵니다.
+        // 필요한 필드만 선택적으로 업데이트한 뒤, JPA 영속성 컨텍스트에 의해 자동으로 flush됨
+        // @Transactional로 인해 메서드 종료 시점에 변경사항이 반영
     }
 }
