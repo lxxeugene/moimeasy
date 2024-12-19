@@ -170,7 +170,7 @@ export default {
 <style scoped>
 .member-container {
   width: 98%;
-  
+
   margin: 10px;
   padding: 20px;
   background-color: #fff;
