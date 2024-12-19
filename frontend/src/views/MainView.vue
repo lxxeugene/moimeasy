@@ -35,6 +35,7 @@ import ScheduleCalendar from '@/views/schedule/ScheduleView.vue';
 import SettlementView from '@/views/moeim/SettlementView.vue';
 import ChatLayoutView from '@/views/chat/ChatRoomListView.vue';
 import Category from '@/views/transaction/Category.vue';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   name: 'MainPage',
@@ -45,6 +46,16 @@ export default {
     SettlementView,
     ChatLayoutView,
     Category,
+  },
+  setup() {
+    const authStore = useAuthStore();
+    const accessToken = authStore.accessToken;
+
+    console.log('Access Token:', accessToken);
+
+    return {
+      accessToken,
+    };
   },
 };
 </script>
