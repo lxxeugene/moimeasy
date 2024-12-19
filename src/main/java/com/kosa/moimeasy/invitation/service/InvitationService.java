@@ -90,4 +90,3 @@ public class InvitationService {
         return invitationRepository.findByMoeimId(moeimId);
     }
 }
-
