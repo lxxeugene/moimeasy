@@ -75,7 +75,7 @@ const items = ref([
     icon: UsersIcon,
     items: [
       {
-        label: '회원관리',
+        label: '회원조회',
         icon: UsersIcon,
         route: '/user-manage',
       },
