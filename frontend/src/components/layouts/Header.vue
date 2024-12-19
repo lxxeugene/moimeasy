@@ -165,9 +165,16 @@ watch(
     menus.value = [
       {
         label: 'Profile',
-        icon: 'pi pi-user-edit',
+        icon: 'pi pi-user',
         command: () => {
           router.push(`/user-profile/${userData.value?.userId}`);
+        },
+      },
+      {
+        label: 'Edit',
+        icon: 'pi pi-user-edit',
+        command: () => {
+          router.push(`/edit-profile/${userData.value?.userId}`);
         },
       },
       nickName.value != '게스트'
