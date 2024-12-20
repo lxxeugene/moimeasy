@@ -148,7 +148,13 @@ watch(
   () => route.matched,
   async () => {
     updatePathInfo();
-    fetchNotification(); //알림 정보 가져오기
+    if (
+      userData.value != '' &&
+      userData.value != null &&
+      userData.value != undefined
+    ) {
+      fetchNotification();
+    } //알림 정보 가져오기
     console.log('라우트 변경됨:', items.value);
     // 유저 정보가져오기
     const userDataStorage = localStorage.getItem('user');
