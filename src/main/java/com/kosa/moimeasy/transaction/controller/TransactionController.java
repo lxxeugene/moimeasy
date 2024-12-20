@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/v1/transaction")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://192.168.5.49:3000")
 public class TransactionController {
 
     private final TransactionService transactionService;

@@ -33,11 +33,11 @@ public class SecurityConfig {
                         .configurationSource(request -> {
                             CorsConfiguration config = new CorsConfiguration();
 
-                            config.addAllowedOrigin("http://localhost:3000");
+                            config.addAllowedOrigin("http://192.168.5.49:3000");
                             //config.setAllowedOrigins(List.of("http://localhost:5137")); //Vue.js
 
                             config.addAllowedOrigin("*");
-                            config.setAllowedOrigins(List.of("http://localhost:3000")); //Vue.js
+                            config.setAllowedOrigins(List.of("http://192.168.5.49:3000")); //Vue.js
 
                             config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH" , "OPTIONS"));
                             config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Refresh-Token"));
@@ -48,7 +48,7 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //Session off
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/api/v1/login", "/api/v1/signup/**","/api/v1/find/**", "/api/v1/reset/**", "/api/v1/logout/**").permitAll() // 로그인 및 회원가입 엔드포인트는 누구나 접근 가능
+                                .requestMatchers("/api/v1/login", "/api/v1/signup/**","/api/v1/find/**", "/api/v1/reset/**", "/api/v1/logout/**","/").permitAll() // 로그인 및 회원가입 엔드포인트는 누구나 접근 가능
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN") // 'admin'역할만 접근 가능
                                 //.requestMatchers("/api/v1/{reviewId}/**").hasRole("OWNER") // 'owner' 역할만 접근 가능
                                 //.anyRequest().hasRole("USER") //로그인 한 사용자 'user' 역활 필요
