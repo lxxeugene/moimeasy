@@ -57,6 +57,13 @@
             height="32px"
             @click="toggle"
           />
+          <!-- <Avatar
+            :image="profileImage ? profileImage : defaultAvatar"
+            class="mr-2"
+            size="large"
+            shape="circle"
+            @click="toggle"
+          /> -->
           <p>{{ nickName }}</p>
           <!-- 프로필이미지 클릭시 드롭다운 메뉴 -->
           <div class="tiered-menu-box">
