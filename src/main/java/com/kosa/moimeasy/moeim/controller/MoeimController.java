@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/moeim")
-@CrossOrigin(origins = "http://192.168.5.49:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class MoeimController {
 
     @Autowired
