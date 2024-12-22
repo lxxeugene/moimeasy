@@ -1,5 +1,6 @@
 <template>
   <div class="login-container">
+    <h1 class="title2">MoeimEasy</h1>
     <h2 class="title">로그인</h2>
     <form @submit.prevent="handleLogin">
       <div class="form-group">
@@ -21,11 +22,11 @@
         />
       </div>
       <div class="form-options">
-    <div>
-      <a href="#" class="forgot-password" @click.prevent="goToFindEmail"
-          >아이디 찾기</a
-        >
-    </div>
+        <div>
+          <a href="#" class="forgot-password" @click.prevent="goToFindEmail"
+            >아이디 찾기</a
+          >
+        </div>
         <a href="#" class="forgot-password" @click.prevent="goToFindPassword"
           >비밀번호 초기화</a
         >
@@ -89,8 +90,8 @@ export default {
       this.$router.push('/main');
     },
     goToFindEmail() {
-    console.log('아이디 찾기 클릭'); // 로그로 이벤트 확인
-    this.$router.push('/find-email'); // FindEmailView로 이동
+      console.log('아이디 찾기 클릭'); // 로그로 이벤트 확인
+      this.$router.push('/find-email'); // FindEmailView로 이동
     },
     goToFindPassword() {
       console.log('비밀번호 초기화 클릭'); // 로그로 이벤트 확인
@@ -115,6 +116,13 @@ export default {
   border-radius: 8px;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.title2 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: #7f56d9;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
 .title {
@@ -193,5 +201,14 @@ input {
 
 .btn-secondary:hover {
   background-color: #f7f5fc;
+}
+.status-pending {
+  color: orange;
+}
+.status-accepted {
+  color: green;
+}
+.status-rejected {
+  color: red;
 }
 </style>

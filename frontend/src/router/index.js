@@ -141,7 +141,7 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
-    component: () => import('@/views/error/Error404View.vue'),
+    component: () => import('@/views/Error/Error404View.vue'),
   },
   {
     path: '/chat-layout',
