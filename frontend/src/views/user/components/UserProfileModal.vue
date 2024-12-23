@@ -2,7 +2,7 @@
   <!-- 사용자 프로필 컨테이너 -->
   <div class="profile-container">
     <Toast />
-    <ConfirmDialog></ConfirmDialog>
+    <ConfirmDialog :modal="false"></ConfirmDialog>
     <form v-if="user">
       <!-- 프로필 이미지 업로드 -->
       <div class="form-group">
@@ -108,7 +108,7 @@ export default {
     };
   },
   mounted() {
-    const userId = this.$route.params.userId; // URL에서 userId 가져오기
+    const userId = JSON.parse(localStorage.getItem('user')).userId;
     this.loadUserData(userId); // 사용자 데이터 불러오기
   },
   methods: {
@@ -148,12 +148,12 @@ export default {
         header: '프로필 등록',
         icon: 'pi pi-id-card',
         rejectProps: {
-          label: 'Cancel',
+          label: '취소',
           severity: 'secondary',
           outlined: true,
         },
         acceptProps: {
-          label: 'Save',
+          label: '등록',
         },
         accept: () => {
           // 프로필 저장 api추가

@@ -42,11 +42,6 @@ const routes = [
   },
 
   {
-    path: '/user-profile/:userId',
-    name: '회원프로필',
-    component: UserProfile,
-  },
-  {
     path: '/edit-profile/:userId',
     name: '회원정보수정',
     component: EditProfileView, // EditProfileView 추가
@@ -135,7 +130,7 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
-    component: () => import('@/views/Error/Error404View.vue'),
+    component: () => import('@/views/error/Error404View.vue'),
   },
   {
     path: '/chat-layout',
