@@ -1,22 +1,13 @@
 <template>
-  <div class="settlement-container">
+  <div class="total-frame">
     <!-- 헤더 -->
     <div class="header">
       <h2>정산 요청 목록</h2>
-      <Button
-        label="정산 요청"
-        icon="pi pi-plus"
-        class="p-button-rounded p-button-primary"
-        @click="openModal"
-      />
+      <Button label="정산 요청" icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openModal" />
     </div>
 
     <!-- 정산 요청 목록 -->
-    <DataTable
-      :value="settlementRequests"
-      class="p-datatable-striped"
-      responsiveLayout="scroll"
-    >
+    <DataTable :value="settlementRequests" class="p-datatable-striped" responsiveLayout="scroll">
       <Column field="title" header="제목">
         <template #body="slotProps">
           <span class="clickable-text" @click="openDetailModal(slotProps.data)">
@@ -33,94 +24,45 @@
       </Column>
       <Column header="영수증">
         <template #body="slotProps">
-          <img
-            :src="slotProps.data.imageUrl"
-            alt="영수증"
-            class="receipt-image clickable-image"
-            @click="openDetailModal(slotProps.data)"
-          />
+          <img :src="slotProps.data.imageUrl" alt="영수증" class="receipt-image clickable-image"
+            @click="openDetailModal(slotProps.data)" />
         </template>
       </Column>
     </DataTable>
 
     <!-- 정산 요청 모달 -->
-    <Dialog
-      header="정산 요청하기"
-      v-model:visible="isModalVisible"
-      :style="{ width: '30vw' }"
-      modal
-    >
+    <Dialog header="정산 요청하기" v-model:visible="isModalVisible" :style="{ width: '30vw' }" modal>
       <div class="form">
         <div class="p-field">
           <label for="title">제목</label>
-          <InputText
-            id="title"
-            v-model="title"
-            placeholder="제목을 입력하세요"
-            class="p-inputtext"
-          />
+          <InputText id="title" v-model="title" placeholder="제목을 입력하세요" class="p-inputtext" />
         </div>
         <div class="p-field">
           <label for="amount">요청 금액</label>
-          <InputText
-            id="amount"
-            v-model="amount"
-            placeholder="금액을 입력하세요"
-            class="p-inputtext"
-          />
+          <InputText id="amount" v-model="amount" placeholder="금액을 입력하세요" class="p-inputtext" />
         </div>
         <div class="p-field">
           <label for="file">영수증 첨부</label>
-          <input
-            type="file"
-            id="file"
-            accept="image/*"
-            @change="onFileChange"
-            class="file-input"
-          />
+          <input type="file" id="file" accept="image/*" @change="onFileChange" class="file-input" />
         </div>
       </div>
       <template #footer>
-        <Button
-          label="취소"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="closeModal"
-        />
-        <Button
-          label="요청 제출"
-          icon="pi pi-check"
-          class="p-button-primary"
-          @click="submitRequest"
-          :disabled="isSubmitDisabled"
-        />
+        <Button label="취소" icon="pi pi-times" class="p-button-text" @click="closeModal" />
+        <Button label="요청 제출" icon="pi pi-check" class="p-button-primary" @click="submitRequest"
+          :disabled="isSubmitDisabled" />
       </template>
     </Dialog>
 
     <!-- 세부 정보 모달 -->
-    <Dialog
-      header="정산 요청 상세"
-      v-model:visible="isDetailModalVisible"
-      :style="{ width: '40vw' }"
-      modal
-    >
+    <Dialog header="정산 요청 상세" v-model:visible="isDetailModalVisible" :style="{ width: '40vw' }" modal>
       <div class="detail-view">
         <h3><strong>제목:</strong>{{ selectedRequest.title }}</h3>
         <p><strong>작성자:</strong> {{ selectedRequest.userName }}</p>
         <p><strong>날짜:</strong> {{ selectedRequest.createdAt }}</p>
-        <img
-          :src="selectedRequest.imageUrl"
-          alt="영수증"
-          class="receipt-image-large"
-        />
+        <img :src="selectedRequest.imageUrl" alt="영수증" class="receipt-image-large" />
       </div>
       <template #footer>
-        <Button
-          label="닫기"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="closeDetailModal"
-        />
+        <Button label="닫기" icon="pi pi-times" class="p-button-text" @click="closeDetailModal" />
       </template>
     </Dialog>
   </div>
