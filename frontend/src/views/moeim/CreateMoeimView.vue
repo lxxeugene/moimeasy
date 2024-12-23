@@ -51,7 +51,6 @@ export default {
         const token = authStore.accessToken;
         const payload = { moeimName: this.moeimName };
 
-        // API 호출
         const response = await axios.post('/api/v1/moeim/create', payload, {
           headers: {
             'Content-Type': 'application/json',
@@ -59,22 +58,23 @@ export default {
           },
         });
 
-        const { moeimId, createdMoeim } = response.data;
+        const { moeimId, moeimName, moeimCode } = response.data;
 
-        if (!createdMoeim.moeimName || !createdMoeim.moeimCode) {
-          throw new Error(
-            '모임 이름 또는 코드가 응답에 포함되어 있지 않습니다.'
-          );
+        if (!moeimId || !moeimName || !moeimCode) {
+          throw new Error('서버 응답에 필요한 데이터가 없습니다.');
         }
 
-        authStore.user.moeimId = moeimId;
+        // authStore와 localStorage 업데이트
+        authStore.user = { ...authStore.user, moeimId };
         localStorage.setItem('user', JSON.stringify(authStore.user));
 
-        // 성공 시 모달 표시
-        this.modalMessage = `"${response.data.moeimName}" 모임이 생성되었습니다. 모임 코드: ${response.data.moeimCode}`;
+        // 모달 메시지 설정
+        this.modalMessage = `"${moeimName}" 모임이 생성되었습니다. 모임 코드: ${moeimCode}`;
         this.isModalVisible = true;
         this.isSuccess = true;
-        this.moeimName = ''; // 입력 필드 초기화
+
+        // 입력 필드 초기화
+        this.moeimName = '';
       } catch (error) {
         console.error('Error creating moeim:', error.response || error.message);
         this.modalMessage = '모임 생성에 실패했습니다. 다시 시도해주세요.';
