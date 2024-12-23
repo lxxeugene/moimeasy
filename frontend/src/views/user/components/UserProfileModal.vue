@@ -1,7 +1,7 @@
 <template>
+  <Toast position="bottom-right" group="bottom-group" />
   <!-- 사용자 프로필 컨테이너 -->
   <div class="profile-container">
-    <Toast />
     <ConfirmDialog :modal="false"></ConfirmDialog>
     <form v-if="user">
       <!-- 프로필 이미지 업로드 -->
@@ -199,6 +199,7 @@ export default {
         userInStorage.profileImage = this.profileImage.profileImage;
         localStorage.setItem('user', JSON.stringify(userInStorage)); // 4. 스토리지 업데이트
         this.toast.add({
+          group: 'bottom-group',
           severity: 'success',
           summary: '등록 완료',
           detail: '프로필 이미지가 등록되었습니다.',
@@ -207,6 +208,7 @@ export default {
       } catch (error) {
         console.error('저장실패', error);
         this.toast.add({
+          group: 'bottom-group',
           severity: 'danger',
           summary: '등록 실패',
           detail: '프로필 이미지 등록에 실패했습니다.',

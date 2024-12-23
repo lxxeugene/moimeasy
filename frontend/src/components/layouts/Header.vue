@@ -2,6 +2,7 @@
   <div class="header-wrapper">
     <div class="header-box">
       <div class="header-box1">
+        <!-- 브레드크럼 영역 -->
         <div class="card breadcrumb-wrapper">
           <Breadcrumb :home="home" :model="items">
             <template #item="{ item, props }">
@@ -63,7 +64,7 @@
           <div class="tiered-menu-box">
             <TieredMenu ref="menu" id="overlay_tmenu" :model="menus" popup />
           </div>
-          <!-- 프로필 모달  -->
+          <!--유저 프로필 모달  -->
           <div class="profole-modal-box">
             <Dialog
               v-model:visible="visible"

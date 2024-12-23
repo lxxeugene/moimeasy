@@ -42,6 +42,11 @@ const routes = [
   },
 
   {
+    path: '/user-profile/:userId',
+    name: '회원프로필',
+    component: UserProfile,
+  },
+  {
     path: '/edit-profile/:userId',
     name: '회원정보수정',
     component: EditProfileView, // EditProfileView 추가
