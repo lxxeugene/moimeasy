@@ -1,5 +1,5 @@
 <template>
-  <Toast position="bottom-right" />
+  <Toast position="top-right" />
   <ConfirmDialog group="positioned" :modal="false"></ConfirmDialog>
   <Dialog
     v-model:visible="visible"

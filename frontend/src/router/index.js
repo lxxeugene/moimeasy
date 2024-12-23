@@ -14,7 +14,6 @@ import WebSocket from '@/views/chat/WebSocketView.vue';
 import TransactionList from '@/views/transaction/TransactionList.vue';
 import Category from '@/views/transaction/Category.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
-import ChatView from '@/views/chat/ChatView.vue';
 import FindEmailView from '@/views/find/FindEmailView.vue';
 import FindUserInfoView from '@/views/find/FindUserInfoView.vue';
 import ResetPasswordView from '@/views/find/ResetPasswordView.vue';
@@ -114,11 +113,6 @@ const routes = [
         name: '게시물 상세',
         component: () => import('@/views/board/BoardDetailView.vue'),
         props: true,
-      },
-      {
-        path: 'chte',
-        name: '채팅',
-        component: () => import('@/views/schedule/components/ChTe.vue'),
       },
     ],
   },

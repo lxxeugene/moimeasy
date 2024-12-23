@@ -43,7 +43,7 @@
         </div>
 
         <!-- 알림메시지  -->
-        <Toast position="bottom-right" />
+        <Toast position="bottom-right" group="bottom-group" />
         <div class="notifications-box" @click="showSecondary">
           <OverlayBadge :value="notificationInfos.length" severity="danger">
             <i class="pi pi-bell" style="font-size: 24px" />
@@ -129,6 +129,7 @@ const fetchNotification = async () => {
     // 알림 내역 저장
     notificationInfos.value = data.map((a, i) => {
       return {
+        group: 'bottom-group',
         severity: 'secondary',
         summary: a.header,
         detail: a.body,
