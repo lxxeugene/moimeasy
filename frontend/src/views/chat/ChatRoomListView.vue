@@ -199,6 +199,7 @@ export default {
         });
 
         this.rooms.push(response.data);
+        await this.fetchRooms();
         this.closeCreateRoomModal();
       } catch (error) {
         console.error('Error creating chat room:', error);

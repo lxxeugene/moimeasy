@@ -33,6 +33,7 @@
 <script>
 import axios from 'axios';
 import Modal from '@/components/Modal.vue';
+import { useAuthStore } from '@/stores/auth';
 
 export default {
   components: { Modal },
@@ -46,7 +47,8 @@ export default {
   methods: {
     async createMoeim() {
       try {
-        const token = localStorage.getItem('accessToken'); // 저장된 토큰 가져오기
+        const authStore = useAuthStore();
+        const token = authStore.accessToken;
         const payload = { moeimName: this.moeimName };
 
         // API 호출
@@ -56,6 +58,17 @@ export default {
             Authorization: `Bearer ${token}`, // 인증 헤더 추가
           },
         });
+
+        const { moeimId, createdMoeim } = response.data;
+
+        if (!createdMoeim.moeimName || !createdMoeim.moeimCode) {
+          throw new Error(
+            '모임 이름 또는 코드가 응답에 포함되어 있지 않습니다.'
+          );
+        }
+
+        authStore.user.moeimId = moeimId;
+        localStorage.setItem('user', JSON.stringify(authStore.user));
 
         // 성공 시 모달 표시
         this.modalMessage = `"${response.data.moeimName}" 모임이 생성되었습니다. 모임 코드: ${response.data.moeimCode}`;

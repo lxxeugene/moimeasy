@@ -23,7 +23,7 @@ public class MoeimController {
     private MoeimService moeimService;
 
     @PostMapping("/create")
-    public ResponseEntity<Moeim> createMoeim(@RequestBody MoeimDTO request,
+    public ResponseEntity<MoeimDTO> createMoeim(@RequestBody MoeimDTO request,
                                              @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -31,9 +31,13 @@ public class MoeimController {
 
         Long userId = Long.valueOf(userDetails.getUsername()); // UserDetails에서 userId 가져오기
         request.setUserId(userId);
-
         Moeim createdMoeim = moeimService.createMoeim(request);
-        return ResponseEntity.ok(createdMoeim);
+
+        MoeimDTO response = new MoeimDTO();
+        response.setMoeimName(createdMoeim.getMoeimName());
+        response.setMoeimCode(createdMoeim.getMoeimCode());
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/join")
