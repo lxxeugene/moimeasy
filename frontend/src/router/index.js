@@ -18,7 +18,7 @@ import FindEmailView from '@/views/find/FindEmailView.vue';
 import FindUserInfoView from '@/views/find/FindUserInfoView.vue';
 import ResetPasswordView from '@/views/find/ResetPasswordView.vue';
 import EditProfileView from '@/views/user/EditProfileView.vue';
-
+import Error404View from '@/views/error/Error404View.vue';
 import Settlement from '@/views/moeim/SettlementView.vue';
 // 다른 뷰를 추가로 임포트
 
@@ -135,7 +135,7 @@ const routes = [
   },
   {
     path: '/:catchAll(.*)',
-    component: () => import('@/views/error/Error404View.vue'),
+    component: () => import('@/views/Error/Error404View.vue'),
   },
   {
     path: '/chat-layout',
