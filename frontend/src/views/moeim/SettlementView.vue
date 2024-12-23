@@ -1,13 +1,22 @@
 <template>
-  <div class="total-frame">
+  <div class="settlement-container">
     <!-- 헤더 -->
     <div class="header">
       <h2>정산 요청 목록</h2>
-      <Button label="정산 요청" icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openModal" />
+      <Button
+        label="정산 요청"
+        icon="pi pi-plus"
+        class="p-button-rounded p-button-primary"
+        @click="openModal"
+      />
     </div>
 
     <!-- 정산 요청 목록 -->
-    <DataTable :value="settlementRequests" class="p-datatable-striped" responsiveLayout="scroll">
+    <DataTable
+      :value="settlementRequests"
+      class="p-datatable-striped"
+      responsiveLayout="scroll"
+    >
       <Column field="title" header="제목">
         <template #body="slotProps">
           <span class="clickable-text" @click="openDetailModal(slotProps.data)">
@@ -24,45 +33,120 @@
       </Column>
       <Column header="영수증">
         <template #body="slotProps">
-          <img :src="slotProps.data.imageUrl" alt="영수증" class="receipt-image clickable-image"
-            @click="openDetailModal(slotProps.data)" />
+          <img
+            :src="slotProps.data.imageUrl"
+            alt="영수증"
+            class="receipt-image clickable-image"
+            @click="openDetailModal(slotProps.data)"
+          />
+        </template>
+      </Column>
+      <Column field="status" header="상태">
+        <template #body="slotProps">
+          <span
+            :class="
+              'status-' +
+              (slotProps.data.status
+                ? slotProps.data.status.toLowerCase()
+                : 'pending')
+            "
+          >
+            {{ getStatusLabel(slotProps.data.status) }}
+          </span>
+        </template>
+      </Column>
+      <Column v-if="isAdmin" header="승인">
+        <template #body="slotProps">
+          <Button
+            v-if="slotProps.data.status === 'PENDING'"
+            label="승인"
+            icon="pi pi-check"
+            class="p-button-success"
+            @click="approveRequest(slotProps.data.id)"
+          />
         </template>
       </Column>
     </DataTable>
 
     <!-- 정산 요청 모달 -->
-    <Dialog header="정산 요청하기" v-model:visible="isModalVisible" :style="{ width: '30vw' }" modal>
+    <Dialog
+      header="정산 요청하기"
+      v-model:visible="isModalVisible"
+      :style="{ width: '30vw' }"
+      modal
+    >
       <div class="form">
         <div class="p-field">
           <label for="title">제목</label>
-          <InputText id="title" v-model="title" placeholder="제목을 입력하세요" class="p-inputtext" />
+          <InputText
+            id="title"
+            v-model="title"
+            placeholder="제목을 입력하세요"
+            class="p-inputtext"
+          />
         </div>
         <div class="p-field">
           <label for="amount">요청 금액</label>
-          <InputText id="amount" v-model="amount" placeholder="금액을 입력하세요" class="p-inputtext" />
+          <InputText
+            id="amount"
+            v-model="amount"
+            placeholder="금액을 입력하세요"
+            class="p-inputtext"
+          />
         </div>
         <div class="p-field">
           <label for="file">영수증 첨부</label>
-          <input type="file" id="file" accept="image/*" @change="onFileChange" class="file-input" />
+          <input
+            type="file"
+            id="file"
+            accept="image/*"
+            @change="onFileChange"
+            class="custom-file-input"
+          />
+          <label for="file" class="custom-file-label">파일 선택</label>
         </div>
       </div>
       <template #footer>
-        <Button label="취소" icon="pi pi-times" class="p-button-text" @click="closeModal" />
-        <Button label="요청 제출" icon="pi pi-check" class="p-button-primary" @click="submitRequest"
-          :disabled="isSubmitDisabled" />
+        <Button
+          label="취소"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="closeModal"
+        />
+        <Button
+          label="요청 제출"
+          icon="pi pi-check"
+          class="p-button-primary"
+          @click="submitRequest"
+          :disabled="isSubmitDisabled"
+        />
       </template>
     </Dialog>
 
     <!-- 세부 정보 모달 -->
-    <Dialog header="정산 요청 상세" v-model:visible="isDetailModalVisible" :style="{ width: '40vw' }" modal>
+    <Dialog
+      header="정산 요청 상세"
+      v-model:visible="isDetailModalVisible"
+      :style="{ width: '40vw' }"
+      modal
+    >
       <div class="detail-view">
         <h3><strong>제목:</strong>{{ selectedRequest.title }}</h3>
         <p><strong>작성자:</strong> {{ selectedRequest.userName }}</p>
         <p><strong>날짜:</strong> {{ selectedRequest.createdAt }}</p>
-        <img :src="selectedRequest.imageUrl" alt="영수증" class="receipt-image-large" />
+        <img
+          :src="selectedRequest.imageUrl"
+          alt="영수증"
+          class="receipt-image-large"
+        />
       </div>
       <template #footer>
-        <Button label="닫기" icon="pi pi-times" class="p-button-text" @click="closeDetailModal" />
+        <Button
+          label="닫기"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="closeDetailModal"
+        />
       </template>
     </Dialog>
   </div>
@@ -105,6 +189,41 @@ export default {
     const selectedFile = ref(null); // 선택된 파일
     const isSubmitDisabled = ref(true);
     const authStore = useAuthStore();
+    const isAdmin = ref(authStore.user?.roleId === 1);
+
+    // 요청 상태에 따른 라벨 반환
+    const getStatusLabel = (status) => {
+      switch (status) {
+        case 'PENDING':
+          return '대기 중';
+        case 'ACCEPTED':
+          return '승인됨';
+        case 'REJECTED':
+          return '거부됨';
+        default:
+          return '알 수 없음';
+      }
+    };
+
+    // 승인 요청 처리
+    const approveRequest = async (requestId) => {
+      if (!requestId) {
+        console.error('Invalid requestId:', requestId); // 로그 추가
+        alert('요청 ID가 유효하지 않습니다.');
+        return;
+      }
+
+      try {
+        await axios.post(`/api/v1/settlements/approve/${requestId}`, null, {
+          headers: { Authorization: `Bearer ${authStore.accessToken}` },
+        });
+        alert('정산 요청이 승인되었습니다.');
+        await fetchRequests();
+      } catch (error) {
+        console.error('Error approving request:', error);
+        alert('정산 요청 승인 중 오류가 발생했습니다.');
+      }
+    };
 
     // 날짜 포맷 함수
     const formatDate = (dateString) => {
@@ -219,6 +338,10 @@ export default {
       openDetailModal,
       closeDetailModal,
       formatDate,
+      isAdmin,
+      getStatusLabel,
+      fetchRequests,
+      approveRequest,
     };
   },
 };
@@ -298,5 +421,43 @@ label {
 
 .p-button-primary:hover {
   background-color: #6b49c1;
+}
+.status-pending {
+  color: orange;
+}
+.status-accepted {
+  color: green;
+}
+.status-rejected {
+  color: red;
+}
+.custom-file-input {
+  position: absolute;
+  z-index: -1;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.custom-file-label {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  background-color: #7f56d9;
+  border: 2px solid #7f56d9;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.custom-file-label:hover {
+  background-color: #6a48b0;
+  border-color: #6a48b0;
 }
 </style>

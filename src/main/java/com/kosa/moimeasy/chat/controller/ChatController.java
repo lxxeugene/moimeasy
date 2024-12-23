@@ -112,6 +112,24 @@ public class ChatController {
         return ResponseEntity.ok(messages);
     }
 
+//    @PostMapping("/room/{roomId}/invite")
+//    public ResponseEntity<String> inviteMembersToRoom(
+//            @PathVariable Long roomId,
+//            @RequestBody List<Long> memberIds,
+//            @AuthenticationPrincipal UserDetails userDetails) {
+//
+//        if (userDetails == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//
+//        Long userId = Long.valueOf(userDetails.getUsername());
+//        try {
+//            chatService.inviteMembersToRoom(roomId, memberIds, userId);
+//            return ResponseEntity.ok("회원 초대가 완료되었습니다.");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 초대 중 오류 발생: " + e.getMessage());
+//        }
+//    }
 
 
 
@@ -119,15 +137,7 @@ public class ChatController {
 
 
 
-//     @PostMapping("/upload")
-// public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-//     try {
-//         String filePath = fileService.uploadFile(file);
-//         return ResponseEntity.ok(filePath);
-//     } catch (Exception e) {
-//         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("파일 업로드 실패");
-//     }
-// }
+
 }
 
 
