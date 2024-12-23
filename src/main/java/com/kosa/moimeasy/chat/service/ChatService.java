@@ -8,6 +8,8 @@ import com.kosa.moimeasy.chat.entity.ChatMessage.MessageType;
 import com.kosa.moimeasy.chat.entity.ChatRoomUser;
 import com.kosa.moimeasy.chat.repository.ChatRoomRepository;
 import com.kosa.moimeasy.chat.repository.ChatRoomUserRepository;
+import com.kosa.moimeasy.moeim.entity.Moeim;
+import com.kosa.moimeasy.moeim.repository.MoeimRepository;
 import com.kosa.moimeasy.user.entity.User;
 import com.kosa.moimeasy.user.repository.UserRepository;
 
@@ -30,6 +32,7 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageRepository chatMessageRepository;
     private final UserRepository userRepository;
+    private final MoeimRepository moeimRepository;
     private final ChatRoomUserRepository chatRoomUserRepository;
 
     @Transactional
@@ -162,6 +165,28 @@ public class ChatService {
                 .map(User::getNickname)
                 .collect(Collectors.toList());
     }
+
+//    @Transactional
+//    public void inviteMembersToRoom(Long roomId, List<Long> memberIds, Long userId) {
+//        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+//                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
+//
+//        // 채팅방에 참여할 사용자 확인 및 추가
+//        List<User> usersToInvite = userRepository.findAllById(memberIds);
+//        for (User user : usersToInvite) {
+//            boolean alreadyMember = chatRoom.getMembers().stream()
+//                    .anyMatch(member -> member.getUser().getUserId().equals(user.getUserId()));
+//
+//            if (!alreadyMember) {
+//                ChatRoomUser chatRoomUser = new ChatRoomUser();
+//                chatRoomUser.setChatRoom(chatRoom);
+//                chatRoomUser.setUser(user);
+//                chatRoomUser.setUserNickname(user.getNickname());
+//                chatRoomUserRepository.save(chatRoomUser);
+//            }
+//        }
+//
+//    }
 
 
 
