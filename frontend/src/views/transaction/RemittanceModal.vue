@@ -59,7 +59,7 @@
 </template>
 <script setup>
 import { ref, watch } from "vue";
-import '@/views/transaction/style/transaction.style.css';
+import '@/views/transaction/style/Transaction.style.css';
 import '@/views/transaction/style/Modal.style.css';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';

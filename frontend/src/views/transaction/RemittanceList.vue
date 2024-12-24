@@ -45,20 +45,20 @@
         <!-- 상태 -->
         <Column header="상태" style="width: 12%">
           <template #body="slotProps">
-            <span :class="getStatusClass(slotProps.data.status)">
-              {{ slotProps.data.status }}
-            </span>
+            <Tag :severity="getSeverity(slotProps.data.status)" :value="slotProps.data.status" />
           </template>
         </Column>
       </DataTable>
     </template>
-  </div>
+  </div>1
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import 'primeicons/primeicons.css';
-import '@/views/transaction/style/transaction.style.css';
+import '@/views/transaction/style/Transaction.style.css';
+import '@/views/transaction/style/Button.style.css';
+import '@/views/transaction/style/Tag.style.css';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
@@ -67,6 +67,8 @@ import RemittanceModal from "./RemittanceModal.vue";
 import UserDepositModal from "./UserDepositModal.vue";
 import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import Tag from 'primevue/tag';
+
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
@@ -77,7 +79,6 @@ const members = ref([]);
 
 const deposit = ref(false);
 const remittance = ref(false);
-const value = ref(""); // 금액 입력
 
 // Local Storage에서 accessToken 가져오기
 const accessToken = localStorage.getItem('accessToken');
@@ -97,6 +98,17 @@ if (!accessToken || !moeimId) {
   router.push('/login'); // 로그인 화면으로 리디렉션
 }
 
+
+// 상태에 따른 severity 결정
+const getSeverity = (status) => {
+  switch (status) {
+    case '납부완료':
+      return 'success';
+    default:
+      return 'danger';
+  }
+};
+
 // 송금 내역 가져오기
 async function fetchRemittanceList() {
   try {
@@ -114,8 +126,6 @@ async function fetchRemittanceList() {
       },
     });
 
-    console.log('startOfMonth:', startOfMonth, startOfMonth.toISOString());
-    console.log('endOfMonth:', endOfMonth, endOfMonth.toISOString());
     // 응답 데이터 처리
     if (response.data.remittanceList) {
       members.value = response.data.remittanceList.map((remittance, index) => ({
@@ -147,49 +157,8 @@ const updateMonth = (offset) => {
   fetchRemittanceList(); // 함수 호출
 };
 
-
-// 상태에 따라 CSS 클래스를 반환하는 함수
-function getStatusClass(status) {
-  return status === '납부완료' ? 'text-green-500 font-bold' : 'text-red-500 font-bold';
-}
-
-// State 관리: localStorage 저장 및 로드
-function loadStateFromLocalStorage() {
-  // const storedVisible1 = localStorage.getItem('visible1');
-  // const storedVisible4 = localStorage.getItem('visible4');
-
-  const storedValue = localStorage.getItem('value');
-
-  // if (storedVisible1 !== null) {
-  //   visible1.value = JSON.parse(storedVisible1);
-  // }
-
-  // if (storedVisible4 !== null) {
-  //   visible4.value = JSON.parse(storedVisible4);
-  // }
-
-  if (storedValue !== null) {
-    value.value = JSON.parse(storedValue);
-  }
-}
-
-// Watchers
-// watch(visible1, (newVal) => {
-//   localStorage.setItem('visible1', JSON.stringify(newVal));
-// });
-
-// watch(visible4, (newVal) => {
-//   localStorage.setItem('visible4', JSON.stringify(newVal));
-// });
-
-watch(value, (newVal) => {
-  localStorage.setItem('value', JSON.stringify(newVal));
-});
-
 // Mounted Hook에서 송금 내역 가져오기 및 초기 데이터 로드
 onMounted(() => {
-  // loadStateFromLocalStorage(); // value 로드 
-
   const date = new Date();
   currentMonth.value = `${date.getMonth() + 1}월 회비 납부내역`; // 초기 월 설정
   fetchRemittanceList();
@@ -197,31 +166,4 @@ onMounted(() => {
 
 </script>
 
-<style scoped>
-.text-green-500 {
-  color: #10b981;
-}
-
-.text-red-500 {
-  color: #ef4444;
-}
-
-/* 버튼 스타일 */
-/* :deep(.pay-button.p-button) {
-  padding: 0.5rem 1rem;
-  margin-right: 10px;
-} */
-
-/* 버튼 레이블 */
-/* :deep(.pay-button .p-button-label) {
-  font-weight: bold !important;
-}
-
-:deep(.pay-button.p-button:hover) {
-  background-color: #523fa8 !important;
-}
-
-:deep(.pay-button.p-button:active) {
-  background-color: #24099e !important;
-} */
-</style>
+<style scoped></style>

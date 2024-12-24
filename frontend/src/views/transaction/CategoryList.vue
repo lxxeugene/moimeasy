@@ -37,12 +37,13 @@
                             </Column>
                             <Column :field="'categoryList'" header="항목" class="header-style">
                                 <template #body="slotProps">
-                                    <span>{{ slotProps.data.categoryList }}</span>
+                                    <span class="content">{{ slotProps.data.categoryList }}</span>
                                 </template>
                             </Column>
                             <Column :field="'categoryMoney'" header=" 금액" class="header-style">
                                 <template #body="slotProps">
-                                    <Tag :value="slotProps.data.categoryMoney" />
+                                    <Tag :value="slotProps.data.categoryMoney"
+                                        :class="getCustomTagClass(slotProps.data.categoryMoney)" />
                                 </template>
                             </Column>
                         </DataTable>
@@ -164,6 +165,19 @@ onMounted(() => {
 });
 
 
+// 금액에 따라 커스텀 클래스 결정
+const getCustomTagClass = (amount) => {
+    if (amount > 10000) {
+        return 'custom-success';
+    } else if (amount > 0) {
+        return 'custom-info';
+    } else if (amount < 0) {
+        return 'custom-danger';
+    } else {
+        return 'custom-warning';
+    }
+};
+
 
 // chartData 설정: categoryData를 바탕으로 동적 차트 데이터 생성
 const setChartData = () => {
@@ -225,6 +239,8 @@ const transformChartData = () => {
 
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -285,10 +301,21 @@ const transformChartData = () => {
     padding: 0.25rem 0.5rem !important;
     width: 35%;
     height: 40px;
-
 }
 
-
+.content {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 1.2rem;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    width: 50%;
+    height: 40px;
+    /* background-color: #f0f0f0; */
+    /* 예시: 배경색 추가 */
+    display: inline-block;
+    /* 필요 시 추가 */
+    /* color: #333; */
+}
 
 .chart-wrapper {}
 
