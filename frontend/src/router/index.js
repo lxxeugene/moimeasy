@@ -12,7 +12,7 @@ import InvitationList from '@/views/user/InvitationListView.vue'; // 초대 목�
 import RemittanceList from '@/views/transaction/RemittanceList.vue';
 import WebSocket from '@/views/chat/WebSocketView.vue';
 import TransactionList from '@/views/transaction/TransactionList.vue';
-import Category from '@/views/transaction/Category.vue';
+import Category from '@/views/transaction/CategoryList.vue';
 import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
 import ChatView from '@/views/chat/ChatView.vue';
 import FindEmailView from '@/views/find/FindEmailView.vue';
