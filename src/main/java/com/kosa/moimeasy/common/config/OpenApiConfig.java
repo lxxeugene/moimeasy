@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
     @Bean
-    public OpenAPI openAPI(@Value("${springdoc.version}") String springdocVersion) {
+    public OpenAPI openAPI() {
+
         Info info = new Info()
-                .title("제목")
-                .version(springdocVersion)
-                .description("설명");
+                .version("v1.0.0")
+                .title("MoeimEasy API 명세서")
+                .description("API Description");
 
         return new OpenAPI()
-                .components(new Components())
                 .info(info);
     }
 }
