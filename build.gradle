@@ -1,6 +1,5 @@
 plugins {
 	id 'java'
-	//id 'org.springframework.boot' version '3.4.0'
 	id 'org.springframework.boot' version '3.2.6'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
@@ -33,7 +32,6 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-//	runtimeOnly 'mysql:mysql-connector-java:8.0.33' connector-j와 중복.
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
