@@ -1,0 +1,8 @@
+.p-button-primary {
+  background-color: #7f56d9;
+  border-color: #7f56d9;
+}
+
+.p-button-primary:hover {
+  background-color: #6b49c1;
+}

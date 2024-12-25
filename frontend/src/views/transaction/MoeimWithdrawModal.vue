@@ -48,13 +48,16 @@
             </div>
         </template>
         <div class=" button-group">
-            <Button label="확인" rounded class="next-button" @click="confirmExpense" />
+            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
             <Button label="취소" rounded class="next-button" @click="closeModal" />
         </div>
     </Dialog>
 
+    <!-- 비밀번호 확인 모달-->
+    <checkPassword v-model:visible="checkPassword" @passwordVerified="handlePasswordVerified" />
+
     <!-- 회비 사용 결과 모달 -->
-    <Dialog v-model:visible="visible4" modal :style="{ width: '27rem', height: '359rem' }" :closable="false">
+    <Dialog v-model:visible="visible4" modal :style="{ width: '30rem', height: '30rem' }" :closable="false">
         <template #header>
             <div
                 style="text-align: center; font-size: 3em; margin:auto; margin-top: 50px; font-weight: bold; color: #7f56d9;">
@@ -84,6 +87,7 @@ import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import axios from "axios";
 import { useLoadingStore } from '@/stores/useLoadingStore';
+import CheckPassword from "./CheckPassword.vue";
 
 
 const loadingStore = useLoadingStore();
@@ -116,10 +120,17 @@ function handleClose() {
     emit('update:visible', false); // 부모 컴포넌트와 상태 동기화
 }
 
+// 비밀번호가 일치하면 입금 처리
+const handlePasswordVerified = (isValid) => {
+    if (isValid) {
+        confirmExpense();
+    }
+}
+
 const visible2 = ref(false); // 지출 항목 선택 모달
 const visible3 = ref(false); // 지출 확인 모달
 const visible4 = ref(false); // 결과 모달
-
+const checkPassword = ref(false); // 비밀번호 입력
 
 // 지출 카테고리 데이터
 const value = ref(""); // 입력한 금액
@@ -244,6 +255,7 @@ watch(value, (newVal) => {
 // 지출 확인 버튼 클릭 -> 지출 처리
 async function confirmExpense() {
     try {
+        const accessToken = localStorage.getItem('accessToken');
         const userRaw = localStorage.getItem('user');
         let userId = null;
         let moeimId = null;
@@ -298,6 +310,15 @@ function closeModal() {
     });
     visible3.value = false;
 }
+
+// 확인 버튼 클릭 시 호출되는 함수
+function openCheckPassword() {
+    console.log("openCheckPassword 호출됨");
+    visible2.value = false;
+    checkPassword.value = true;
+    console.log("visible2:", visible2.value, "checkPassword:", checkPassword.value);
+}
+
 
 </script>
 

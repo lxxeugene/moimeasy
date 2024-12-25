@@ -79,4 +79,11 @@ public class TransactionController {
     ) {
         return ResponseEntity.ok(transactionService.getInitialData(request));
     }
+
+    // 입력한 비밀번호가 맞는지 확인
+    @PostMapping("/password")
+    public ResponseEntity<PasswordCheckDto.Response> checkPassword(
+    @Valid @RequestBody PasswordCheckDto.Request passwordCheckDto) {
+            return ResponseEntity.ok(transactionService.checkPassword(passwordCheckDto));
+    }
 }

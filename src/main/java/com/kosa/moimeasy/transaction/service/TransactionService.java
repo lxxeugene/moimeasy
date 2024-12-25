@@ -15,6 +15,7 @@ import com.kosa.moimeasy.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -34,6 +35,9 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final MoeimRepository moeimRepository;
     private final TransactionRepository transactionRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final Map<Long, Integer> attemptCount = new HashMap<>(); // 사용자별 비밀번호 시도 횟수 저장
+    private static final int MAX_ATTEMPTS = 5; // 최대 비밀번호 입력 횟수
 
     // 유저 계좌 입금
     @Transactional
@@ -45,7 +49,7 @@ public class TransactionService {
 
         // 계좌 금액 변경
         if (request.getAmount() <= 0) {
-            throw new CustomException(BALANCE_NOT_ENOUGH); // 예외 처리: 잘못된 금액
+            throw new CustomException(BALANCE_NOT_ENOUGH); // 예외 처리: 잔액 부족
         }
         user.setAmount(user.getAmount() + request.getAmount());
 
@@ -483,6 +487,35 @@ public class TransactionService {
                 .startDate(startDate)
                 .endDate(endDate)
                 .categories(categories)
+                .build();
+    }
+
+    // 비밀번호 확인
+    public PasswordCheckDto.Response checkPassword(PasswordCheckDto.Request passwordCheckDto){
+        User user = userRepository.findById(passwordCheckDto.getUserId())
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        boolean isPasswordValid = passwordEncoder.matches(passwordCheckDto.getPassword(), user.getPassword());
+
+        if (!isPasswordValid) {
+            int currentCount = attemptCount.getOrDefault(passwordCheckDto.getUserId(), 0) + 1;
+            attemptCount.put(passwordCheckDto.getUserId(), currentCount);
+            log.info("비밀번호가 일치하지 않습니다. 시도 횟수 : {}", currentCount);
+            if(currentCount == MAX_ATTEMPTS) {
+                attemptCount.remove(passwordCheckDto.getUserId()); // 카운트 초기화
+                throw new CustomException(PASSWORD_NOT_MATCH); // 예외 처리: 5번 틀리면 입금, 송금 종료
+            }
+            int remainingAttempts = MAX_ATTEMPTS - currentCount;
+            return PasswordCheckDto.Response.builder()
+                    .isValid(false)
+                    .message("비밀번호가 일치하지 않습니다.")
+                    .remainingAttempts(remainingAttempts)
+                    .build();
+        }
+        attemptCount.remove(passwordCheckDto.getUserId());
+        return PasswordCheckDto.Response.builder()
+                .isValid(true)
+                .message("비밀번호가 일치합니다.")
                 .build();
     }
 }

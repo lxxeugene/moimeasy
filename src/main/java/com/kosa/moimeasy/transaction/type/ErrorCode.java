@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum ErrorCode {
     USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
     ALREADY_EXISTS_PHONE("이미 가입된 휴대전화번호입니다."),
-    PASSWORD_NOT_MATCH("비밀번호가 일치하지 않습니다."),
+    PASSWORD_NOT_MATCH("비밀번호가 일치하지 않습니다. 잠시 후 다시 시도하여 주시기 바랍니다."),
+    PASSWORD_RETRY("비밀번호가 일치하지 않습니다. 다시 입력하여 주시기 바랍니다."),
 
     USER_NOT_PERMITTED("사용자 권한이 없습니다."),
 
