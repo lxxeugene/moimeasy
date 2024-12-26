@@ -1,25 +1,20 @@
 <template>
   <div class="gallery-list-container" ref="galleryRef">
     <div v-for="item in galleryList" :key="item.id" class="masonry-item">
-      <!-- 로딩 전 스켈레톤 (옵션) -->
       <Skeleton
-        v-if="loadingMap[item.id]"
+        v-if="isLoading(item.id)"
         shape="rectangle"
         width="100%"
         height="200px"
       />
 
-      <!-- 로딩 완료된 이미지 -->
       <img
-        v-else
-        :src="item.firebaseUrl"
+        :src="item.imageUrl"
         :alt="`Image ${item.id}`"
         loading="lazy"
         @load="onImageLoad(item.id)"
       />
-      <p class="image-caption">{{ item.imageUrl }}</p>
     </div>
-    <!-- 무한 스크롤 트리거 -->
     <div ref="loadMoreTrigger" class="load-more-trigger"></div>
   </div>
 </template>
@@ -28,43 +23,31 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import Skeleton from 'primevue/skeleton';
-import { fetchImageUrl } from '@/utils/image-load-utils';
-// 위에서 보여주신 함수 (filePath -> downloadUrl)
 
 const galleryList = ref([]);
 const page = ref(0);
 const totalPages = ref(1);
-
-// 각 이미지 로딩 상태를 관리 (true → 스켈레톤 표시)
 const loadingMap = ref({});
-
-// 무한 스크롤 관찰용 엘리먼트
 const loadMoreTrigger = ref(null);
+
+// 로딩 상태 체크 함수 추가
+function isLoading(id) {
+  return loadingMap.value[id] === undefined ? true : loadingMap.value[id];
+}
 
 async function loadData() {
   if (page.value < totalPages.value) {
     try {
       const res = await axios.get(
-        `/api/gallery?moeimId=1&page=${page.value}&size=12`
+        `/api/v1/gallery?moeimId=1&page=${page.value}&size=12`
       );
       const { content, totalPages: tPages } = res.data;
       totalPages.value = tPages;
 
-      // 1) 로딩 전에 스켈레톤 ON
+      // 새로운 아이템들의 초기 로딩 상태를 true로 설정
       content.forEach((item) => {
         loadingMap.value[item.id] = true;
       });
-
-      // 2) DB에 저장된 imageUrl이 'gallery/xxx.jpg' 등 경로만 있다 가정
-      for (const item of content) {
-        try {
-          const url = await fetchImageUrl(item.imageUrl);
-          item.firebaseUrl = url;
-        } catch (e) {
-          // 오류 발생 시, fallback 처리
-          item.firebaseUrl = null;
-        }
-      }
 
       // 기존 목록에 추가
       galleryList.value.push(...content);
@@ -73,6 +56,11 @@ async function loadData() {
       console.error(error);
     }
   }
+}
+
+function onImageLoad(id) {
+  // 이미지 로드 완료 시 로딩 상태를 false로 변경
+  loadingMap.value[id] = false;
 }
 
 function initIntersectionObserver() {
@@ -94,11 +82,6 @@ function initIntersectionObserver() {
   }
 }
 
-function onImageLoad(id) {
-  // 이미지가 실제로 로드되었으면 스켈레톤 OFF
-  loadingMap.value[id] = false;
-}
-
 onMounted(() => {
   loadData();
   initIntersectionObserver();
@@ -106,8 +89,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.gallery-list-container {
-  /* Masonry (CSS-only) 예시 */
+/* .gallery-list-container {
   column-count: 4;
   column-gap: 1rem;
 }
@@ -117,12 +99,65 @@ onMounted(() => {
   display: block;
   width: 100%;
 }
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.load-more-trigger {
+  height: 1px;
+} */
+
+/* .gallery-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.masonry-item {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .load-more-trigger {
   height: 1px;
 }
-.image-caption {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 4px;
+
+/* 반응형 그리드 레이아웃 */
+/* @media (min-width: 768px) {
+  .gallery-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+} */
+
+.gallery-list-container {
+  /* column-count 대신 column-width 사용 */
+  columns: 250px auto;
+  column-gap: 1rem;
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+  display: inline-block;
+  width: 100%;
+}
+
+.masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.load-more-trigger {
+  height: 1px;
 }
 </style>

@@ -20,8 +20,11 @@ public class GalleryService {
     private final MoeimRepository moeimRepository;
 
     // Gallery 목록 불러오기
+//    public Page<Gallery> getGalleryList(Long moeimId,String page, String size) {
+//            return galleryRepository.findByMoeim_MoeimId(moeimId);
+//    }
     public Page<Gallery> getGalleryList(Long moeimId, Pageable pageable) {
-            return galleryRepository.findByMoeim_MoeimId(moeimId, pageable);
+        return galleryRepository.findByMoeim_MoeimId(moeimId, pageable);
     }
 
     // 이미지 저장

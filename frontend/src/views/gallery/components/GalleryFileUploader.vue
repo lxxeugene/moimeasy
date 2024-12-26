@@ -166,7 +166,7 @@ const toast = useToast();
 const totalSize = ref(0);
 const totalSizePercent = ref(0);
 const files = ref([]);
-
+const uploadedFiles = ref([]); // uploadedFiles 선언 및 초기화
 // 파일 크기 단위 변환 함수 -> 파일크기 표시용
 const formatSize = (bytes) => {
   const k = 1024;
@@ -219,7 +219,6 @@ const uploadEvent = async (primevueUploadCallback) => {
   try {
     // 업로드한 파일들의 다운로드 URL을 담을 배열
     const uploadedFileUrls = [];
-
     for (const file of files.value) {
       // Firebase 업로드
       const storageRef = firebaseRef(
@@ -244,9 +243,25 @@ const uploadEvent = async (primevueUploadCallback) => {
 
     console.log('서버 저장 결과:', response.data);
 
-    // PrimeVue FileUpload 컴포넌트 내부 처리 (파일 업로드 완료 상태로 표시)
-    primevueUploadCallback();
+    // *** 핵심 수정 부분 ***
+    if (response.data) {
+      console.log(files.value);
+      const uploadedFilesData = uploadedFileUrls.map((uploadedFile) => ({
+        name: uploadedFile.fileName,
+        objectURL: uploadedFile.downloadUrl,
+        size:
+          files.value.find((f) => f.name === uploadedFile.fileName)?.size || 0, // size가 없을 경우 0으로 설정
+        type:
+          files.value.find((f) => f.name === uploadedFile.fileName)?.type || '', // type이 없을 경우 빈 문자열로 설정
+      }));
 
+      // FileUpload 컴포넌트의 uploadedFiles를 업데이트하는 올바른 방법
+      primevueUploadCallback({ files: uploadedFilesData });
+      uploadedFiles.value = uploadedFilesData; // uploadedFiles 업데이트
+      console.log('primevueUploadCallback 호출됨', uploadedFilesData);
+    }
+
+    console.log('파일 업로드 완료');
     // 업로드 성공 Toast
     toast.add({
       group: 'positioned',
