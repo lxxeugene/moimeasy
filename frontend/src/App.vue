@@ -4,15 +4,17 @@
     <LoadingOverlay />
     <!-- 사이드바 -->
     <SideBar
+      v-if="userData"
       class="sidebar"
       :class="{ expanded: uiStore.visible }"
-      v-if="userData"
     />
     <!-- 스피드다이얼 영역-->
     <SideSpeedDial v-if="userData" />
-    <!-- 메인 컨텐츠 -->
+    <!-- 메인 영역 -->
     <div class="contents-wrapper">
-      <Header class="header" />
+      <!-- 헤더 -->
+      <Header v-if="userData" class="header" />
+      <!-- 메인 컨텐츠 -->
       <router-view />
     </div>
   </div>
@@ -68,9 +70,5 @@ watch(
   flex: 3;
   background-color: #f8f9fa;
   overflow: auto;
-}
-
-.hidden {
-  display: none; /* 애니메이션 종료 후 숨기기 */
 }
 </style>
