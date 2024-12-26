@@ -84,8 +84,8 @@ export default {
       ],
       guideImages: [
         '/guide/user.png',
-        '/intro/intro2.png',
-        '/intro/intro3.png',
+        '/guide/settlement.png',
+        '/guide/chat.png',
         '/intro/intro4.png',
         '/intro/intro5.png',
         '/intro/intro6.png',
