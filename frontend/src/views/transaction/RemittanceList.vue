@@ -48,7 +48,6 @@
             </template>
           </Column>
         </DataTable>
-
       </template>
     </div>
   </div>
@@ -70,19 +69,21 @@ import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import Tag from 'primevue/tag';
 import { fetchImageUrl } from '@/utils/image-load-utils';
+import { useConfirm } from "primevue/useconfirm"; // confirm 사용을 위해 추가
 
 const defaultProfileImage =
   'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png';
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
-
 const currentMonth = ref('');
 const currentDate = ref(new Date()); // 현재 날짜를 기준으로 동작
 const members = ref([]);
-
 const deposit = ref(false);
 const remittance = ref(false);
+const confirm = useConfirm(); // alert 창
+const previousDate = ref(new Date()); // 이전 월
+const isReverting = ref(false); // 되돌림 상태
 
 // Local Storage에서 accessToken 가져오기
 const accessToken = localStorage.getItem('accessToken');
@@ -167,13 +168,14 @@ async function fetchRemittanceList() {
           };
         })
       );
-      console.log('송금 내역:', members.value);
     } else {
       members.value = [];
-      console.warn('송금 내역이 없습니다.');
     }
   } catch (error) {
-    console.error('송금 내역 조회 중 오류 발생:', error.response?.data || error.message);
+    if (!isReverting.value) {
+      isReverting.value = true;
+      confirm1(error.response.data);
+    }
     members.value = [];
   }
   finally {
@@ -181,12 +183,17 @@ async function fetchRemittanceList() {
   }
 }
 
+
 // 월 변경 및 데이터 다시 가져오기
 const updateMonth = (offset) => {
-  currentDate.value.setMonth(currentDate.value.getMonth() + offset);
-  currentMonth.value = `${currentDate.value.getMonth() + 1}월 회비 납부내역`;
-  fetchRemittanceList(); // 함수 호출
-};
+  if (!isReverting.value) {
+    previousDate.value = new Date(currentDate.value); // 이전 날짜 저장
+    currentDate.value.setMonth(currentDate.value.getMonth() + offset);
+    const month = currentDate.value.getMonth() + 1;
+    currentMonth.value = `${month}월 회비 납부내역`;
+    fetchRemittanceList(); // 함수 호출
+  };
+}
 
 // Mounted Hook에서 송금 내역 가져오기 및 초기 데이터 로드
 onMounted(() => {
@@ -194,6 +201,32 @@ onMounted(() => {
   currentMonth.value = `${date.getMonth() + 1}월 회비 납부내역`; // 초기 월 설정
   fetchRemittanceList();
 });
+
+const confirm1 = (message) => {
+  confirm.require({
+    message: message,
+    header: 'Error',
+    icon: 'pi pi-times',
+    rejectProps: {
+      label: '취소',
+      severity: 'secondary',
+      outlined: true
+    },
+    acceptProps: {
+      label: '확인'
+    },
+    accept: () => {
+      // 이전 날짜로 되돌리기
+      currentDate.value = previousDate.value;
+      const month = currentDate.value.getMonth() + 1;
+      currentMonth.value = `${month}월 거래내역`;
+      isReverting.value = false;
+      fetchRemittanceList(); // 이전 월 데이터로 돌아가기
+    },
+    reject: () => {
+    }
+  });
+};
 
 </script>
 

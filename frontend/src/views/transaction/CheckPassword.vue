@@ -12,7 +12,6 @@
         <div class="button-group">
             <Button label="확인" rounded class="next-button" @click="CheckPassword" />
         </div>
-        <ConfirmDialog />
     </Dialog>
 </template>
 
@@ -115,7 +114,7 @@ async function CheckPassword() {
 
 const confirm1 = (message) => {
     confirm.require({
-        message: message || '오류가 발생했습니다. 잠시 후 다시 시도하여 주시기 바랍니다.',
+        message: message,
         header: 'Error',
         icon: 'pi pi-times',
         rejectProps: {
@@ -129,9 +128,6 @@ const confirm1 = (message) => {
         accept: () => {
             emit("update:visible", false);
         },
-        reject: () => {
-            emit("update:visible", false);
-        }
     });
 };
 </script>

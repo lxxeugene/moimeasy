@@ -22,6 +22,7 @@ public enum ErrorCode {
     BALANCE_NOT_ENOUGH("계좌의 잔액이 부족합니다."),
     TRANSACTION_TYPE_NOT_FOUND("거래 종류를 확인할 수 없습니다."),
     TRANSACTION_LIST_NOT_FOUND("거래내역이 존재하지 않습니다."),
+    TRANSACTION_LAST_MONTH("마지막 달 입니다."),
     USER_ALREADY_PAID("이미 회비를 납부했습니다."),
 
     INVALID_DATE("유효한 날짜인지 확인해주세요."),

@@ -306,10 +306,15 @@ public class TransactionService {
             throw new CustomException(INVALID_DATE);
         }
 
+        // 시작 날짜가 조회 당일 날짜를 초과한 경우 오늘 날짜로 반환
+        if (startDate.isAfter(nowDate)) {
+            throw new CustomException(TRANSACTION_LAST_MONTH);
+        }
+
+
         // 끝 날짜가 조회 당일 날짜를 초과한 경우 오늘 날짜로 반환
         if (endDate.isAfter(nowDate)) {
             return getTransactionListResponse(request.getMoeimId(), startDate, nowDate);
-//            throw new CustomException(INVALID_DATE);
         }
 
 //        // 조회 기간이 최대 조회 기간을 넘을 경우
@@ -329,9 +334,16 @@ public class TransactionService {
                 moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)
         );
 
+        LocalDate nowDate = LocalDate.now();
+
         // 거래내역이 존재하지 않을 시 예외 메시지 전송
         if (resultList.isEmpty()) {
             throw new CustomException(TRANSACTION_LIST_NOT_FOUND);
+        }
+
+        // 시작 날짜가 조회 당일 날짜를 초과한 경우 오늘 날짜로 반환
+        if (startDate.isAfter(nowDate)) {
+            throw new CustomException(TRANSACTION_LAST_MONTH);
         }
 
         Long monthDeposit = transactionRepository.findMonthlyIncome(moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
@@ -388,6 +400,13 @@ public class TransactionService {
 
         // 모임에 가입된 유저
         List<User> users = userRepository.findByMoeimId(moeimId);
+
+        LocalDate nowDate = LocalDate.now();
+
+        // 시작 날짜가 조회 당일 날짜를 초과한 경우 오늘 날짜로 반환
+        if (startDate.isAfter(nowDate)) {
+            throw new CustomException(TRANSACTION_LAST_MONTH);
+        }
 
         // 송금내역 있는 사용자들에 대한 DTO 변환
         List<RemittanceListDto> remittanceList = resultList.stream()
@@ -452,6 +471,7 @@ public class TransactionService {
         Moeim moeim = moeimRepository.findByUserId(user.getMoeimId())
                 .orElseThrow(() -> new ResourceNotFoundException("모임을 찾을 수 없습니다."));
 
+        LocalDate nowDate = LocalDate.now();
         LocalDate startDate = request.getStartDate(); // 월의 시작일 2024-12-01T00:00
         LocalDate endDate = request.getEndDate(); // 월의 마지막일 2024-12-31T23:59:59
 
@@ -462,6 +482,11 @@ public class TransactionService {
 
         // 모임에 해당하는 거래 데이터 조회 (모임 ID를 기반으로)
         List<Transaction> transactions = transactionRepository.findCategoryNameByMoeimId(moeim.getMoeimId(), startDateTime, endDateTime);
+
+        // 시작 날짜가 조회 당일 날짜를 초과한 경우 오늘 날짜로 반환
+        if (startDate.isAfter(nowDate)) {
+            throw new CustomException(TRANSACTION_LAST_MONTH);
+        }
 
         // 거래내역이 존재하지 않을 시 예외 메시지 전송
         if (transactions.isEmpty()) {
