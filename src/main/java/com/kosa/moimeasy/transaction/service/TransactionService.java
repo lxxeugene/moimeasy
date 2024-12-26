@@ -391,17 +391,17 @@ public class TransactionService {
                 .map(transaction -> {
                     Long userId = null;
                     String userName = "알 수 없는 사용자";
-                    String photo = "default-photo.png";
+                    String profileImage = "default-photo.png";
                     if (transaction.getUserAccount() != null) {
                         userId = transaction.getUserAccount().getUserId();
                         userName = transaction.getUserAccount().getUserName();
-                        photo = transaction.getUserAccount().getProfileImage();
+                        profileImage = transaction.getUserAccount().getProfileImage();
                     }
 
                     return RemittanceListDto.builder()
                             .userId(userId)
                             .receivedAccount(transaction.getReceivedAccount())
-                            .photo(photo)
+                            .profileImage(profileImage)
                             .userName(userName)
                             .amount(transaction.getAmount())
                             .transactionType(TransactionType.REMITTANCE)
@@ -419,11 +419,11 @@ public class TransactionService {
         for (User user : users) {
             if (!userWithTransactions.contains(user.getUserId())) {
                 String userName = user.getNickname() != null ? user.getNickname() : "알 수 없는 사용자";
-                String photo = user.getProfileImage();
+                String profileImage = user.getProfileImage();
                 remittanceList.add(RemittanceListDto.builder()
                         .userId(user.getUserId())
                         .receivedAccount("알 수 없는 계좌")
-                        .photo(photo)
+                        .profileImage(profileImage)
                         .userName(userName)
                         .amount(0.0)
                         .transactionType(null)

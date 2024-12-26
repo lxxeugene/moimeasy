@@ -27,7 +27,7 @@
         <!-- 번호 -->
         <Column field="number" header="번호" style="width: 12%" />
 
-        <Column header="profileImage" style="width: 12%">
+        <Column header="사진" style="width: 12%">
           <template #body="slotProps">
             <img :src="slotProps.data.profileImage" alt="사진" style="width: 40px; height: 40px; border-radius: 50%;" />
           </template>
@@ -71,6 +71,8 @@ import Tag from 'primevue/tag';
 import { firebaseStorage } from '@/firebase/firebaseConfig';
 import { fetchImageUrl } from '@/utils/image-load-utils';
 
+const defaultProfileImage =
+  'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png';
 
 const router = useRouter();
 const loadingStore = useLoadingStore();
@@ -87,7 +89,6 @@ const accessToken = localStorage.getItem('accessToken');
 const userRaw = localStorage.getItem('user');
 let moeimId = null;
 let userId = null;
-let profileImage = null;
 
 if (userRaw) {
   const user = JSON.parse(userRaw); // JSON 파싱
@@ -99,6 +100,12 @@ if (!accessToken || !moeimId) {
   console.error('필수 데이터(accessToken 또는 moeimId)가 누락되었습니다.');
   router.push('/login'); // 로그인 화면으로 리디렉션
 }
+
+/**  파이어베이스 스토리지의 url로 변환*/
+const changeImageUrl = async (imageUrl) => {
+  return await fetchImageUrl(imageUrl);
+};
+
 
 
 // 상태에 따른 severity 결정
@@ -113,8 +120,8 @@ const getSeverity = (status) => {
 
 // 송금 내역 가져오기
 async function fetchRemittanceList() {
+  loadingStore.startLoading();  // 로딩 시작
   try {
-    loadingStore.startLoading();  // 로딩 시작
     // 현재 월의 첫 번째 날짜과 마지막 날짜 계산
     const startOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth(), 1));
     const endOfMonth = new Date(Date.UTC(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 0));
@@ -130,14 +137,36 @@ async function fetchRemittanceList() {
 
     // 응답 데이터 처리
     if (response.data.remittanceList) {
-      members.value = response.data.remittanceList.map((remittance, index) => ({
-        number: index + 1, // 번호 추가
-        userName: remittance.userName, // 이름
-        amount: remittance.amount, // 금액
-        transactionAt: remittance.transactionAt, // 납부일자
-        status: remittance.transactionType === 'REMITTANCE' ? '납부완료' : '회비미납', // 상태
-        profileImage: remittance.profileImage || null, // 사진 (기본값 처리)
-      }));
+      members.value = await Promise.all(
+        response.data.remittanceList.map(async (remittance, index) => {
+          let profileImage = null;
+          // profileImage가 유효한 문자열인지 확인
+          if (
+            remittance.profileImage &&
+            typeof remittance.profileImage === 'string' &&
+            remittance.profileImage.trim() !== ''
+          ) {
+            try {
+              // 파이어베이스 스토리지용 URL 변환
+              profileImage = await changeImageUrl(remittance.profileImage);
+            } catch (error) {
+              console.error('이미지 변환 실패:', error);
+              profileImage = defaultProfileImage;
+            }
+          } else {
+            // 유효하지 않으면 기본 이미지로 설정
+            profileImage = defaultProfileImage;
+          }
+          return {
+            number: index + 1, // 번호 추가
+            userName: remittance.userName, // 이름
+            amount: remittance.amount, // 금액
+            transactionAt: remittance.transactionAt, // 납부일자
+            status: remittance.transactionType === 'REMITTANCE' ? '납부완료' : '회비미납', // 상태
+            profileImage
+          };
+        })
+      );
       console.log('송금 내역:', members.value);
     } else {
       members.value = [];
