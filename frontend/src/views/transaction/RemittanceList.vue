@@ -27,11 +27,11 @@
         <!-- 번호 -->
         <Column field="number" header="번호" style="width: 12%" />
 
-        <!-- <Column header="회원사진" style="width: 12%">
+        <Column header="profileImage" style="width: 12%">
           <template #body="slotProps">
-            <img :src="slotProps.data.photo" alt="사진" style="width: 40px; height: 40px; border-radius: 50%;" />
+            <img :src="slotProps.data.profileImage" alt="사진" style="width: 40px; height: 40px; border-radius: 50%;" />
           </template>
-</Column> -->
+        </Column>
 
         <!-- 이름 -->
         <Column field="userName" header="이름" style="width: 12%" />
@@ -68,6 +68,8 @@ import UserDepositModal from "./UserDepositModal.vue";
 import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import Tag from 'primevue/tag';
+import { firebaseStorage } from '@/firebase/firebaseConfig';
+import { fetchImageUrl } from '@/utils/image-load-utils';
 
 
 const router = useRouter();
@@ -85,7 +87,7 @@ const accessToken = localStorage.getItem('accessToken');
 const userRaw = localStorage.getItem('user');
 let moeimId = null;
 let userId = null;
-let photo = null;
+let profileImage = null;
 
 if (userRaw) {
   const user = JSON.parse(userRaw); // JSON 파싱
@@ -134,7 +136,7 @@ async function fetchRemittanceList() {
         amount: remittance.amount, // 금액
         transactionAt: remittance.transactionAt, // 납부일자
         status: remittance.transactionType === 'REMITTANCE' ? '납부완료' : '회비미납', // 상태
-        photo: remittance.photo || null, // 사진 (기본값 처리)
+        profileImage: remittance.profileImage || null, // 사진 (기본값 처리)
       }));
       console.log('송금 내역:', members.value);
     } else {
