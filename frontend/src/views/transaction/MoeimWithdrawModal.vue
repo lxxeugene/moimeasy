@@ -38,7 +38,7 @@
     </Dialog>
 
     <!-- 회비 사용 확인 모달 -->
-    <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '30rem' }">
+    <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '20rem' }">
         <template #header>
             <div style="font-size: 1.2em; margin: auto;  margin-top: 30px; color: black;">
                 <span style="font-weight: bold; color: blue;">{{ selectedExpense }}</span> 항목에
@@ -48,8 +48,8 @@
             </div>
         </template>
         <div class=" button-group">
-            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
             <Button label="취소" rounded class="next-button" @click="closeModal" />
+            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
         </div>
     </Dialog>
 
@@ -314,7 +314,7 @@ function closeModal() {
 // 확인 버튼 클릭 시 호출되는 함수
 function openCheckPassword() {
     console.log("openCheckPassword 호출됨");
-    visible2.value = false;
+    visible3.value = false;
     checkPassword.value = true;
     console.log("visible2:", visible2.value, "checkPassword:", checkPassword.value);
 }

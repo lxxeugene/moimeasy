@@ -6,9 +6,9 @@
       <div class="title">{{ currentMonth }}</div>
       <!-- 가운데: 아이콘 그룹 -->
       <div class="icon-button-group">
-        <i class="pi pi-caret-left" style="font-size: 1rem" @click="updateMonth(-1)"></i>
-        <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
-        <i class="pi pi-caret-right" style="font-size: 1rem" @click="updateMonth(1)"></i>
+        <i class="pi pi-caret-left icon-hover" @click="updateMonth(-1)"></i>
+        <i class="pi pi-calendar-times"></i>
+        <i class="pi pi-caret-right icon-hover" @click="updateMonth(1)"></i>
       </div>
       <!-- 회비 납부 모달 -->
       <Button label="회비 납부" icon="pi pi-check" iconPos="right" rounded class="rimittance-button"
@@ -20,37 +20,38 @@
         @click="deposit = true" />
       <UserDepositModal v-model:visible="deposit" />
     </div>
+    <div class="card">
+      <template v-if="members && members.length">
+        <DataTable :value="members" paginator :rows="7" tableStyle="min-width: 60rem">
+          <!-- 번호 -->
+          <Column field="number" header="번호" style="width: 12%" />
+
+          <Column header="사진" style="width: 12%">
+            <template #body="slotProps">
+              <img :src="slotProps.data.profileImage" alt="사진" style="width: 40px; height: 40px; border-radius: 50%;" />
+            </template>
+          </Column>
+
+          <!-- 이름 -->
+          <Column field="userName" header="이름" style="width: 12%" />
+
+          <!-- 금액 -->
+          <Column field="amount" header="금액" style="width: 12%" />
+
+          <!-- 납부일자 -->
+          <Column field="transactionAt" header="납부일자" style="width: 12%" />
+
+          <!-- 상태 -->
+          <Column header="상태" style="width: 12%">
+            <template #body="slotProps">
+              <Tag :severity="getSeverity(slotProps.data.status)" :value="slotProps.data.status" />
+            </template>
+          </Column>
+        </DataTable>
+
+      </template>
+    </div>
   </div>
-  <div class="card">
-    <template v-if="members && members.length">
-      <DataTable :value="members" paginator :rows="5" tableStyle="min-width: 60rem">
-        <!-- 번호 -->
-        <Column field="number" header="번호" style="width: 12%" />
-
-        <Column header="사진" style="width: 12%">
-          <template #body="slotProps">
-            <img :src="slotProps.data.profileImage" alt="사진" style="width: 40px; height: 40px; border-radius: 50%;" />
-          </template>
-        </Column>
-
-        <!-- 이름 -->
-        <Column field="userName" header="이름" style="width: 12%" />
-
-        <!-- 금액 -->
-        <Column field="amount" header="금액" style="width: 12%" />
-
-        <!-- 납부일자 -->
-        <Column field="transactionAt" header="납부일자" style="width: 12%" />
-
-        <!-- 상태 -->
-        <Column header="상태" style="width: 12%">
-          <template #body="slotProps">
-            <Tag :severity="getSeverity(slotProps.data.status)" :value="slotProps.data.status" />
-          </template>
-        </Column>
-      </DataTable>
-    </template>
-  </div>1
 </template>
 
 <script setup>
@@ -68,7 +69,6 @@ import UserDepositModal from "./UserDepositModal.vue";
 import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import Tag from 'primevue/tag';
-import { firebaseStorage } from '@/firebase/firebaseConfig';
 import { fetchImageUrl } from '@/utils/image-load-utils';
 
 const defaultProfileImage =

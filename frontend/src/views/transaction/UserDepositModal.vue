@@ -25,17 +25,16 @@
     </Dialog>
 
     <!-- 확인 모달 -->
-    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '30rem' }">
+    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '20rem' }">
         <template #header>
-            <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
-                <span style="font-weight: bold; color:blue;">{{ userAccount }}</span> 계좌에
-                <span style="font-weight: bold; color:blue;">{{ value }}</span>원 입금하시겠습니까?
+            <div class="confirm-modal-text">
+                <span> {{ userAccount }}</span> 계좌에 <span> {{ value }}</span>원 입금하시겠습니까?
                 <p>입금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
             </div>
         </template>
         <div class="button-group">
-            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
             <Button label="취소" rounded class="next-button" @click="closeModal" />
+            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
         </div>
     </Dialog>
 
@@ -66,6 +65,7 @@
 import { ref, watch } from "vue";
 import '@/views/transaction/style/transaction.style.css';
 import '@/views/transaction/style/Modal.style.css';
+import '@/views/transaction/style/Button.style.css';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';

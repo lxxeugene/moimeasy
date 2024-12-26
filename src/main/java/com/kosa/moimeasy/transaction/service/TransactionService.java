@@ -266,6 +266,12 @@ public class TransactionService {
         return getRemittanceListResponse(request.getMoeimId(), startDate, endDate);
     }
 
+    // 모임 확인
+    private Moeim getValidmoeim(Long moeimid) {
+        return moeimRepository.findById(moeimid)
+            .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
+    }
+
     // 거래내역 조회
     @Transactional
     public TransactionListDto.Response getTransactionList(TransactionListDto.Request request) {
@@ -280,15 +286,13 @@ public class TransactionService {
         LocalDate startDate = request.getStartDate();
         LocalDate endDate = request.getEndDate();
         LocalDate nowDate = LocalDate.now();
-        int defaultDateRange = 7;
-        int maxDateRange = 40;
 
-        // 시작 날짜와 끝 날짜가 null 인 경우 (조회일 포함 일주일 내역 반환)
-        if (startDate == null && endDate == null) {
-            LocalDate weekAgoDate = nowDate.minusDays(defaultDateRange - 1);
-
-            return getTransactionListResponse(request.getMoeimId(), weekAgoDate, nowDate);
-        }
+//        // 시작 날짜와 끝 날짜가 null 인 경우 (조회일 포함 일주일 내역 반환)
+//        if (startDate == null && endDate == null) {
+//            LocalDate weekAgoDate = nowDate.minusDays(defaultDateRange - 1);
+//
+//            return getTransactionListResponse(request.getMoeimId(), weekAgoDate, nowDate);
+//        }
 
         // 시작 날짜와 끝 날짜 둘 중 하나만 null 로 보낸 경우
         if (startDate == null || endDate == null) {
@@ -308,50 +312,31 @@ public class TransactionService {
 //            throw new CustomException(INVALID_DATE);
         }
 
-        // 조회 기간이 최대 조회 기간을 넘을 경우
-        int betweenDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
-        if (betweenDays + 1 > maxDateRange) {
-            throw new CustomException(INVALID_DATE_RANGE);
-        }
+//        // 조회 기간이 최대 조회 기간을 넘을 경우
+//        int betweenDays = (int) ChronoUnit.DAYS.between(startDate, endDate);
+//        if (betweenDays + 1 > maxDateRange) {
+//            throw new CustomException(INVALID_DATE_RANGE);
+//        }
 
         // 두 날짜 전부 제대로 조회한 경우
         return getTransactionListResponse(moeim.getMoeimId(), startDate, endDate);
     }
 
-    // 모임 확인
-    private Moeim getValidmoeim(Long moeimid) {
-        return moeimRepository.findById(moeimid)
-            .orElseThrow(() -> new CustomException(ACCOUNT_NOT_FOUND));
-    }
-
-    // 거래 유형
-    private String getTransactionTargetName(Transaction transaction) {
-        switch (transaction.getTransactionType()) {
-            case WITHDRAW -> {
-                return transaction.getCategoryName();
-            }
-            case DEPOSIT -> {
-                return transaction.getDepositName();
-            }
-            case REMITTANCE -> {
-                return transaction.getDepositName();
-            }
-        }
-        return ErrorCode.TRANSACTION_TYPE_NOT_FOUND.getDescription();
-    }
-
-    // 거래 내역 조회 Response Dto 반환
+    // 거래 내역 조회 Response 반환 메소드
     private TransactionListDto.Response getTransactionListResponse(Long moeimId, LocalDate startDate, LocalDate endDate
     ) {
         List<Transaction> resultList = transactionRepository.findByMoeimAccountAndDateRange(
                 moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)
         );
 
-        Long monthDeposit = transactionRepository.findMonthlyIncome(moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)
-        );
+        // 거래내역이 존재하지 않을 시 예외 메시지 전송
+        if (resultList.isEmpty()) {
+            throw new CustomException(TRANSACTION_LIST_NOT_FOUND);
+        }
 
-        Long monthExpense = transactionRepository.findMonthlyExpenditure(moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX)
-        );
+        Long monthDeposit = transactionRepository.findMonthlyIncome(moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+
+        Long monthExpense = transactionRepository.findMonthlyExpenditure(moeimId, startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
 
         return TransactionListDto.Response.builder()
                 .transactionList(resultList.stream()
@@ -370,6 +355,24 @@ public class TransactionService {
             .build();
     }
 
+    // 거래 유형
+    private String getTransactionTargetName(Transaction transaction) {
+        switch (transaction.getTransactionType()) {
+            case WITHDRAW -> {
+                return transaction.getCategoryName();
+            }
+            case DEPOSIT -> {
+                return transaction.getDepositName();
+            }
+            case REMITTANCE -> {
+                return transaction.getDepositName();
+            }
+        }
+        return ErrorCode.TRANSACTION_TYPE_NOT_FOUND.getDescription();
+    }
+
+
+    // 거래내역 타입 반환
     private String determineTransactionType(Transaction transaction) {
         if (transaction.getTransactionType()== TransactionType.WITHDRAW) {
             return "출금";
@@ -438,7 +441,7 @@ public class TransactionService {
     }
 
 
-    // 카테고리 반환
+    // 카테고리 리스트 반환
     public InitialDataDto getInitialData(InitialDataDto request) {
 
         //사용자 조회
@@ -459,6 +462,11 @@ public class TransactionService {
 
         // 모임에 해당하는 거래 데이터 조회 (모임 ID를 기반으로)
         List<Transaction> transactions = transactionRepository.findCategoryNameByMoeimId(moeim.getMoeimId(), startDateTime, endDateTime);
+
+        // 거래내역이 존재하지 않을 시 예외 메시지 전송
+        if (transactions.isEmpty()) {
+            throw new CustomException(TRANSACTION_LIST_NOT_FOUND);
+        }
 
         // double 타입으로 합산
         Map<String, Double> categoryMap = transactions.stream()

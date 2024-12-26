@@ -23,23 +23,25 @@
     </Dialog>
 
     <!-- 확인 모달 -->
-    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '25rem' }">
+    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '20rem' }">
         <template #header>
-            <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
-                <span style="font-weight: bold;">{{ moeimName }}</span> 님에게 {{ value }} 원 이체하시겠습니까?
-                <p>출금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
-                <p>입금계좌 : {{ moeimBank }}({{ moeimName }}) {{ moeimAccount }}</p>
+            <div class="confirm-modal-text">
+                <span>{{ moeimName }}</span> 님에게 <span>{{ value }}</span> 원 이체하시겠습니까?
+                <div>
+                    <p>출금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
+                    <p>입금계좌 : {{ moeimBank }}({{ moeimName }}) {{ moeimAccount }}</p>
+                </div>
             </div>
         </template>
         <div class="button-group">
-            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
             <Button label="취소" rounded class="next-button" @click="closeModal" />
+            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
         </div>
     </Dialog>
 
     <!-- 비밀번호 확인 모달-->
     <checkPassword v-model:visible="checkPassword" @passwordVerified="handlePasswordVerified" />
-   
+
     <!--확인 모달-->
     <ConfirmDialog />
 

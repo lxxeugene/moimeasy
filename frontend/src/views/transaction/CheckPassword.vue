@@ -1,8 +1,8 @@
 <template>
     <!-- 비밀번호 검증 모달 -->
-    <Dialog :visible="visible" @update:visible="handleClose" modal :style="{ width: '30rem', height: '25rem' }">
+    <Dialog :visible="visible" @update:visible="handleClose" modal :style="{ width: '25rem', height: '25rem' }">
         <template #header>
-            <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
+            <div class="password-text">
                 <p>비밀번호를 입력해주세요</p>
             </div>
         </template>
@@ -136,4 +136,11 @@ const confirm1 = (message) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.password-text {
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 30px;
+    color: black;
+}
+</style>
