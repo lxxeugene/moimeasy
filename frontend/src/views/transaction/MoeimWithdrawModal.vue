@@ -59,9 +59,8 @@
     <!-- 회비 사용 결과 모달 -->
     <Dialog v-model:visible="visible4" modal :style="{ width: '30rem', height: '30rem' }" :closable="false">
         <template #header>
-            <div
-                style="text-align: center; font-size: 3em; margin:auto; margin-top: 50px; font-weight: bold; color: #7f56d9;">
-                <i class="pi pi-minus-circle" style="font-size: 8rem; margin-bottom: 20px;"></i>
+            <div class="modal-result">
+                <i class="pi pi-minus-circle" />
                 <div>모임비 지출</div>
             </div>
         </template>
@@ -85,11 +84,13 @@ import SplitButton from 'primevue/splitbutton';
 import { defineProps, defineEmits } from 'vue';
 import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
+import { useConfirm } from "primevue/useconfirm";
 import axios from "axios";
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import CheckPassword from "./CheckPassword.vue";
 
 
+const confirm = useConfirm();
 const loadingStore = useLoadingStore();
 
 // 부모로부터 visible 상태를 prop으로 받음
@@ -240,6 +241,7 @@ async function selectOption() {
         }
     } catch (error) {
         console.error("API 요청 중 오류 발생:", error.response?.data || error.message);
+        confirm1(error.response?.data);
     }
 }
 
@@ -289,6 +291,7 @@ async function confirmExpense() {
 
     } catch (error) {
         console.error("모임비 지출 중 오류 발생:", error.response?.data || error.message);
+        confirm1(error.response?.data);
     }
 }
 
@@ -318,6 +321,30 @@ function openCheckPassword() {
     checkPassword.value = true;
     console.log("visible2:", visible2.value, "checkPassword:", checkPassword.value);
 }
+
+
+const confirm1 = (message) => {
+    confirm.require({
+        message: message,
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: '취소',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: '확인'
+        },
+        accept: () => {
+            visible2.value = false;
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: '사용 취소', detail: '거래가 취소되었습니다.', life: 3000 });
+            visible2.value = false;
+        }
+    });
+};
 
 
 </script>
