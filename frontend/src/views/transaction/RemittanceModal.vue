@@ -23,20 +23,27 @@
     </Dialog>
 
     <!-- 확인 모달 -->
-    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '25rem' }">
+    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '20rem' }">
         <template #header>
-            <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
-                <span style="font-weight: bold;">{{ moeimName }}</span> 님에게 {{ value }} 원 이체하시겠습니까?
-                <p>출금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
-                <p>입금계좌 : {{ moeimBank }}({{ moeimName }}) {{ moeimAccount }}</p>
+            <div class="confirm-modal-text">
+                <span>{{ moeimName }}</span> 님에게 <span>{{ value }}</span> 원 이체하시겠습니까?
+                <div>
+                    <p>출금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
+                    <p>입금계좌 : {{ moeimBank }}({{ moeimName }}) {{ moeimAccount }}</p>
+                </div>
             </div>
-            <ConfirmDialog></ConfirmDialog>
         </template>
         <div class="button-group">
-            <Button label="확인" rounded class="next-button" @click="confirmremittance" />
             <Button label="취소" rounded class="next-button" @click="closeModal" />
+            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
         </div>
     </Dialog>
+
+    <!-- 비밀번호 확인 모달-->
+    <checkPassword v-model:visible="checkPassword" @passwordVerified="handlePasswordVerified" />
+
+    <!--확인 모달-->
+    <ConfirmDialog />
 
     <!-- 결과 모달 -->
     <Dialog v-model:visible="visible3" modal :style="{ width: '27rem', height: '30rem' }" :closable="false">
@@ -65,10 +72,10 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import axios from "axios";
 import { defineProps, defineEmits } from 'vue';
-import SplitButton from 'primevue/splitbutton';
-import Toast from 'primevue/toast';
 import { useToast } from 'primevue/usetoast';
 import { useConfirm } from "primevue/useconfirm";
+import CheckPassword from "./CheckPassword.vue";
+
 
 // 부모로부터 visible 상태를 prop으로 받음
 defineProps({
@@ -85,7 +92,6 @@ function handleClose() {
     emit('update:visible', false); // 부모 컴포넌트와 상태 동기화
 }
 
-
 const confirm = useConfirm();
 const toast = useToast();
 
@@ -97,6 +103,7 @@ const userName = ref(""); // 사용자 이름
 const userAccount = ref(""); // 사용자 계좌번호
 const moeimBank = ref("토스"); // 모임 은행 이름
 const moeimAccount = ref(""); // 모임 계좌번호
+const checkPassword = ref(false); // 비밀번호 입력력
 
 const visible2 = ref(false); // 확인 모달
 const visible3 = ref(false); // 결과 모달
@@ -175,6 +182,14 @@ async function remittanceAmount() {
     }
 }
 
+// 비밀번호가 일치하면 입금 처리
+const handlePasswordVerified = (isValid) => {
+    if (isValid) {
+        confirmremittance();
+    }
+}
+
+
 // 확인 버튼 클릭 -> 송금 처리
 async function confirmremittance() {
     try {
@@ -215,14 +230,14 @@ async function confirmremittance() {
         visible2.value = false; // 확인 모달 닫기
         visible3.value = true; // 결과 모달 열기
     } catch (error) {
-        console.error("송금 중 오류 발생:", error.response?.data || error.message);
-        confirm1(error.response?.data || error.message);
+        console.error("송금 중 오류 발생:", error.response?.data);
+        confirm1(error.response?.data);
     }
 }
 
 const confirm1 = (message) => {
     confirm.require({
-        message: message || '회비를 이미 납부하였습니다.',
+        message: message,
         header: 'Confirmation',
         icon: 'pi pi-exclamation-triangle',
         rejectProps: {
@@ -260,6 +275,14 @@ function closeModal() {
         life: 3000,
     });
     visible2.value = false;
+}
+
+// 확인 버튼 클릭 시 호출되는 함수
+function openCheckPassword() {
+    console.log("openCheckPassword 호출됨");
+    visible2.value = false;
+    checkPassword.value = true;
+    console.log("visible2:", visible2.value, "checkPassword:", checkPassword.value);
 }
 </script>
 
