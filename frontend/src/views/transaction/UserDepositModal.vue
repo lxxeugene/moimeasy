@@ -25,19 +25,21 @@
     </Dialog>
 
     <!-- 확인 모달 -->
-    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '30rem' }">
+    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '20rem' }">
         <template #header>
-            <div style="text-align: center; font-size: 1.2em; margin-top: 30px; color: black;">
-                <span style="font-weight: bold; color:blue;">{{ userAccount }}</span> 계좌에
-                <span style="font-weight: bold; color:blue;">{{ value }}</span>원 입금하시겠습니까?
+            <div class="confirm-modal-text">
+                <span> {{ userAccount }}</span> 계좌에 <span> {{ value }}</span>원 입금하시겠습니까?
                 <p>입금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
             </div>
         </template>
         <div class="button-group">
-            <Button label="확인" rounded class="next-button" @click="confirmDeposit" />
             <Button label="취소" rounded class="next-button" @click="closeModal" />
+            <Button label="확인" rounded class="next-button" @click="openCheckPassword" />
         </div>
     </Dialog>
+
+    <!-- 비밀번호 확인 모달-->
+    <checkPassword v-model:visible="checkPassword" @passwordVerified="handlePasswordVerified" />
 
     <!-- 결과 모달 -->
     <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '30rem' }" :closable="false">
@@ -63,12 +65,13 @@
 import { ref, watch } from "vue";
 import '@/views/transaction/style/transaction.style.css';
 import '@/views/transaction/style/Modal.style.css';
+import '@/views/transaction/style/Button.style.css';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Toast from 'primevue/toast';
 import { defineProps, defineEmits } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import { useConfirm } from "primevue/useconfirm";
+import CheckPassword from "./CheckPassword.vue";
 import axios from "axios";
 
 
@@ -87,7 +90,6 @@ function handleClose() {
     emit('update:visible', false); // 부모 컴포넌트와 상태 동기화
 }
 
-const confirm = useConfirm();
 const toast = useToast();
 
 // 모달 제어
@@ -99,6 +101,7 @@ const visible3 = ref(false); // 결과 모달
 const userBank = ref("신한"); // 사용자 은행 이름
 const userName = ref(""); // 사용자 이름
 const userAccount = ref(""); // 사용자 계좌번호
+const checkPassword = ref(false); // 비밀번호 입력
 
 // 숫자 버튼 목록
 const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'x'];
@@ -112,6 +115,12 @@ function handleButtonClick(num) {
     }
 }
 
+// 비밀번호가 일치하면 입금 처리
+const handlePasswordVerified = (isValid) => {
+    if (isValid) {
+        confirmDeposit();
+    }
+}
 
 // 다음 버튼 클릭 -> 확인 모달 표시
 async function depositAmount() {
@@ -175,12 +184,10 @@ async function confirmDeposit() {
         const accessToken = localStorage.getItem('accessToken');
         const userRaw = localStorage.getItem('user');
         let userId = null;
-        let moeimId = null;
 
         if (userRaw) {
             const user = JSON.parse(userRaw); // JSON 파싱
             userId = user?.userId || null; // 'userId' 키로 가져오기
-            moeimId = user?.moeimId || null; // `moeimId` 키로 가져오기
         }
         const response = await axios.put(
             "/api/v1/transaction/userDeposit",
@@ -190,7 +197,7 @@ async function confirmDeposit() {
             },
             {
                 headers: { Authorization: `Bearer ${accessToken}` },
-            }
+            },
         );
         console.log("요청 데이터:", {
             userId: userId,
@@ -225,6 +232,14 @@ function closeModal() {
         life: 3000,
     });
     visible2.value = false;
+}
+
+// 확인 버튼 클릭 시 호출되는 함수
+function openCheckPassword() {
+    console.log("openCheckPassword 호출됨");
+    visible2.value = false;
+    checkPassword.value = true;
+    console.log("visible2:", visible2.value, "checkPassword:", checkPassword.value);
 }
 
 </script>
