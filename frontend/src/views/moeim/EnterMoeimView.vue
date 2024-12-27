@@ -33,6 +33,7 @@
 import axios from 'axios';
 import Modal from '@/components/Modal.vue';
 import { useAuthStore } from '@/stores/auth';
+import { fetchAddNotification } from '@/utils/notification-add-utils';
 
 axios.defaults.baseURL = 'http://localhost:8088';
 axios.defaults.withCredentials = true;
@@ -46,6 +47,7 @@ export default {
       },
       isModalVisible: false,
       modalMessage: '',
+      isSuccess: false,
     };
   },
   methods: {
@@ -70,6 +72,12 @@ export default {
 
         authStore.user.moeimId = moeimId;
         localStorage.setItem('user', JSON.stringify(authStore.user));
+
+        fetchAddNotification(
+          '회원 입장 알림',
+          `${authStore.user.nickname}님이 모임에 가입하셨습니다.`,
+          moeimId
+        );
 
         this.modalMessage = message;
         this.isModalVisible = true;
