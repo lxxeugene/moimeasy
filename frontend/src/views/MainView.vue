@@ -1,5 +1,6 @@
 <template>
   <div class="main-page-container">
+    <div class="main-page-wrapper">
     <h1>누구님 환영합니다.</h1>
     <!-- 상단 섹션: 프로필, 달력, 채팅 -->
     <div class="top-section">
@@ -21,6 +22,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -57,13 +59,19 @@ export default {
 
 <style scoped>
 .main-page-container {
+  background-image: url("../assets/images/pexels-photo-7130555.png");
+  background-size: cover;
+  height: 100vh;
+  width: 100;
+  /* 전체 화면 높이 */
+}
+.main-page-wrapper {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   padding: 10px;
-  background-color: #f5f7fa;
   height: 100vh;
-  width: 70%;
+  width: 900px;
   /* 전체 화면 높이 */
 }
 
