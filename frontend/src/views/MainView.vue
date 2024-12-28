@@ -1,10 +1,8 @@
 <template>
   <div class="main-page-container">
+    <h1>누구님 환영합니다.</h1>
     <!-- 상단 섹션: 프로필, 달력, 채팅 -->
     <div class="top-section">
-      <div class="profile-section scrollable narrow">
-        <UserProfile />
-      </div>
       <div class="calendar-section scrollable wide">
         <ScheduleCalendarMini />
       </div>
@@ -20,9 +18,6 @@
       </div>
       <div class="category-section scrollable">
         <CategoryChart />
-      </div>
-      <div class="settlement-section scrollable">
-        <SettlementView />
       </div>
     </div>
   </div>
@@ -62,11 +57,13 @@ export default {
 
 <style scoped>
 .main-page-container {
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   padding: 10px;
   background-color: #f5f7fa;
   height: 100vh;
+  width: 70%;
   /* 전체 화면 높이 */
 }
 
