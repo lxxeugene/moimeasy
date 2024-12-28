@@ -162,7 +162,7 @@ const updateMonth = (offset) => {
         previousDate.value = new Date(currentDate.value); // 이전 날짜 저장
         currentDate.value.setMonth(currentDate.value.getMonth() + offset);
         const month = currentDate.value.getMonth() + 1;
-        currentMonth.value = `${currentDate.value.getMonth() + 1}월 카테고리별 지출내역`;
+        currentMonth.value = `${currentDate.value.getMonth() + 1}월 카테고리별 지출 내용`;
         // 새로운 기간으로 데이터 재조회
         fetchInitialData();
     }
@@ -170,7 +170,7 @@ const updateMonth = (offset) => {
 
 onMounted(() => {
     const date = new Date();
-    currentMonth.value = `${date.getMonth() + 1}월 카테고리별 지출내역`;
+    currentMonth.value = `${date.getMonth() + 1}월 카테고리별 지출 내용`;
     fetchInitialData(); // 데이터 조회 후 chartData, categoryData 설정
 });
 

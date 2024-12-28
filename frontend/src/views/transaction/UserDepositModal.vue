@@ -44,10 +44,9 @@
     <!-- 결과 모달 -->
     <Dialog v-model:visible="visible3" modal :style="{ width: '30rem', height: '30rem' }" :closable="false">
         <template #header>
-            <div
-                style="display: flex; justify-content: center; align-items: center; font-size: 4em; margin-top: 50px; font-weight: bold; color: #7f56d9;">
-                <i class="pi pi-check-circle" style="font-size: 8rem; margin-right: 20px;"></i>
-                <div style="margin-top: 30px;">입금</div>
+            <div class="modal-result">
+                <i class="pi pi-check-circle" />
+                <div>입금</div>
             </div>
         </template>
 

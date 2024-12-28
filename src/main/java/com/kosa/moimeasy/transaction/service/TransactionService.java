@@ -166,18 +166,20 @@ public class TransactionService {
     @Transactional
     public RemittanceDto.Response remittance(RemittanceDto.Request request) {
 
+        // 유저 계좌 없을 때
         User sentAccount = userRepository.findById(request.getUserId())
             .orElseThrow(() -> new CustomException(SENT_ACCOUNT_NOT_FOUND));
 
+        // 모임 계좌 없을 때
         Moeim receivedAccount = moeimRepository.findById(request.getMoeimId())
             .orElseThrow(() -> new CustomException(RECEIVED_ACCOUNT_NOT_FOUND));
 
         // (송금 요청 금액 > 보내는 계좌의 잔액)의 경우 예외 발생
         if (request.getAmount() > sentAccount.getAmount()) {
-            throw new CustomException(BALANCE_NOT_ENOUGH);
+            throw new CustomException(USER_BALANCE_NOT_ENOUGH);
         }
 
-        // 이미 납부했으면 납부했다는 알림
+        // 이미 납부했으면 납부했다는 예외 발생
         List<Transaction> transactions = transactionRepository.findByUserId(request.getUserId());
 
         for (Transaction transaction : transactions) {
