@@ -77,7 +77,7 @@ const routes = [
         component: Settlement },
     ],
   },
-  { path: '/category', name: '카테고리별 소비내역', component: Category },
+  { path: '/category', name: '카테고리별 지출 내용', component: Category },
   { path: '/chat', name: 'WebSocket', component: WebSocket },
   { path: '/chat-room-list', name: '채팅목록', component: ChatRoomList },
   {
