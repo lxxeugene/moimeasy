@@ -3,13 +3,6 @@
     <div class="header">
       <div class="title-bar">
         <div class="title">{{ currentMonth }}</div>
-      </div>
-      <div class="sub-title-bar">
-        <div class="money">
-          잔액 : {{ accountBalance.toLocaleString() }}원
-          수입 : {{ totalDeposit.toLocaleString() }}원
-          지출 : {{ totalExpense.toLocaleString() }}원
-        </div>
         <div class="icon-button-group">
           <i class="pi pi-caret-left icon-hover" @click="updateMonth(-1)"></i>
           <i class="pi pi-calendar-times"></i>
@@ -19,23 +12,36 @@
     </div>
     <div class="card datatable-card">
       <template v-if="products.length">
-        <DataTable :value="products" virtualScroll scrollHeight="500px" stripedRows tableStyle="min-width: 50rem"
-          ref="dt" class="centered-datatable">
+        <DataTable :value="products" removableSort virtualScroll scrollHeight="500px" stripedRows
+          tableStyle="min-width: 50rem" ref="dt" class="centered-datatable">
           <template #header>
             <div class="export-button-container">
+              <div class="money">
+                <span class="money-item">
+                  <Tag class="custom-tag">잔액 : {{ accountBalance.toLocaleString() }} 원</Tag>
+                </span>
+                <span class="money-item">
+                  <Tag class="custom-tag" style="color: #519de0; background-color: #519de024;">
+                    수입 : {{ totalDeposit.toLocaleString() }} 원</Tag>
+                </span>
+                <span class="money-item">
+                  <Tag class="custom-tag" style="color: #e051a9; background-color: #e051a920;">
+                    지출 : {{ totalExpense.toLocaleString() }} 원</Tag>
+                </span>
+              </div>
               <Button icon="pi pi-external-link" label="내보내기" iconPos="right" @click="exportCSV($event)"
                 class="export-button" />
             </div>
           </template>
 
           <!-- 날짜 컬럼 -->
-          <Column field="tradedate" header="날짜"></Column>
+          <Column field="tradedate" header="날짜" sortable style="width: 25%"></Column>
 
           <!-- 거래내역 컬럼 -->
-          <Column field="tradelist" header="거래내역"></Column>
+          <Column field="tradelist" header="거래내역" sortable style="width: 25%"></Column>
 
           <!-- 금액 컬럼 -->
-          <Column field="trademoney" header="금액">
+          <Column field="trademoney" header="금액" sortable style="width: 25%">
             <template #body="slotProps">
               <span :class="slotProps.data.tradetype === '출금' ? 'money-negative' : 'money-positive'">
                 {{ slotProps.data.tradetype === '출금' ? '-' : '' }}
@@ -45,7 +51,7 @@
           </Column>
 
           <!-- 구분 컬럼 (Tag 컴포넌트 사용 예시) -->
-          <Column field="tradetype" header="구분">
+          <Column field="tradetype" header="구분" sortable style="width: 25%">
             <template #body="slotProps">
               <Tag :value="slotProps.data.tradetype"
                 :severity="slotProps.data.tradetype === '입금' ? 'success' : 'danger'" />
@@ -83,7 +89,7 @@ const products = ref([]); // 초기 값으로 빈 배열 설정
 const currentDate = ref(new Date()); // 현재 날짜를 기준으로 동작
 const accountBalance = ref(0);
 const totalDeposit = ref(0);
-const totalExpense = ref(0); 
+const totalExpense = ref(0);
 const confirm = useConfirm(); // alert 창
 const previousDate = ref(new Date()); // 이전 월
 const isReverting = ref(false); // 되돌림 상태
@@ -223,20 +229,26 @@ const confirm1 = (message) => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  /* 변경: 80% → 100% */
   padding: 10px;
   justify-content: center;
   box-sizing: border-box;
-  /* 패딩 포함 */
 }
 
 .title-bar {
   flex-direction: column;
-  margin-bottom: 40px;
+}
+
+.icon-button-group {
+  align-self: flex-end;
+  margin-right: 300px;
 }
 
 .money {
-  font-size: 1.2em;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 1.5em;
+  justify-content: center;
+  align-items: center;
 }
 
 .datatable-card {
@@ -248,8 +260,8 @@ const confirm1 = (message) => {
 
 .export-button-container {
   display: flex;
-  justify-content: flex-end;
-  padding-right: 1rem;
+  justify-content: space-between;
+  align-items: center;
 }
 
 :deep(.export-button) {
@@ -283,5 +295,11 @@ const confirm1 = (message) => {
 .money-positive {
   font-weight: bold;
   color: #519de0;
+}
+
+.custom-tag {
+  /* 원하는 커스터마이징 스타일을 여기에 추가 */
+  font-weight: bold;
+  font-size: 1.1em;
 }
 </style>

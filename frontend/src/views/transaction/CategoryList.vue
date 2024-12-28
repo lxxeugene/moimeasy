@@ -22,8 +22,8 @@
                     </SplitterPanel>>
                     <SplitterPanel class="full-size-panel">
                         <div class="card datatable-card">
-                            <DataTable :value="categoryData" ref="dt" class="centered-datatable"
-                                tableStyle="min-width: 20rem">
+                            <DataTable :value="categoryData" virtualScroll scrollHeight="70%" ref="dt"
+                                class="centered-datatable" tableStyle="min-width: 20rem">
                                 <Column header="비율" class="header-style">
                                     <template #body="slotProps">
                                         <div class="circle-container">
@@ -39,9 +39,10 @@
                                         <span class="content">{{ slotProps.data.categoryList }}</span>
                                     </template>
                                 </Column>
-                                <Column :field="'categoryMoney'" header=" 금액" class="header-style">
+                                <Column :field="'categoryMoney'" header="금액" class="header-style">
                                     <template #body="slotProps">
-                                        <Tag :value="slotProps.data.categoryMoney"
+                                        <!-- 숫자에 쉼표를 추가하고, 조건에 따라 클래스 지정 -->
+                                        <Tag :value="slotProps.data.categoryMoney.toLocaleString()"
                                             :class="getCustomTagClass(slotProps.data.categoryMoney)" />
                                     </template>
                                 </Column>
@@ -89,8 +90,30 @@ const categoryData = ref([]); // 백엔드에서 받아온 카테고리별 데�
 const chartData = ref({});
 const expense = ref(false);
 // 카테고리 개수에 따라 색상 배열 생성
-const backgroundColors = ['#C19ED2', '#FFA2C3', '#FF7CA1', '#96C2EE', '#68A3EE'];
-const hoverBackgroundColors = ['#B58BBF', '#FF99BA', '#FF7296', '#8CB9E8', '#62A0E6'];
+const backgroundColors = [
+    '#C19ED2', // Light Purple
+    '#FFA2C3', // Light Pink
+    '#FF7CA1', // Pink
+    '#96C2EE', // Light Blue
+    '#68A3EE', // Blue
+    '#98f5e1', // Light Yellow
+    '#FDE4CF', // Light Orange
+    '#FFCFD2', // Light Coral
+    '#F1C0E8', // Light Lavender
+    '#B9FBC0'  // Light Green
+];
+const hoverBackgroundColors = [
+    '#A678B9', // Darker Purple
+    '#E67FA0', // Darker Pink
+    '#E6737F', // Darker Pink
+    '#7F99C9', // Darker Blue
+    '#4F8CD3', // Darker Blue
+    '#98f5e1', // Darker Yellow
+    '#E2C3B8', // Darker Orange
+    '#E5A3B3', // Darker Coral
+    '#D1A3E1', // Darker Lavender
+    '#A3E0A0'  // Darker Green
+];
 const confirm = useConfirm(); // alert 창
 const previousDate = ref(new Date()); // 이전 월
 const isReverting = ref(false); // 되돌림 상태
@@ -177,14 +200,17 @@ onMounted(() => {
 
 // 금액에 따라 커스텀 클래스 결정
 const getCustomTagClass = (amount) => {
-    if (amount > 10000) {
-        return 'custom-success';
-    } else if (amount > 0) {
-        return 'custom-info';
-    } else if (amount < 0) {
-        return 'custom-danger';
-    } else {
-        return 'custom-warning';
+    if (amount < 10000) {
+        return 'custom-tag1';
+    } else if (amount < 20000) {
+        return 'custom-tag2';
+    } else if (amount < 40000) {
+        return 'custom-tag3';
+    } else if (amount < 50000) {
+        return 'custom-tag4';
+    }
+    else {
+        return 'default';
     }
 };
 
@@ -286,6 +312,13 @@ const confirm1 = (message) => {
     margin: 20px;
 }
 
+.datatable-card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 
 .chart-container {
     width: 80%;
@@ -333,7 +366,7 @@ const confirm1 = (message) => {
     font-size: 1.2rem;
     border-radius: 0.5rem;
     padding: 0.25rem 0.5rem;
-    width: 50%;
+    width: 80%;
     height: 40px;
     /* background-color: #f0f0f0; */
     /* 예시: 배경색 추가 */
@@ -342,7 +375,8 @@ const confirm1 = (message) => {
     /* color: #333; */
 }
 
-.chart-wrapper {}
-
-.full-size-panel {}
+:deep(.p-tag) {
+    height: 40px;
+    width: 70px;
+}
 </style>

@@ -10,14 +10,16 @@
         <i class="pi pi-calendar-times"></i>
         <i class="pi pi-caret-right icon-hover" @click="updateMonth(1)"></i>
       </div>
-      <!-- 회비 납부 모달 -->
-      <Button label="회비 납부" icon="pi pi-check" iconPos="right" rounded class="rimittance-button"
-        @click="remittance = true" />
-      <RemittanceModal v-model:visible="remittance" />
+      <div class="button-group" style="gap: 1.2em;">
+        <!-- 회비 납부 모달 -->
+        <Button label="회비 납부" icon="pi pi-check" iconPos="right" rounded class="rimittance-button"
+          @click="remittance = true" />
+        <RemittanceModal v-model:visible="remittance" />
 
-      <!-- 계좌 입금 모달-->
-      <Button label="계좌 입금" icon="pi pi-paypal" iconPos="right" rounded class="deposit-button"
-        @click="deposit = true" />
+        <!-- 계좌 입금 모달-->
+        <Button label="계좌 입금" icon="pi pi-dollar" iconPos="right" rounded class="deposit-button"
+          @click="deposit = true" />
+      </div>
       <UserDepositModal v-model:visible="deposit" />
     </div>
     <div class="card">
@@ -36,8 +38,11 @@
           <Column field="userName" header="이름" style="width: 12%" />
 
           <!-- 금액 -->
-          <Column field="amount" header="금액" style="width: 12%" />
-
+          <Column field="amount" header="금액" style="width: 12%; font-weight: bold;">
+            <template #body="slotProps">
+              {{ Number(slotProps.data.amount).toLocaleString() }}
+            </template>
+          </Column>
           <!-- 납부일자 -->
           <Column field="transactionAt" header="납부일자" style="width: 12%" />
 
@@ -230,4 +235,8 @@ const confirm1 = (message) => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+::v-deep .p-datatable-tbody>tr>td {
+  vertical-align: middle;
+}
+</style>
