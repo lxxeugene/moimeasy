@@ -3,24 +3,15 @@
     <!-- 헤더 -->
     <div class="header">
       <h2>정산 요청 목록</h2>
-      <Button
-        label="정산 요청"
-        icon="pi pi-plus"
-        class="p-button-rounded p-button-primary"
-        @click="openModal"
-      />
+      <Button label="정산 요청" icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openModal" />
     </div>
 
     <!-- 정산 요청 목록 -->
-    <DataTable
-      :value="settlementRequests"
-      class="p-datatable-striped"
-      responsiveLayout="scroll"
-    >
-      <Column field="title" header="제목">
+    <DataTable :value="settlementRequests" class="p-datatable-striped" responsiveLayout="scroll">
+      <Column field="categoryName" header="제목">
         <template #body="slotProps">
           <span class="clickable-text" @click="openDetailModal(slotProps.data)">
-            {{ slotProps.data.title }}
+            {{ slotProps.data.categoryName }}
           </span>
         </template>
       </Column>
@@ -33,112 +24,60 @@
       </Column>
       <Column header="영수증">
         <template #body="slotProps">
-          <img
-            :src="slotProps.data.imageUrl"
-            alt="영수증"
-            class="receipt-image clickable-image"
-            @click="openDetailModal(slotProps.data)"
-          />
+          <img :src="slotProps.data.imageUrl" alt="영수증" class="receipt-image clickable-image"
+            @click="openDetailModal(slotProps.data)" />
         </template>
       </Column>
       <Column field="status" header="상태">
         <template #body="slotProps">
-          <span
-            :class="
-              'status-' +
-              (slotProps.data.status
-                ? slotProps.data.status.toLowerCase()
-                : 'pending')
-            "
-          >
+          <span :class="'status-' +
+            (slotProps.data.status
+              ? slotProps.data.status.toLowerCase()
+              : 'pending')
+            ">
             {{ getStatusLabel(slotProps.data.status) }}
           </span>
         </template>
       </Column>
       <Column v-if="isAdmin" header="승인">
         <template #body="slotProps">
-          <Button
-            v-if="slotProps.data.status === 'PENDING'"
-            label="승인"
-            icon="pi pi-check"
-            class="p-button-success"
-            @click="approveRequest(slotProps.data.id)"
-          />
+          <Button v-if="slotProps.data.status === 'PENDING'" label="승인" icon="pi pi-check" class="p-button-success"
+            @click="approveRequest(slotProps.data.id)" />
         </template>
       </Column>
     </DataTable>
 
     <!-- 정산 요청 모달 -->
-    <Dialog
-      header="정산 요청하기"
-      v-model:visible="isModalVisible"
-      :style="{ width: '30vw' }"
-      modal
-    >
+    <Dialog header="정산 요청하기" v-model:visible="isModalVisible" :style="{ width: '30vw' }" modal>
       <div class="form">
         <div class="p-field">
-          <label for="title">제목</label>
-          <InputText
-            id="title"
-            v-model="title"
-            placeholder="제목을 입력하세요"
-            class="p-inputtext"
-          />
+          <label for="categoryName">제목</label>
+          <InputText id="categoryName" v-model="categoryName" placeholder="제목을 입력하세요" class="p-inputtext" />
         </div>
         <div class="p-field">
           <label for="amount">요청 금액</label>
-          <InputText
-            id="amount"
-            v-model="amount"
-            placeholder="금액을 입력하세요"
-            class="p-inputtext"
-          />
+          <InputText id="amount" v-model="amount" placeholder="금액을 입력하세요" class="p-inputtext" />
         </div>
         <div class="p-field">
           <label for="file">영수증 첨부</label>
-          <input
-            type="file"
-            id="file"
-            accept="image/*"
-            @change="onFileChange"
-            class="custom-file-input"
-          />
+          <input type="file" id="file" accept="image/*" @change="onFileChange" class="custom-file-input" />
           <label for="file" class="custom-file-label">파일 선택</label>
         </div>
       </div>
       <template #footer>
-        <Button
-          label="취소"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="closeModal"
-        />
-        <Button
-          label="요청 제출"
-          icon="pi pi-check"
-          class="p-button-primary"
-          @click="submitRequest"
-          :disabled="isSubmitDisabled"
-        />
+        <Button label="취소" icon="pi pi-times" class="p-button-text" @click="closeModal" />
+        <Button label="요청 제출" icon="pi pi-check" class="p-button-primary" @click="submitRequest"
+          :disabled="isSubmitDisabled" />
       </template>
     </Dialog>
 
     <!-- 세부 정보 모달 -->
-    <Dialog
-      header="정산 요청 상세"
-      v-model:visible="isDetailModalVisible"
-      :style="{ width: '40vw' }"
-      modal
-    >
+    <Dialog header="정산 요청 상세" v-model:visible="isDetailModalVisible" :style="{ width: '40vw' }" modal>
       <div class="detail-view">
-        <h3><strong>제목:</strong>{{ selectedRequest.title }}</h3>
+        <h3><strong>제목:</strong>{{ selectedRequest.categoryName }}</h3>
         <p><strong>작성자:</strong> {{ selectedRequest.userName }}</p>
         <p><strong>날짜:</strong> {{ selectedRequest.createdAt }}</p>
-        <img
-          :src="selectedRequest.imageUrl"
-          alt="영수증"
-          class="receipt-image-large"
-        />
+        <img :src="selectedRequest.imageUrl" alt="영수증" class="receipt-image-large" />
       </div>
     </Dialog>
   </div>
@@ -175,7 +114,7 @@ export default {
     const isModalVisible = ref(false);
     const isDetailModalVisible = ref(false);
     const selectedRequest = ref({});
-    const title = ref('');
+    const categoryName = ref('');
     const amount = ref('');
     const imageUrl = ref('');
     const selectedFile = ref(null); // 선택된 파일
@@ -247,8 +186,8 @@ export default {
     };
 
     // 제출 버튼 활성화 상태 감지
-    watch([title, amount, imageUrl], () => {
-      isSubmitDisabled.value = !title.value || !amount.value || !imageUrl.value;
+    watch([categoryName, amount, imageUrl], () => {
+      isSubmitDisabled.value = !categoryName.value || !amount.value || !imageUrl.value;
     });
 
     // 정산 요청 제출
@@ -257,7 +196,7 @@ export default {
 
       try {
         const payload = {
-          title: title.value,
+          categoryName: categoryName.value,
           amount: parseFloat(amount.value),
           imageUrl: imageUrl.value, // Firebase URL 전송
         };
@@ -281,7 +220,7 @@ export default {
 
     const closeModal = () => {
       isModalVisible.value = false;
-      title.value = '';
+      categoryName.value = '';
       amount.value = '';
       imageUrl.value = '';
       selectedFile.value = null;
@@ -317,7 +256,7 @@ export default {
       settlementRequests,
       isModalVisible,
       isDetailModalVisible,
-      title,
+      categoryName,
       amount,
       imageUrl,
       selectedFile,
@@ -414,15 +353,19 @@ label {
 .p-button-primary:hover {
   background-color: #6b49c1;
 }
+
 .status-pending {
   color: orange;
 }
+
 .status-accepted {
   color: green;
 }
+
 .status-rejected {
   color: red;
 }
+
 .custom-file-input {
   position: absolute;
   z-index: -1;
