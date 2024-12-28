@@ -1,66 +1,68 @@
 <template>
     <div class="total-frame">
-        <div class="header">
+        <div class="title-bar">
             <div class="title"> {{ currentMonth }} </div>
             <div class="icon-button-group">
-                <i class="pi pi-caret-left" style="font-size: 1rem" @click="updateMonth(-1)"></i>
-                <i class="pi pi-calendar-times" style="font-size: 1rem"></i>
-                <i class="pi pi-caret-right" style="font-size: 1rem" @click="updateMonth(1)"></i>
+                <i class="pi pi-caret-left icon-hover" @click="updateMonth(-1)"></i>
+                <i class="pi pi-calendar-times"></i>
+                <i class="pi pi-caret-right icon-hover" @click="updateMonth(1)"></i>
             </div>
             <div class="withdraw-money"> <Button label="회비사용" icon="pi pi-dollar" iconPos="right" rounded
                     class="expense-button" @click="expense = true" />
                 <MoeimWithdraw v-model:visible="expense" :onFetch="fetchInitialData" />
             </div>
         </div>
-    </div>
-    <div v-if="hasData">
-        <Splitter>
-            < <!-- 도넛 차트 -->
-                <SplitterPanel class="full-size-panel">
-                    <div class="chart-wrapper">
-                        <Chart type="doughnut" :data="chartData" :options="chartOptions" class="chart-container" />
-                    </div>
-                </SplitterPanel>>
-                <SplitterPanel class="full-size-panel">
-                    <div class="card datatable-card">
-                        <DataTable :value="categoryData" ref="dt" class="centered-datatable"
-                            tableStyle="min-width: 20rem">
-                            <Column header="비율" class="header-style">
-                                <template #body="slotProps">
-                                    <div class="circle-container">
-                                        <div :style="{ backgroundColor: slotProps.data.categoryColor }"
-                                            class="circle-content">
-                                            <span>{{ slotProps.data.categoryPercentage }}%</span>
+        <div v-if="hasData">
+            <Splitter>
+                < <!-- 도넛 차트 -->
+                    <SplitterPanel class="full-size-panel">
+                        <div class="chart-wrapper">
+                            <Chart type="doughnut" :data="chartData" :options="chartOptions" class="chart-container" />
+                        </div>
+                    </SplitterPanel>>
+                    <SplitterPanel class="full-size-panel">
+                        <div class="card datatable-card">
+                            <DataTable :value="categoryData" ref="dt" class="centered-datatable"
+                                tableStyle="min-width: 20rem">
+                                <Column header="비율" class="header-style">
+                                    <template #body="slotProps">
+                                        <div class="circle-container">
+                                            <div :style="{ backgroundColor: slotProps.data.categoryColor }"
+                                                class="circle-content">
+                                                <span>{{ slotProps.data.categoryPercentage }}%</span>
+                                            </div>
                                         </div>
-                                    </div>
-                                </template>
-                            </Column>
-                            <Column :field="'categoryList'" header="항목" class="header-style">
-                                <template #body="slotProps">
-                                    <span class="content">{{ slotProps.data.categoryList }}</span>
-                                </template>
-                            </Column>
-                            <Column :field="'categoryMoney'" header=" 금액" class="header-style">
-                                <template #body="slotProps">
-                                    <Tag :value="slotProps.data.categoryMoney"
-                                        :class="getCustomTagClass(slotProps.data.categoryMoney)" />
-                                </template>
-                            </Column>
-                        </DataTable>
-                    </div>
-                </SplitterPanel>
-        </Splitter>
-    </div>
-    <div v-else>
-        <!-- 데이터가 없을 때 표시 -->
-        <p>데이터가 없습니다.</p>
+                                    </template>
+                                </Column>
+                                <Column :field="'categoryList'" header="항목" class="header-style">
+                                    <template #body="slotProps">
+                                        <span class="content">{{ slotProps.data.categoryList }}</span>
+                                    </template>
+                                </Column>
+                                <Column :field="'categoryMoney'" header=" 금액" class="header-style">
+                                    <template #body="slotProps">
+                                        <Tag :value="slotProps.data.categoryMoney"
+                                            :class="getCustomTagClass(slotProps.data.categoryMoney)" />
+                                    </template>
+                                </Column>
+                            </DataTable>
+                        </div>
+                    </SplitterPanel>
+            </Splitter>
+        </div>
+        <div v-else>
+            <!-- 데이터가 없을 때 표시 -->
+            <p>데이터가 없습니다.</p>
+        </div>
+        <ConfirmDialog />
     </div>
 </template>
 
 <script setup>
-import '@/views/transaction/style/transaction.style.css';
+import '@/views/transaction/style/Transaction.style.css';
+import '@/views/transaction/style/Button.style.css';
 import '@/views/transaction/style/Modal.style.css';
-import '@/views/transaction/style/tag.style.css';
+import '@/views/transaction/style/Tag.style.css';
 import 'primeicons/primeicons.css';
 import { onMounted, ref } from "vue";
 import Chart from 'primevue/chart';
@@ -74,6 +76,7 @@ import { useRouter } from 'vue-router';
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import MoeimWithdraw from "./MoeimWithdrawModal.vue";
 import Tag from 'primevue/tag';
+import { useConfirm } from "primevue/useconfirm"; // confirm 사용을 위해 추가
 
 
 const loadingStore = useLoadingStore();
@@ -88,6 +91,9 @@ const expense = ref(false);
 // 카테고리 개수에 따라 색상 배열 생성
 const backgroundColors = ['#C19ED2', '#FFA2C3', '#FF7CA1', '#96C2EE', '#68A3EE'];
 const hoverBackgroundColors = ['#B58BBF', '#FF99BA', '#FF7296', '#8CB9E8', '#62A0E6'];
+const confirm = useConfirm(); // alert 창
+const previousDate = ref(new Date()); // 이전 월
+const isReverting = ref(false); // 되돌림 상태
 
 
 
@@ -137,12 +143,13 @@ async function fetchInitialData() {
         chartData.value = setChartData();    // categoryData.value 기반으로 chartData 설정
         chartOptions.value = setChartOptions();
         transformChartData();                // chartData 기반 비율 계산
-
-        console.log(response.data);
     }
     catch (error) {
+        if (!isReverting.value) {
+            isReverting.value = true;
+            confirm1(error.response.data);
+        }
         hasData.value = false; // 오류 발생 시 데이터가 없다고 설정
-        console.error("모임 세부 정보 조회 중 오류 발생:", error.response?.data || error.message);
     }
     finally {
         loadingStore.stopLoading(); // 로딩 중지
@@ -151,16 +158,19 @@ async function fetchInitialData() {
 
 // 월 변경 및 데이터 다시 가져오기
 const updateMonth = (offset) => {
-    currentDate.value.setMonth(currentDate.value.getMonth() + offset);
-    currentMonth.value = `${currentDate.value.getMonth() + 1}월 카테고리별 지출내역`;
-
-    // 새로운 기간으로 데이터 재조회
-    fetchInitialData();
+    if (!isReverting.value) {
+        previousDate.value = new Date(currentDate.value); // 이전 날짜 저장
+        currentDate.value.setMonth(currentDate.value.getMonth() + offset);
+        const month = currentDate.value.getMonth() + 1;
+        currentMonth.value = `${currentDate.value.getMonth() + 1}월 카테고리별 지출 내용`;
+        // 새로운 기간으로 데이터 재조회
+        fetchInitialData();
+    }
 };
 
 onMounted(() => {
     const date = new Date();
-    currentMonth.value = `${date.getMonth() + 1}월 카테고리별 지출내역`;
+    currentMonth.value = `${date.getMonth() + 1}월 카테고리별 지출 내용`;
     fetchInitialData(); // 데이터 조회 후 chartData, categoryData 설정
 });
 
@@ -235,22 +245,37 @@ const transformChartData = () => {
     }
 };
 
+const confirm1 = (message) => {
+    confirm.require({
+        message: message,
+        header: 'Error',
+        icon: 'pi pi-times',
+        rejectProps: {
+            label: '취소',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: '확인'
+        },
+        accept: () => {
+            // 이전 날짜로 되돌리기
+            currentDate.value = previousDate.value;
+            const month = currentDate.value.getMonth() + 1;
+            currentMonth.value = `${month}월 지출내역`;
+            isReverting.value = false;
+            fetchInitialData(); // 이전 월 데이터 다시 가져오기
+        },
+        reject: () => {
+        }
+    });
+};
+
 </script>
 
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.title {
-    display: flex;
-}
 
 .full-size-panel,
 .chart-wrapper {
