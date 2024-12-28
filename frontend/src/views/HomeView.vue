@@ -40,6 +40,7 @@
               v-for="(guide, index) in guideImages"
               :key="index"
             >
+              <p class="subtitle">쉽고 간편한 모임 관리를 시작하세요!</p>
               <img :src="guide" alt="Guide Image" />
             </div>
           </div>
