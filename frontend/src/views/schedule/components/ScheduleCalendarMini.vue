@@ -144,59 +144,26 @@ const rejectPromise = ref(null);
 
 // Fullcalendar 옵션 설정
 const calendarOptions = reactive({
-  plugins: [
-    dayGridPlugin,
-    timeGridPlugin,
-    interactionPlugin,
-    googleCalendarPlugin,
-  ],
+  plugins: [dayGridPlugin, googleCalendarPlugin],
   headerToolbar: {
     left: '', // 추후 myCustomButton버튼 추가
     center: 'prev title next',
     right: '',
   },
-  buttonText: {
-    today: 'Today',
-    month: 'Month',
-    week: 'Week',
-    day: 'Day',
-  },
+  height: '300px',
+  contentHeight: '40px', // 내부 콘텐츠 높이 조정
   initialView: 'dayGridMonth',
-  // events: [],
-  editable: true,
-  selectable: true,
-  selectMirror: true,
-  dayMaxEvents: true,
+  editable: false,
+  selectable: false,
+  selectMirror: false,
+  dayMaxEvents: false,
   weekends: true,
   locale: 'ko',
   googleCalendarApiKey: googleCalendarApiKey,
   dayCellContent: (info) => info.date.getDate(),
-  select: handleDateSelect,
   eventClick: handleEventClick,
   eventsSet: handleEvents,
   eventAdd: handleEventAdd,
-  eventChange: handleEventChange,
-  eventRemove: handleEventRemove,
-  // eventSources: [
-  //   {
-  //     googleCalendarId: googleCalendarId,
-  //     className: 'holiday-event',
-  //   },
-  // ],
-  // customButtons: {
-  //   myCustomButton: {
-  //     text: 'Add',
-  //     click: () => {
-  //       const calendarApi = calendarRef.value.getApi();
-  //       calendarApi.addEvent({
-  //         title: 'New Event',
-  //         start: new Date(),
-  //         end: new Date(),
-  //       });
-  //       alert('새 이벤트가 추가되었습니다!');
-  //     },
-  //   },
-  // },
 });
 
 //아래부터 메서드 정의

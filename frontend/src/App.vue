@@ -72,5 +72,6 @@ watch(
   flex: 3;
   background-color: #f8f9fa;
   overflow: auto;
+  height: 100vh;
 }
 </style>

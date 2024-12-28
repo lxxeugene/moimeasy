@@ -6,28 +6,12 @@
 .demo-app {
   display: flex;
   min-height: 100%;
-  font-family:
-    Arial,
-    Helvetica Neue,
-    Helvetica,
-    sans-serif;
   font-size: 14px;
-}
-
-.demo-app-sidebar {
-  width: 200px;
-  line-height: 1.5;
-  background: #f9f1ff;
-  border-right: 1px solid #d3e2e8;
-}
-
-.demo-app-sidebar-section {
-  padding: 2em;
 }
 
 .demo-app-main {
   flex-grow: 1;
-  padding: 2em;
+  padding: 0px 10px;
 }
 
 .fc {
@@ -37,6 +21,7 @@
 
 /* 헤더 툴바 */
 .fc-header-toolbar {
+  width: 100%;
 }
 /* 헤더 좌측  */
 .fc-toolbar-chunk:nth-of-type(1) {
@@ -50,38 +35,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* 헤더 우측  */
-.fc-toolbar-chunk:nth-of-type(3) {
-  /*버튼 커스텀 */
-  .fc-button {
-    background-color: #fafbfd !important;
-    color: #787a7b !important; /* 텍스트 색상 */
-    cursor: pointer;
-  }
-  .fc-button:nth-of-type(1) {
-    border: 1px solid #d4d4d4 !important;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-  }
-  .fc-button:nth-of-type(2) {
-    border: 1px solid #d4d4d4 !important;
-  }
-  .fc-button:nth-of-type(3) {
-    border: 1px solid #d4d4d4 !important;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-  }
-
-  .fc-button:hover {
-    background-color: #f0ecfb !important;
-  }
-  .fc-button:focus {
-    background-color: #735bf3 !important;
-    color: #ffff !important;
-    border: 1px solid #735bf3 !important;
-  }
 }
 
 /* 헤더 버튼 */
@@ -98,9 +51,9 @@
   box-shadow: none !important;
 }
 
-/* 테이블 헤더 셀 */
+/* 테이블 헤더 셀 (월,화,수..)*/
 .fc-col-header-cell {
-  height: 30px;
+  height: 20px;
   background: #f2eefb;
   border: none !important;
 }
@@ -117,15 +70,19 @@
   justify-content: center;
   align-items: center;
   height: 30px;
-  font-weight: 500;
 }
 /* 날짜 패딩효과 */
 .fc-daygrid-day-number {
-  padding: 10px !important;
+  margin: 0 auto;
 }
 .fc-theme-standard .fc-scrollgrid {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+}
+/* 캘린더 셀 이벤트*/
+.fc-daygrid-day-events {
+  /* background-color: #fd7385; */
+  height: 25px;
 }
 
 /* 기본 이벤트 스타일 */
@@ -255,4 +212,8 @@
   &:hover {
     background-color: #dbf1f7 !important;
   }
+}
+
+.fc-daygrid-day {
+  height: 20px !important; /* 날짜 셀 높이 */
 }
