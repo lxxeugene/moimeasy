@@ -51,7 +51,7 @@ public class SettlementController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("사용자 인증이 필요합니다.");
         }
 
-        if (requestDTO.getTitle() == null || requestDTO.getTitle().isEmpty()) {
+        if (requestDTO.getCategoryName() == null || requestDTO.getCategoryName().isEmpty()) {
             return ResponseEntity.badRequest().body("제목을 입력해 주세요.");
         }
         if (requestDTO.getImageUrl() == null || requestDTO.getImageUrl().isEmpty()) {
