@@ -180,8 +180,7 @@ router.beforeEach((to, from, next) => {
     '/find-email',
     '/finduser',
     '/resetpassword',
-    '/',
-    '/home',
+    '/'
   ];
   const requiresAuth = !publicPages.includes(to.path); // 인증이 필요한 페이지
 
