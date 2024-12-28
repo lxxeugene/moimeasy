@@ -94,7 +94,7 @@ export default {
 }
 
 .calendar-section {
-  flex: 3;
+  flex: 2;
   /* 넓은 너비 */
   background-color: white;
   padding: 10px;
@@ -130,7 +130,7 @@ export default {
 }
 
 .wide {
-  flex: 3;
+  flex: 1;
   /* 넓은 섹션 */
 }
 </style>

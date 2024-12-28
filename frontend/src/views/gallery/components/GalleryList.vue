@@ -43,7 +43,7 @@ async function loadData() {
       );
       const { content, totalPages: tPages } = res.data;
       totalPages.value = tPages;
-
+      console.log('받아온 갤러리 데이터:', content);
       // 새로운 아이템들의 초기 로딩 상태를 true로 설정
       content.forEach((item) => {
         loadingMap.value[item.id] = true;
@@ -108,38 +108,7 @@ onMounted(() => {
   height: 1px;
 } */
 
-/* .gallery-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.masonry-item {
-  margin-bottom: 1rem;
-  width: 100%;
-}
-
-.masonry-item img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.load-more-trigger {
-  height: 1px;
-}
-
-/* 반응형 그리드 레이아웃 */
-/* @media (min-width: 768px) {
-  .gallery-list-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-  }
-} */
-
 .gallery-list-container {
-  /* column-count 대신 column-width 사용 */
   columns: 250px auto;
   column-gap: 1rem;
 }
