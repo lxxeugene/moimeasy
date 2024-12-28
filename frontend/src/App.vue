@@ -4,16 +4,16 @@
     <LoadingOverlay />
     <!-- 사이드바 -->
     <SideBar
-      v-if="userData"
+      v-if="userData && !hideLayout"
       class="sidebar"
       :class="{ expanded: uiStore.visible }"
     />
     <!-- 스피드다이얼 영역-->
-    <SideSpeedDial v-if="userData" />
+    <SideSpeedDial v-if="userData && !hideLayout" />
     <!-- 메인 영역 -->
     <div class="contents-wrapper">
       <!-- 헤더 -->
-      <Header v-if="userData" class="header" />
+      <Header v-if="userData && !hideLayout" class="header" />
       <!-- 메인 컨텐츠 -->
       <router-view />
     </div>
@@ -22,11 +22,13 @@
 
 <script setup>
 import { useUIStore } from '@/stores/uiStore';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const userData = ref('');
 const uiStore = useUIStore();
+
+const hideLayout = computed(() => route.meta.hideLayout);
 
 watch(
   () => route.matched,

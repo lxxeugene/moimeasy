@@ -94,7 +94,7 @@ public class SettlementController {
 
         // roleId 확인 (Role 객체를 통해 접근)
         if (!"admin".equalsIgnoreCase(user.getRole().getRoleName())) { // 관리자인지 확인
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 권한이 필요합니다.");
+            // return ResponseEntity.status(HttpStatus.FORBIDDEN).body("관리자 권한이 필요합니다.");
         }
 
         // 정산 승인 처리

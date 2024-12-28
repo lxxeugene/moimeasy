@@ -40,6 +40,7 @@
               v-for="(guide, index) in guideImages"
               :key="index"
             >
+              <p class="subtitle">쉽고 간편한 모임 관리를 시작하세요!</p>
               <img :src="guide" alt="Guide Image" />
             </div>
           </div>
@@ -74,22 +75,28 @@ export default {
   data() {
     return {
       images: [
-        '/intro/intro1.png',
-        '/intro/intro2.png',
-        '/intro/intro3.png',
-        '/intro/intro4.png',
-        '/intro/intro5.png',
-        '/intro/intro6.png',
-        '/intro/intro7.png',
-      ],
-      guideImages: [
-        '/guide/user.png',
+        '/guide/login.png',
+        '/guide/signup.png',
+        '/guide/moeim.png',
         '/guide/settlement.png',
         '/guide/chat.png',
-        '/intro/intro4.png',
-        '/intro/intro5.png',
-        '/intro/intro6.png',
-        '/intro/intro7.png',
+        '/guide/invitation.png',
+        '/guide/calendar.png',
+        '/guide/schedule.png',
+        '/guide/remittance.png',
+        '/guide/transaction.png',
+      ],
+      guideImages: [
+        '/guide/login.png',
+        '/guide/signup.png',
+        '/guide/moeim.png',
+        '/guide/settlement.png',
+        '/guide/chat.png',
+        '/guide/invitation.png',
+        '/guide/calendar.png',
+        '/guide/schedule.png',
+        '/guide/remittance.png',
+        '/guide/transaction.png',
       ],
       currentImageIndex: 0,
       currentGuideIndex: 0,
