@@ -1,6 +1,8 @@
 <template>
   <div class="main-page-container">
-    <h1>누구님 환영합니다.</h1>
+    <div class="main-page-header">
+      <h1>{{ user.nickname }}님 환영합니다. 즐거운 하루보내세요 😃</h1>
+    </div>
     <!-- 상단 섹션: 프로필, 달력, 채팅 -->
     <div class="top-section">
       <div class="calendar-section scrollable wide">
@@ -45,11 +47,14 @@ export default {
   setup() {
     const authStore = useAuthStore();
     const accessToken = authStore.accessToken;
+    const user = authStore.user;
 
     console.log('Access Token:', accessToken);
+    console.log('user :', user);
 
     return {
       accessToken,
+      user,
     };
   },
 };
@@ -65,6 +70,18 @@ export default {
   height: 100vh;
   width: 70%;
   /* 전체 화면 높이 */
+}
+/* 메인 헤더 인삿말 */
+.main-page-header {
+  margin-bottom: 10px;
+  padding: 20px 10px;
+  background-color: white;
+  border-radius: 10px;
+  color: rgb(56, 55, 55);
+  box-shadow: 0 2px 4px rgba(142, 76, 166, 0.1);
+  font-size: 1.5rem;
+  font-weight: 500;
+  /* 헤더 */
 }
 
 /* 상단 섹션 */
