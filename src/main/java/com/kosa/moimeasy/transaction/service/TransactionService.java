@@ -470,9 +470,8 @@ public class TransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException("사용자를 찾을 수 없습니다."));
 
         // 사용자에 해당하는 모임 조회 (사용자의 ID를 기반으로)
-        Moeim moeim = moeimRepository.findByUserId(user.getMoeimId())
+        Moeim moeim = moeimRepository.findById(user.getMoeimId())
                 .orElseThrow(() -> new ResourceNotFoundException("모임을 찾을 수 없습니다."));
-
         LocalDate nowDate = LocalDate.now();
         LocalDate startDate = request.getStartDate(); // 월의 시작일 2024-12-01T00:00
         LocalDate endDate = request.getEndDate(); // 월의 마지막일 2024-12-31T23:59:59
