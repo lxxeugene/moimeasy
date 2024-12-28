@@ -1,5 +1,6 @@
 <template>
   <div class="authority-container">
+    <h1 class="title2">MoeimEasy</h1>
     <h2 class="title">권한 설정</h2>
     <div class="button-group">
       <button class="btn-primary" @click="selectCreateMoeim">운영자 권한</button>
@@ -36,6 +37,13 @@ export default {
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
+}
+.title2 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: #7f56d9;
+  font-weight: bold;
+  margin-bottom: 20px;
 }
 
 /* 제목 스타일 */

@@ -72,6 +72,9 @@ const routes = [
         name: '거래내역',
         component: TransactionList,
       },
+      { path: '/settlement', 
+        name: '정산요청', 
+        component: Settlement },
     ],
   },
   { path: '/category', name: '카테고리별 소비내역', component: Category },
@@ -142,7 +145,6 @@ const routes = [
     name: '채팅',
     component: () => import('@/views/chat/ChatLayoutView.vue'),
   },
-  { path: '/settlement', name: '정산요청', component: Settlement },
   {
     path: '/main',
     name: '메인',
