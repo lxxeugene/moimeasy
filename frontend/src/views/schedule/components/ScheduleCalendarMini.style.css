@@ -81,7 +81,7 @@
 }
 /* 캘린더 셀 이벤트*/
 .fc-daygrid-day-events {
-  background-color: #fd7385;
+  /* background-color: #fd7385; */
   height: 25px;
 }
 
