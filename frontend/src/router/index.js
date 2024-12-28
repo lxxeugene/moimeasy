@@ -72,9 +72,7 @@ const routes = [
         name: '거래내역',
         component: TransactionList,
       },
-      { path: '/settlement', 
-        name: '정산요청', 
-        component: Settlement },
+      { path: '/settlement', name: '정산요청', component: Settlement },
     ],
   },
   { path: '/category', name: '카테고리별 지출 내용', component: Category },
@@ -182,6 +180,8 @@ router.beforeEach((to, from, next) => {
     '/find-email',
     '/finduser',
     '/resetpassword',
+    '/',
+    '/home',
   ];
   const requiresAuth = !publicPages.includes(to.path); // 인증이 필요한 페이지
 
