@@ -11,24 +11,36 @@
     <!-- 스피드다이얼 영역-->
     <SideSpeedDial v-if="userData && !hideLayout" />
     <!-- 메인 영역 -->
-    <div class="contents-wrapper">
+    <div class="contents-wrapper" ref="contentsWrapperRef">
       <!-- 헤더 -->
       <Header v-if="userData && !hideLayout" class="header" />
       <!-- 메인 컨텐츠 -->
       <router-view />
+      <div v-if="isButtonVisible" class="arrow-button" @click="scrollToTop">
+        <i class="pi pi-angle-up" style="font-size: 1.5rem"></i>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { useUIStore } from '@/stores/uiStore';
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const userData = ref('');
 const uiStore = useUIStore();
-
+const isButtonVisible = ref(false);
 const hideLayout = computed(() => route.meta.hideLayout);
+const contentsWrapperRef = ref(null); // 콘텐츠 WRAPPER 참조
+const scrollTopPosition = ref(0); // 스크롤 위치 추적
+
+// 스크롤을 최상단으로 이동
+const scrollToTop = () => {
+  if (contentsWrapperRef.value) {
+    contentsWrapperRef.value.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+};
 
 watch(
   () => route.matched,
@@ -38,6 +50,20 @@ watch(
   },
   { immediate: true } // 컴포넌트가 처음 마운트될 때도 실행
 );
+// 스크롤 위치를 감시
+watch(scrollTopPosition, (newVal) => {
+  isButtonVisible.value = newVal > 1000; // 스크롤 위치가 100 이상일 때 버튼 표시
+});
+
+// DOM이 마운트된 이후 처리
+onMounted(() => {
+  if (contentsWrapperRef.value) {
+    // 스크롤 이벤트에서 위치 업데이트
+    contentsWrapperRef.value.addEventListener('scroll', () => {
+      scrollTopPosition.value = contentsWrapperRef.value.scrollTop;
+    });
+  }
+});
 </script>
 
 <style>
@@ -73,5 +99,36 @@ watch(
   background-color: #f8f9fa;
   overflow: auto;
   height: 100vh;
+}
+
+.arrow-button {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  cursor: pointer;
+  z-index: 1000;
+  background-color: var(--p-primary-500);
+  color: #ffffff;
+  padding: 5px;
+  border-radius: 50%;
+  animation: bounce 1s infinite; /* Apply bounce animation */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Hover Effect */
+.up-arrow-btn:hover {
+  transform: scale(1.1); /* Slightly increase size on hover */
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0); /* Default position */
+  }
+  50% {
+    transform: translateY(-10px); /* Move up slightly */
+  }
 }
 </style>

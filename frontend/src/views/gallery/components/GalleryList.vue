@@ -16,6 +16,7 @@
         />
       </div>
     </div>
+
     <!-- 스크롤 내려 아래 트리거가 화면에 보이면 이벤트호출 -->
     <div ref="loadMoreTrigger" class="load-more-trigger"></div>
   </div>
@@ -27,7 +28,6 @@ import axios from 'axios';
 import Skeleton from 'primevue/skeleton';
 import Masonry from 'masonry-layout';
 import imagesLoaded from 'imagesloaded';
-
 //  ref 변수
 const galleryRef = ref(null); // 갤러리 컨테이너 참조
 const galleryList = ref([]); // 갤러리 아이템 목록
@@ -178,10 +178,16 @@ onMounted(async () => {
     width: calc(20% - 16px);
   }
 } */
-
+/* 테블릿 화면에서 3개 */
 @media screen and (max-width: 1490px) {
   .masonry-item {
-    width: calc(33.333% - 16px); /* 테블릿 화면에서 3개 */
+    width: calc(25% - 16px);
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  .masonry-item {
+    width: calc(33.333% - 16px);
   }
 }
 
