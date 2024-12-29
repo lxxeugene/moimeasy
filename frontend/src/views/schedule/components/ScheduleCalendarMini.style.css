@@ -109,8 +109,6 @@
 .demo-app-mini-wrapper .fc-daygrid-day-frame {
   height: 38px !important;
 }
-.demo-app-mini-wrapper .fc-scrollgrid-sync-inner {
-}
 
 .demo-app-mini-wrapper .fc-popover {
   top: 0px !important;
@@ -201,6 +199,7 @@
   flex: 1;
   padding: 5px;
   overflow: hidden;
+  background-color: #ffffff;
 }
 /*사이드바 */
 .demo-app-sidebar {
