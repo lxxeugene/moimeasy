@@ -1,5 +1,6 @@
 package com.kosa.moimeasy.gallery;
 
+import com.kosa.moimeasy.gallery.dto.GalleryResponseDto;
 import com.kosa.moimeasy.gallery.dto.GalleryUploadRequest;
 import com.kosa.moimeasy.gallery.dto.UploadFileInfo;
 import lombok.Builder;
@@ -52,10 +53,4 @@ public class GalleryController {
         List<UploadFileInfo> files = request.getFiles();
         return galleryService.saveImageUrls(moeimId, files);
     }
-}
-@Data
-@Builder
-class GalleryResponseDto {
-    private Long id;
-    private String imageUrl;
 }
