@@ -9,7 +9,9 @@
     <!-- 이미지 파일 업로더 -->
     <GalleryFileUploader v-if="isUploaderVisible" />
     <!-- 이미지 리스트-->
-    <GalleryList />
+    <div class="gallery-list-container">
+      <GalleryList />
+    </div>
   </div>
 </template>
 
@@ -30,5 +32,9 @@ const toggleShowUploader = () => {
   width: 98%;
   margin: 10px;
   height: auto;
+}
+.gallery-list-container {
+  width: 100%;
+  margin-left: 8px;
 }
 </style>
