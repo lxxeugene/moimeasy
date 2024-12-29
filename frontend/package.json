@@ -22,6 +22,8 @@
     "axios": "^1.7.8",
     "chart.js": "^4.4.7",
     "firebase": "^11.0.2",
+    "imagesloaded": "^5.0.0",
+    "masonry-layout": "^4.2.2",
     "mermaid": "^11.4.1",
     "pinia": "^2.2.8",
     "primeicons": "^7.0.0",

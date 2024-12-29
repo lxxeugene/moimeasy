@@ -1,12 +1,12 @@
 <template>
   <div class="gallery-container">
+    <!-- 이미지업로더 토글버튼 -->
     <Button
       label="이미지업로드"
       icon="pi pi-cloud-upload"
       @click="toggleShowUploader"
     />
     <!-- 이미지 파일 업로더 -->
-
     <GalleryFileUploader v-if="isUploaderVisible" />
     <!-- 이미지 리스트-->
     <GalleryList />
@@ -18,7 +18,7 @@ import GalleryFileUploader from './components/GalleryFileUploader.vue';
 import GalleryList from './components/GalleryList.vue';
 import { ref } from 'vue';
 
-//
+// 이미지 업로더 토글
 const isUploaderVisible = ref(false);
 const toggleShowUploader = () => {
   isUploaderVisible.value = !isUploaderVisible.value;

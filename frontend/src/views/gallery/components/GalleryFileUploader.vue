@@ -158,7 +158,8 @@ import {
 } from 'firebase/storage';
 import { firebaseStorage } from '@/firebase/firebaseConfig';
 import axios from 'axios';
-
+const user = JSON.parse(localStorage.getItem('user'));
+const moeimId = user.moeimId;
 const $primevue = usePrimeVue();
 const toast = useToast();
 // 파일 업로드 관련 변수
@@ -276,14 +277,13 @@ const uploadEvent = async (primevueUploadCallback) => {
     // 2) 서버에 다운로드 URL 전송
     const response = await axios.post('/api/v1/gallery', {
       files: uploadedFileUrls.value,
-      moeimId: 1, // 임시로 1로 설정
+      moeimId: moeimId, // 임시로 1로 설정
     });
 
     console.log('서버 저장 결과:', response.data);
 
-    // *** 핵심 수정 부분 ***
     if (response.data) {
-      console.log('핵심부분 실행>>>>>', files.value);
+      console.log(' 실행>>>>>', files.value);
       const uploadedFilesData = uploadedFileUrls.value.map((uploadedFile) => ({
         name: uploadedFile.fileName,
         objectURL: uploadedFile.downloadUrl,
