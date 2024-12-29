@@ -35,9 +35,6 @@
   margin: 0 auto;
 }
 
-/* 헤더 툴바 */
-.fc-header-toolbar {
-}
 /* 헤더 좌측  */
 .fc-toolbar-chunk:nth-of-type(1) {
   width: 170px;
@@ -184,7 +181,7 @@
     color: #ffb85c !important;
   }
 }
-/* 공휴일 이벤트 */
+
 .holiday-event {
   background-color: #ffe2e6;
   border: none;

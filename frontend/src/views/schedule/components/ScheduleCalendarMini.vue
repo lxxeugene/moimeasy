@@ -2,9 +2,7 @@
   <Toast position="bottom-right" />
   <!-- 삭제&조회 모달창 -->
   <ConfirmDialog group="positioned" :modal="false"></ConfirmDialog>
-  <div>
-    <h1>sss</h1>
-  </div>
+
   <!-- 캘린더&사이드바 wrapper -->
   <div class="demo-app-mini-wrapper">
     <!-- 캘린더 -->
@@ -24,12 +22,25 @@
     </div>
     <!-- 사이드바 -->
     <div class="demo-app-sidebar">
+      <h2>이달의 일정 ({{ currentEvents.length }})</h2>
       <div class="demo-app-sidebar-section">
-        <h2>All Events ({{ currentEvents.length }})</h2>
         <ul>
-          <li v-for="event in currentEvents" :key="event.id">
-            <b>{{ event.startStr }}</b>
-            <i>{{ event.title }}</i>
+          <li
+            v-for="event in currentEvents"
+            :key="event.id"
+            class="event-lists"
+          >
+            <div class="event-lists-icon">
+              <i class="pi pi-calendar" style="font-size: 1rem"></i>
+            </div>
+            <div class="event-lists-info">
+              <div>
+                <b>{{ event.startStr }}</b>
+              </div>
+              <div>
+                <i>{{ event.title }}</i>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
@@ -192,8 +203,17 @@ function handleEventClick(clickInfo) {
 }
 
 function handleEvents(events) {
-  console.log(events);
-  currentEvents.value = events;
+  const calendarApi = calendarRef.value.getApi();
+  const startDate = calendarApi.view.activeStart; // 보이는 달력의 시작
+  const endDate = calendarApi.view.activeEnd; // 보이는 달력의 끝(익일 00시)
+
+  // 이 범위 내 이벤트만 필터
+  currentEvents.value = events.filter((e) => {
+    const eventStart = e.start || e.startStr;
+    const eventEnd = e.end || e.start; // end가 없으면 start=end
+    // 이벤트가 (startDate~endDate) 범위와 겹치는지 판별
+    return eventStart < endDate && eventEnd >= startDate;
+  });
 }
 
 /**서버에 일정 추가 */

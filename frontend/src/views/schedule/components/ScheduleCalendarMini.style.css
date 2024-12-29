@@ -5,13 +5,7 @@
 }
 .demo-app-mini-wrapper {
   display: flex;
-  padding: 8px 10px;
-}
-.demo-app-sidebar {
-  flex: 1;
-  width: 300px;
-  border-left: 1px solid #e9e9e9;
-  padding: 20px;
+  padding: 8px 8px;
 }
 
 .demo-app {
@@ -48,7 +42,14 @@
   justify-content: center;
   align-items: center;
 }
+/* 헤더 하단 마진 제거 */
+.demo-app-mini-wrapper .fc-header-toolbar {
+  margin-bottom: 4px !important;
+}
 
+.demo-app-mini-wrapper .fc-toolbar-title {
+  font-size: 17px;
+}
 /* 헤더 버튼 */
 .fc-button {
   background-color: #ffffff !important;
@@ -67,7 +68,7 @@
 .demo-app-mini-wrapper .fc-col-header-cell {
   height: 20px;
   background: #f2eefb;
-  font-size: 10px;
+  font-size: 12px !important;
   border: none !important;
 }
 /* 헤더 셀높이 */
@@ -78,7 +79,7 @@
   border-top-left-radius: 10px;
 }
 .fc-col-header-cell:nth-of-type(7) {
-  border-top-right-radius: 10px;
+  border-top-right-radius: 8px;
 }
 
 .fc-col-header-cell > div {
@@ -89,8 +90,9 @@
 }
 /* 테이블 헤더 셀 설정 끝*/
 .demo-app-mini-wrapper a {
-  font-size: 7px;
+  font-size: 8px;
 }
+
 /* 날짜 패딩효과 */
 .demo-app-mini-wrapper .fc-daygrid-day-number {
   /* 후손 선택자로 구분  */
@@ -102,15 +104,12 @@
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+
 /* 날짜셀 높이 */
 .demo-app-mini-wrapper .fc-daygrid-day-frame {
-  height: 20px !important;
-  overflow: hidden !important;
-  position: relative;
+  height: 38px !important;
 }
-
-.demo-app-mini-wrapper .fc-daygrid-day-bg {
-  height: 0px;
+.demo-app-mini-wrapper .fc-scrollgrid-sync-inner {
 }
 
 .demo-app-mini-wrapper .fc-popover {
@@ -194,72 +193,57 @@
   }
 }
 
-/* 다이얼로그 커스텀 */
-.fc-direction-ltr {
-  margin: 0 !important;
-}
-
-.add-dialog-subtitle {
-  color: 18px;
-}
-.add-dialog-inputbox {
-  margin-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.add-dialog-inputbox-label {
-  font-weight: bold;
-}
-.add-dialog-input {
-  flex: 1 1 auto;
-}
-
-.add-dialog-inputbox {
-  display: flex;
-  flex-direction: column;
-  height: auto!;
-}
-
-.float-label-container {
-  width: 100%;
-}
-@media (min-width: 768px) {
-  .float-label-container {
-    width: 14rem;
-  }
-}
-.select-style {
-  width: 100%;
-}
-
-.p-select-option:nth-child(1) {
-  &:hover {
-    background-color: #ffe2e6 !important;
-  }
-}
-.p-select-option:nth-child(2) {
-  &:hover {
-    background-color: #fff4e7 !important;
-  }
-}
-.p-select-option:nth-child(3) {
-  &:hover {
-    background-color: #ebe2fd !important;
-  }
-}
-.p-select-option:nth-child(4) {
-  &:hover {
-    background-color: #e4f8f1 !important;
-  }
-}
-.p-select-option:nth-child(5) {
-  &:hover {
-    background-color: #dbf1f7 !important;
-  }
-}
-
 .fc-daygrid-day {
   height: 20px !important; /* 날짜 셀 높이 */
+}
+
+.demo-app-sidebar {
+  flex: 1;
+  padding: 5px;
+  overflow: hidden;
+}
+/*사이드바 */
+.demo-app-sidebar {
+  font-size: 12px;
+
+  color: #787a7b;
+
+  h2 {
+    font-size: 15px;
+    margin-left: 5px;
+    margin-bottom: 3px;
+  }
+
+  b {
+    font-size: 9px;
+    margin-left: 1px;
+  }
+}
+
+.demo-app-sidebar-section {
+  padding: 5px 10px;
+  height: 270px;
+  overflow: auto;
+  border-left: 1px solid #e9e9e9;
+}
+.event-lists {
+  width: 100%;
+  margin-top: 3px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.event-lists-icon {
+  background-color: #ebe2fd;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #787a7b;
+}
+.event-lists-info {
+  width: 110px;
 }
