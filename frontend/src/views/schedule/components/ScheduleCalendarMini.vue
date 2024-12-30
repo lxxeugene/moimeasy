@@ -1,89 +1,49 @@
 <template>
   <Toast position="bottom-right" />
+  <!-- 삭제&조회 모달창 -->
   <ConfirmDialog group="positioned" :modal="false"></ConfirmDialog>
-  <Dialog
-    v-model:visible="visible"
-    :modal="false"
-    header="새 일정 "
-    :style="{ width: '25rem' }"
-    @hide="rejectDialog"
-  >
-    <span class="add-dialog-subtitle"></span>
-    <div class="add-dialog-inputbox">
-      <FloatLabel variant="on">
-        <InputText
-          id="eventTitle"
-          class="add-dialog-input"
-          autocomplete="off"
-          v-model="newEventTitle"
-        />
-        <label for="eventTitle" class="add-dialog-inputbox-label">일정명</label>
-      </FloatLabel>
-      <FloatLabel class="float-label-container" variant="on">
-        <Select
-          v-model="newEventType"
-          inputId="eventType"
-          :options="types"
-          optionLabel="name"
-          class="select-style"
-        />
-        <label for="eventType" class="add-dialog-inputbox-label"
-          >일정 타입</label
-        >
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <InputText
-          id="eventDescription"
-          class="add-dialog-input"
-          autocomplete="off"
-          v-model="newEventDescription"
-        />
-        <label for="eventDescription" class="add-dialog-inputbox-label"
-          >설명</label
-        >
-      </FloatLabel>
-      <FloatLabel variant="on">
-        <InputText
-          id="eventLocation"
-          class="add-dialog-input"
-          autocomplete="off"
-          v-model="newEventLocation"
-        />
-        <label for="eventLocation" class="add-dialog-inputbox-label"
-          >장소</label
-        >
-      </FloatLabel>
-    </div>
-    <template #footer>
-      <Button
-        label="취소"
-        text
-        severity="secondary"
-        @click="rejectDialog"
-        autofocus
-      />
-      <Button
-        label="추가"
-        outlined
-        severity="secondary"
-        @click="resolveDialog"
-        autofocus
-      />
-    </template>
-  </Dialog>
 
-  <div class="demo-app">
-    <div class="demo-app-main">
-      <FullCalendar
-        ref="calendarRef"
-        class="demo-app-calendar"
-        :options="calendarOptions"
-      >
-        <template v-slot:eventContent="arg">
-          <b>{{ arg.timeText }}</b>
-          <i>{{ arg.event.title }}</i>
-        </template>
-      </FullCalendar>
+  <!-- 캘린더&사이드바 wrapper -->
+  <div class="demo-app-mini-wrapper">
+    <!-- 캘린더 -->
+    <div class="demo-app">
+      <div class="demo-app-main">
+        <FullCalendar
+          ref="calendarRef"
+          class="demo-app-calendar"
+          :options="calendarOptions"
+        >
+          <template v-slot:eventContent="arg">
+            <b>{{ arg.timeText }}</b>
+            <i>{{ arg.event.title }}</i>
+          </template>
+        </FullCalendar>
+      </div>
+    </div>
+    <!-- 사이드바 -->
+    <div class="demo-app-sidebar">
+      <h2>이달의 일정 ({{ currentEvents.length }})</h2>
+      <div class="demo-app-sidebar-section">
+        <ul>
+          <li
+            v-for="event in currentEvents"
+            :key="event.id"
+            class="event-lists"
+          >
+            <div class="event-lists-icon">
+              <i class="pi pi-calendar" style="font-size: 1rem"></i>
+            </div>
+            <div class="event-lists-info">
+              <div>
+                <b>{{ event.startStr }}</b>
+              </div>
+              <div>
+                <i>{{ event.title }}</i>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -93,8 +53,6 @@ import { ref, reactive, onMounted, watch } from 'vue';
 import '@/views/schedule/components/ScheduleCalendarMini.style.css';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
 import googleCalendarPlugin from '@fullcalendar/google-calendar';
 import { createEventId } from '@/utils/event-utils';
 import axios from 'axios';
@@ -156,7 +114,8 @@ const calendarOptions = reactive({
   editable: false,
   selectable: false,
   selectMirror: false,
-  dayMaxEvents: false,
+  dayMaxEvents: 1,
+  moreLinkClick: 'popover',
   weekends: true,
   locale: 'ko',
   googleCalendarApiKey: googleCalendarApiKey,
@@ -244,8 +203,17 @@ function handleEventClick(clickInfo) {
 }
 
 function handleEvents(events) {
-  console.log(events);
-  currentEvents.value = events;
+  const calendarApi = calendarRef.value.getApi();
+  const startDate = calendarApi.view.activeStart; // 보이는 달력의 시작
+  const endDate = calendarApi.view.activeEnd; // 보이는 달력의 끝(익일 00시)
+
+  // 이 범위 내 이벤트만 필터
+  currentEvents.value = events.filter((e) => {
+    const eventStart = e.start || e.startStr;
+    const eventEnd = e.end || e.start; // end가 없으면 start=end
+    // 이벤트가 (startDate~endDate) 범위와 겹치는지 판별
+    return eventStart < endDate && eventEnd >= startDate;
+  });
 }
 
 /**서버에 일정 추가 */
