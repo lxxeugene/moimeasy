@@ -25,26 +25,22 @@
   background-color: #17a2b8;
 }
 
-.p-tag.custom-success {
+.p-tag.custom-custom-tag1 {
   background-color: #c19ed2 !important;
-  /* 녹색 */
   color: white !important;
 }
 
-.p-tag.custom-danger {
+.p-tag.custom-tag2 {
   background-color: #ffa2c3 !important;
-  /* 빨간색 */
   color: white !important;
 }
 
-.p-tag.custom-info {
+.p-tag.custom-tag3 {
   background-color: #96c2ee !important;
-  /* 파란색 */
   color: white !important;
 }
 
-.p-tag.custom-warning {
-  background-color: #68a3ee !important;
-  /* 노란색 */
-  color: black !important;
+.p-tag.custom-tag4 {
+  background-color: #61c993 !important;
+  color: white !important;
 }

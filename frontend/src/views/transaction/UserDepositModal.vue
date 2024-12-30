@@ -9,7 +9,8 @@
             <div class="text-header">입금 금액</div>
         </template>
         <div class="text-display">
-            <InputText type="text" :value="`${value}원`" v-model="value" readonly class="text-input" />
+            <!-- 세 자리마다 콤마 표시 -->
+            <InputText type="text" :value="formattedValue + '원'" readonly class="text-input" />
         </div>
         <div class="number-buttons">
             <Button v-for="num in numbers" :key="num" rounded class="number-button" @click="handleButtonClick(num)">
@@ -25,10 +26,10 @@
     </Dialog>
 
     <!-- 확인 모달 -->
-    <Dialog v-model:visible="visible2" modal :style="{ width: '30rem', height: '20rem' }">
+    <Dialog v-model:visible="visible2" modal :style="{ width: '32rem', height: '20rem' }">
         <template #header>
             <div class="confirm-modal-text">
-                <span> {{ userAccount }}</span> 계좌에 <span> {{ value }}</span>원 입금하시겠습니까?
+                <span> {{ userAccount }}</span> 계좌에 <span> {{ formattedValue }}</span>원 입금하시겠습니까?
                 <p>입금계좌 : {{ userBank }}({{ userName }}) {{ userAccount }}</p>
             </div>
         </template>
@@ -53,7 +54,7 @@
         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
             <p style="margin-bottom: 50px;"><span style="font-weight: bold; color: blue;">{{ userName }}</span> 님의 <span
                     style="font-weight: bold; color: blue;">{{ userAccount }} </span> 계좌에<br>
-                <span style="font-weight: bold; color: blue;">{{ value }} </span>원을 입금하였습니다.
+                <span style="font-weight: bold; color: blue;">{{ formattedValue }} </span>원을 입금하였습니다.
             </p>
             <Button label="닫기" rounded @click="visible3 = false" />
         </div>
@@ -61,7 +62,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import '@/views/transaction/style/transaction.style.css';
 import '@/views/transaction/style/Modal.style.css';
 import '@/views/transaction/style/Button.style.css';
@@ -104,6 +105,29 @@ const checkPassword = ref(false); // 비밀번호 입력
 
 // 숫자 버튼 목록
 const numbers = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', 'x'];
+
+// 세 자리마다 콤마가 들어간 표시용 값
+const formattedValue = computed(() => {
+    if (!value.value) {
+        return "";
+    }
+    const unformatted = value.value.replace(/,/g, "");
+    const numericVal = parseFloat(unformatted);
+
+    // 소수점만 입력 등으로 parseFloat가 NaN이면
+    if (isNaN(numericVal)) {
+        return value.value;
+    }
+
+    const parts = unformatted.split(".");
+    let intPart = parts[0];
+    const decimalPart = parts[1] || "";
+
+    intPart = parseInt(intPart, 10).toLocaleString();
+    return decimalPart.length > 0
+        ? `${intPart}.${decimalPart}`
+        : intPart;
+});
 
 // 버튼 클릭 시 호출
 function handleButtonClick(num) {
