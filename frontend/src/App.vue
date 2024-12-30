@@ -16,6 +16,7 @@
       <Header v-if="userData && !hideLayout" class="header" />
       <!-- 메인 컨텐츠 -->
       <router-view />
+      <!-- 스크롤 탑 버튼 -->
       <div v-if="isButtonVisible" class="arrow-button" @click="scrollToTop">
         <i class="pi pi-angle-up" style="font-size: 1.5rem"></i>
       </div>
@@ -50,15 +51,14 @@ watch(
   },
   { immediate: true } // 컴포넌트가 처음 마운트될 때도 실행
 );
-// 스크롤 위치를 감시
+// 스크롤 위치 감시
 watch(scrollTopPosition, (newVal) => {
-  isButtonVisible.value = newVal > 1000; // 스크롤 위치가 100 이상일 때 버튼 표시
+  isButtonVisible.value = newVal > 1000; // 스크롤 위치가 1000 이상일 때 버튼 표시
 });
 
-// DOM이 마운트된 이후 처리
 onMounted(() => {
+  // 스크롤 탑 이벤트 리스너 적용
   if (contentsWrapperRef.value) {
-    // 스크롤 이벤트에서 위치 업데이트
     contentsWrapperRef.value.addEventListener('scroll', () => {
       scrollTopPosition.value = contentsWrapperRef.value.scrollTop;
     });
@@ -70,6 +70,7 @@ onMounted(() => {
 .app-layout {
   display: flex;
 }
+/* 사이드바 설정 */
 .sidebar {
   flex: 0; /* 사이드바영역 전체비율 설정 -> 디폴트 : 접힌 상태 */
   background-color: #333;
@@ -101,6 +102,7 @@ onMounted(() => {
   height: 100vh;
 }
 
+/* 스크롤 탑 버튼 스타일 */
 .arrow-button {
   position: fixed;
   right: 30px;
@@ -111,24 +113,18 @@ onMounted(() => {
   color: #ffffff;
   padding: 5px;
   border-radius: 50%;
-  animation: bounce 1s infinite; /* Apply bounce animation */
+  animation: bounce 1s infinite;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease-in-out;
 }
 
-/* Hover Effect */
-.up-arrow-btn:hover {
-  transform: scale(1.1); /* Slightly increase size on hover */
-}
-
-/* Bounce Animation */
 @keyframes bounce {
   0%,
   100% {
-    transform: translateY(0); /* Default position */
+    transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px); /* Move up slightly */
+    transform: translateY(-10px);
   }
 }
 </style>

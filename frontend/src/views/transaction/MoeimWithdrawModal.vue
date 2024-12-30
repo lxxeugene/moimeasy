@@ -88,7 +88,7 @@ import { useConfirm } from "primevue/useconfirm";
 import axios from "axios";
 import { useLoadingStore } from '@/stores/useLoadingStore';
 import CheckPassword from "./CheckPassword.vue";
-
+import { fetchAddNotification } from '@/utils/notification-add-utils'; // 알림 
 
 const confirm = useConfirm();
 const loadingStore = useLoadingStore();
@@ -114,7 +114,6 @@ function dataReload() {
     }
     emit('update:visible', false); // visible 상태를 false로 업데이트 (다이얼로그 닫기)
 }
-
 
 // Dialog 닫힐 때 실행
 function handleClose() {
@@ -311,6 +310,13 @@ async function confirmExpense() {
         visible3.value = false;
         visible4.value = true;
 
+        // 알림 추가
+        fetchAddNotification(
+            '회비 지출',
+            `${userName.value} 님이 회비를 사용하였습니다.`,
+            moeimId
+        );
+
     } catch (error) {
         console.error("모임비 지출 중 오류 발생:", error.response?.data || error.message);
         confirm1(error.response?.data);
@@ -367,7 +373,6 @@ const confirm1 = (message) => {
         }
     });
 };
-
 
 </script>
 
