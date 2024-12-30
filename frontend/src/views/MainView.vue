@@ -22,7 +22,7 @@
               <i class="pi pi-ellipsis-v" style="font-size: 1rem"></i>
             </router-link>
           </div>
-          <ChatLayoutView />
+          <ChatRoomList @selectRoom="openChatRoom" />
         </div>
       </div>
 
@@ -48,6 +48,13 @@
         </div>
       </div>
     </div>
+    <!-- 채팅방 모달 -->
+    <div v-if="isChatModalVisible" class="chat-modal">
+      <div class="chat-modal-content">
+        <button class="modal-close-btn" @click="closeChatModal">×</button>
+        <ChatView :roomId="selectedRoomId" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -56,7 +63,8 @@ import UserProfile from '@/views/user/UserProfileView.vue';
 import BoardViewMini from '@/views/board/components/BoardViewMini.vue';
 import ScheduleCalendarMini from '@/views/schedule/components/ScheduleCalendarMini.vue';
 import SettlementView from '@/views/moeim/SettlementView.vue';
-import ChatLayoutView from '@/views/chat/ChatRoomListView.vue';
+import ChatRoomList from '@/views/chat/ChatRoomListView.vue';
+import ChatView from '@/views/chat/ChatView.vue';
 import { useAuthStore } from '@/stores/auth';
 import CategoryChart from './transaction/CategoryChart.vue';
 import router from '@/router';
@@ -68,8 +76,25 @@ export default {
     BoardViewMini,
     ScheduleCalendarMini,
     SettlementView,
-    ChatLayoutView,
+    ChatRoomList,
+    ChatView,
     CategoryChart,
+  },
+  data() {
+    return {
+      isChatModalVisible: false, // 모달 표시 여부
+      selectedRoomId: null, // 선택된 채팅방 ID
+    };
+  },
+  methods: {
+    openChatRoom(roomId) {
+      this.selectedRoomId = roomId;
+      this.isChatModalVisible = true; // 모달 표시
+    },
+    closeChatModal() {
+      this.isChatModalVisible = false;
+      this.selectedRoomId = null;
+    },
   },
   setup() {
     const authStore = useAuthStore();
@@ -195,5 +220,43 @@ export default {
     color: rgb(120, 120, 120);
     cursor: pointer;
   }
+}
+
+.chat-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.chat-modal-content {
+  position: relative;
+  background: white;
+  width: 60%;
+
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  color: #333;
 }
 </style>
