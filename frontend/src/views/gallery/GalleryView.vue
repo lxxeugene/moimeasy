@@ -5,6 +5,7 @@
       label="이미지업로드"
       icon="pi pi-cloud-upload"
       @click="toggleShowUploader"
+      class="uploader-toggle-button"
     />
     <!-- 이미지 파일 업로더 -->
     <GalleryFileUploader v-if="isUploaderVisible" />
@@ -34,5 +35,10 @@ const toggleShowUploader = () => {
 .gallery-list-container {
   width: 100%;
   margin-left: 6px;
+}
+
+.uploader-toggle-button {
+  display: block;
+  margin-left: auto; /* 우측 정렬 */
 }
 </style>
