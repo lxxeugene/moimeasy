@@ -75,6 +75,7 @@ import { useLoadingStore } from '@/stores/useLoadingStore';
 import Tag from 'primevue/tag';
 import { fetchImageUrl } from '@/utils/image-load-utils';
 import { useConfirm } from "primevue/useconfirm"; // confirm 사용을 위해 추가
+import { fetchAddNotification } from '@/utils/notification-add-utils'; // 알림 
 
 const defaultProfileImage =
   'https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png';
@@ -236,7 +237,7 @@ const confirm1 = (message) => {
 </script>
 
 <style scoped>
-::v-deep .p-datatable-tbody>tr>td {
+:deep(.p-datatable-tbody>tr>td) {
   vertical-align: middle;
 }
 </style>

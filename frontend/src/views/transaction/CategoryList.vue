@@ -22,7 +22,7 @@
                     </SplitterPanel>>
                     <SplitterPanel class="full-size-panel">
                         <div class="card datatable-card">
-                            <DataTable :value="categoryData" virtualScroll scrollHeight="70%" ref="dt"
+                            <DataTable :value="categoryData" virtualScroll scrollHeight="55%" ref="dt"
                                 class="centered-datatable" tableStyle="min-width: 20rem">
                                 <Column header="비율" class="header-style">
                                     <template #body="slotProps">
