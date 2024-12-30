@@ -3,11 +3,6 @@
     <div class="header">
       <div class="title-bar">
         <div class="title">{{ currentMonth }}</div>
-        <div class="icon-button-group">
-          <i class="pi pi-caret-left icon-hover" @click="updateMonth(-1)"></i>
-          <i class="pi pi-calendar-times"></i>
-          <i class="pi pi-caret-right icon-hover" @click="updateMonth(1)"></i>
-        </div>
       </div>
     </div>
     <div class="card datatable-card">
@@ -15,6 +10,11 @@
         <DataTable :value="products" removableSort virtualScroll scrollHeight="500px" stripedRows
           tableStyle="min-width: 50rem" ref="dt" class="centered-datatable">
           <template #header>
+            <div class="icon-button-group">
+              <i class="pi pi-caret-left icon-hover" @click="updateMonth(-1)"></i>
+              <i class="pi pi-calendar-times"></i>
+              <i class="pi pi-caret-right icon-hover" @click="updateMonth(1)"></i>
+            </div>
             <div class="export-button-container">
               <div class="money">
                 <span class="money-item">
@@ -239,8 +239,8 @@ const confirm1 = (message) => {
 }
 
 .icon-button-group {
-  align-self: flex-end;
-  margin-right: 300px;
+  justify-content: flex-end !important;
+  margin-bottom: 20px;
 }
 
 .money {

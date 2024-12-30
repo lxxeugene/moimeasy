@@ -89,6 +89,7 @@ const chartOptions = ref({});
 const categoryData = ref([]); // 백엔드에서 받아온 카테고리별 데이터
 const chartData = ref({});
 const expense = ref(false);
+
 // 카테고리 개수에 따라 색상 배열 생성
 const backgroundColors = [
     '#C19ED2', // Light Purple
@@ -96,7 +97,7 @@ const backgroundColors = [
     '#FF7CA1', // Pink
     '#96C2EE', // Light Blue
     '#68A3EE', // Blue
-    '#98f5e1', // Light Yellow
+    '#98f5e1', // Light Aqua
     '#FDE4CF', // Light Orange
     '#FFCFD2', // Light Coral
     '#F1C0E8', // Light Lavender
@@ -108,7 +109,7 @@ const hoverBackgroundColors = [
     '#E6737F', // Darker Pink
     '#7F99C9', // Darker Blue
     '#4F8CD3', // Darker Blue
-    '#98f5e1', // Darker Yellow
+    '#6ECFB8', // Darker Aqua
     '#E2C3B8', // Darker Orange
     '#E5A3B3', // Darker Coral
     '#D1A3E1', // Darker Lavender
