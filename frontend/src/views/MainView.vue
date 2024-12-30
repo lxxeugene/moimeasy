@@ -7,9 +7,21 @@
       <!-- 상단 섹션: 프로필, 달력, 채팅 -->
       <div class="top-section">
         <div class="calendar-section scrollable wide">
+          <div class="main-scetion-title">
+            <h2>일정캘린더</h2>
+            <router-link to="/schedule/calendar">
+              <i class="pi pi-ellipsis-v" style="font-size: 1rem"></i>
+            </router-link>
+          </div>
           <ScheduleCalendarMini />
         </div>
         <div class="chat-section scrollable narrow">
+          <div class="main-scetion-title">
+            <h2>모임채팅</h2>
+            <router-link to="/chat-layout">
+              <i class="pi pi-ellipsis-v" style="font-size: 1rem"></i>
+            </router-link>
+          </div>
           <ChatLayoutView />
         </div>
       </div>
@@ -17,9 +29,21 @@
       <!-- 하단 섹션: 게시판, 카테고리, 정산 -->
       <div class="bottom-section">
         <div class="board-section wide">
+          <div class="main-scetion-title">
+            <h2>게시판</h2>
+            <router-link to="/schedule/board">
+              <i class="pi pi-ellipsis-v" style="font-size: 1rem"></i>
+            </router-link>
+          </div>
           <BoardViewMini />
         </div>
         <div class="category-section">
+          <div class="main-scetion-title">
+            <h2>모임지출</h2>
+            <router-link to="/category">
+              <i class="pi pi-ellipsis-v" style="font-size: 1rem"></i>
+            </router-link>
+          </div>
           <CategoryChart />
         </div>
       </div>
@@ -35,6 +59,7 @@ import SettlementView from '@/views/moeim/SettlementView.vue';
 import ChatLayoutView from '@/views/chat/ChatRoomListView.vue';
 import { useAuthStore } from '@/stores/auth';
 import CategoryChart from './transaction/CategoryChart.vue';
+import router from '@/router';
 
 export default {
   name: 'MainPage',
@@ -82,13 +107,16 @@ export default {
 }
 /* 메인 헤더 인삿말 */
 .main-page-header {
-  padding: 20px 10px;
+  padding: 18px 10px;
   background-color: white;
   border-radius: 10px;
-  color: rgb(56, 55, 55);
-  box-shadow: 0 2px 4px rgba(142, 76, 166, 0.1);
-  font-size: 1.5rem;
+  color: rgb(7, 7, 7);
+  box-shadow:
+    0px 4px 6px rgba(0, 0, 0, 0.1),
+    0px 1px 3px rgba(0, 0, 0, 0.06);
+  font-size: 1.3rem;
   font-weight: 500;
+
   /* 헤더 */
 }
 
@@ -108,7 +136,7 @@ export default {
   background-color: white;
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   /* 스크롤 활성화 */
   max-height: 45vh;
@@ -117,9 +145,9 @@ export default {
 .calendar-section {
   /* 넓은 너비 */
   background-color: white;
-  padding: 10px;
+  padding: 15px 15px 5px;
   border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   max-height: 45vh;
 }
@@ -130,7 +158,7 @@ export default {
 .settlement-section {
   flex: 1;
   background-color: white;
-  padding: 20px;
+  padding: 15px;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   max-height: 45vh;
@@ -151,5 +179,21 @@ export default {
 .wide {
   flex: 2.5;
   /* 넓은 섹션 */
+}
+
+.main-scetion-title {
+  display: flex;
+  color: rgb(0, 0, 0);
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+  }
+  i {
+    color: rgb(120, 120, 120);
+    cursor: pointer;
+  }
 }
 </style>
