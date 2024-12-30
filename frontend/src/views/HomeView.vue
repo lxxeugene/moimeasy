@@ -85,6 +85,7 @@ export default {
         '/guide/schedule.png',
         '/guide/remittance.png',
         '/guide/transaction.png',
+        '/guide/chart.png',
       ],
       guideImages: [
         '/guide/login.png',
@@ -97,6 +98,7 @@ export default {
         '/guide/schedule.png',
         '/guide/remittance.png',
         '/guide/transaction.png',
+        '/guide/chart.png',
       ],
       currentImageIndex: 0,
       currentGuideIndex: 0,
