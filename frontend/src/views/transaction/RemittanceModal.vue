@@ -225,6 +225,7 @@ async function confirmremittance() {
         const userRaw = localStorage.getItem("user");
         let userId = null;
         let moeimId = null;
+        let userName = null; // 사용자 이름
 
         if (userRaw) {
             const user = JSON.parse(userRaw);
