@@ -231,9 +231,15 @@ export default {
         );
 
         if (response.data.length > 0) {
-          messages.value.push(...response.data);
-          lastMessageId.value = response.data[response.data.length - 1].id;
-          scrollToBottom();
+          const newMessages = response.data.filter(
+            (message) => !messages.value.some((m) => m.id === message.id)
+          );
+          messages.value.push(...newMessages);
+
+          if (newMessages.length > 0) {
+            lastMessageId.value = newMessages[newMessages.length - 1].id;
+            scrollToBottom();
+          }
         }
       } catch (error) {
         console.error('Error fetching messages:', error);
