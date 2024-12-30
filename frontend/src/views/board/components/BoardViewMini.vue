@@ -257,7 +257,7 @@ onMounted(() => {
 <style>
 .board-wrapper {
   width: 98%;
-  margin: 10px;
+  margin: 20px 10px 10px;
 }
 
 .filter-header {
