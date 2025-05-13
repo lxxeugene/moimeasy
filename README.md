@@ -61,8 +61,7 @@
 
 ## 🚀 ERD
 
-![ERD](https://github.com/user-attachments/assets/d1a7cae7-daf6-41af-b7c3-6b351a47e4d0)
-
+![ERD]
 ---
 
 ## 👩🏻‍💻 팀원
