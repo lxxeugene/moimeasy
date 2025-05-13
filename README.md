@@ -54,7 +54,7 @@
 ## 🎳 아키텍처
 
 <div align="center">
-  <img width="800" alt="architecture" src="https://github.com/user-attachments/assets/045dbc12-798b-46d4-a8e9-14b3feaeb082" />
+  //<img width="800" alt="architecture" src="https://github.com/user-attachments/assets/045dbc12-798b-46d4-a8e9-14b3feaeb082" />
 </div>
 
 ---
