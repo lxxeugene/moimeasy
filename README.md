@@ -1,6 +1,6 @@
 # #MoeimEasy
 
-<img width="1000" alt="MoeimEasy Demo" src="https://github.com/lxxeugene/moimeasy/blob/main/images/메인페이지.png?raw=true" />
+<img width="1000" alt="MoeimEasy Demo" src="https://github.com/lxxeugene/moimeasy/blob/main/images/main.png?raw=true" />
 
 ## 💪🏻 프로젝트 소개
 소규모 모임을 운영할 때 겪는 의사소통 불편, 정산 혼란, 일정 공유 어려움을 해결하고자 만들었습니다.  
@@ -54,7 +54,7 @@
 ## 🎳 아키텍처
 
 <div align="center">
-  <img width="800" src="https://github.com/lxxeugene/moimeasy/blob/main/images/아키텍처.png?raw=true" />
+  <img width="800" src="https://github.com/lxxeugene/moimeasy/blob/main/images/architecture.png?raw=true" />
 </div>
 
 ---
