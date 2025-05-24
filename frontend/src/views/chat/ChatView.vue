@@ -11,21 +11,16 @@
       >
         <Avatar
           :icon="'pi pi-user'"
-          :style="{
-            backgroundColor: getAvatarColor(message.senderId),
-          }"
+          :style="{ backgroundColor: getAvatarColor(message.senderId) }"
           shape="circle"
         />
         <div class="message-content">
-          <!-- 닉네임 표시 -->
           <strong>{{ message.senderNickname }}</strong>
 
-          <!-- TEXT 메시지 -->
           <p v-if="message.messageType === 'TEXT' || !message.messageType">
             {{ message.content }}
           </p>
 
-          <!-- IMAGE 메시지 -->
           <img
             v-else-if="message.messageType === 'IMAGE'"
             :src="message.fileUrl || message.content"
@@ -33,7 +28,6 @@
             class="chat-media"
           />
 
-          <!-- VIDEO 메시지 -->
           <video
             v-else-if="message.messageType === 'VIDEO'"
             :src="message.fileUrl || message.content"
@@ -41,42 +35,22 @@
             class="chat-media"
           ></video>
 
-          <!-- 알 수 없는 메시지 타입 -->
           <p v-else>Unsupported message type: {{ message.messageType }}</p>
-
           <small>{{ formatTimestamp(message.timestamp) }}</small>
         </div>
       </div>
     </div>
     <div class="chat-input">
-      <input
-        type="file"
-        ref="fileInput"
-        @change="handleFileSelect"
-        style="display: none"
-      />
-      <Button
-        icon="pi pi-plus"
-        class="btn-add-file"
-        @click="triggerFileUpload"
-      />
+      <input type="file" ref="fileInput" @change="handleFileSelect" style="display: none" />
+      <Button icon="pi pi-plus" class="btn-add-file" @click="triggerFileUpload" />
       <InputText
         v-model="newMessage"
         placeholder="메세지를 작성하세요"
         aria-label="Message Input"
         @keyup.enter="sendMessage"
       />
-      <Button
-        icon="pi pi-send"
-        aria-label="Send Message"
-        @click="sendMessage"
-      />
-      <Button
-        aria-label="Open Emoji Picker"
-        class="emoji-button"
-        @click="toggleEmojiPicker"
-        >😉</Button
-      >
+      <Button icon="pi pi-send" aria-label="Send Message" @click="sendMessage" />
+      <Button aria-label="Open Emoji Picker" class="emoji-button" @click="toggleEmojiPicker">😉</Button>
       <div v-if="showEmojiPicker" class="emoji-picker-container">
         <EmojiPicker :native="true" @select="onSelectEmoji" />
       </div>
@@ -85,13 +59,15 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
+import axios from 'axios';
 import Avatar from 'primevue/avatar';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import EmojiPicker from 'vue3-emoji-picker';
 import { useAuthStore } from '@/stores/auth';
-import axios from 'axios';
 import 'vue3-emoji-picker/css';
 import {
   ref as firebaseRef,
@@ -102,62 +78,47 @@ import { firebaseStorage } from '@/firebase/firebaseConfig';
 
 export default {
   props: {
-    components: {
-      EmojiPicker, // 로컬 등록
-    },
-    roomId: {
-      type: String,
-      required: true,
-    },
+    components: { EmojiPicker },
+    roomId: { type: String, required: true },
   },
   setup(props) {
-    const fileInput = ref(null);
-    const selectedFile = ref(null);
+    const authStore = useAuthStore();
+    const loggedInUserId = authStore.user?.userId;
+
     const messages = ref([]);
     const newMessage = ref('');
     const showEmojiPicker = ref(false);
     const chatContainer = ref(null);
-    const pollingInterval = ref(null);
-    const lastMessageId = ref(0);
+    const fileInput = ref(null);
+    const selectedFile = ref(null);
+    const stompClient = ref(null);
+    const socket = ref(null);
 
-    const authStore = useAuthStore();
-    const loggedInUserId = authStore.user?.userId;
+    const connectWebSocket = () => {
+      socket.value = new SockJS('http://localhost:8080/ws-chat');
+      stompClient.value = Stomp.over(socket.value);
 
-    //이미지, 비디오 업로드 const selectedFile = ref(null);
-
-    const triggerFileUpload = () => {
-      fileInput.value.click();
+      stompClient.value.connect({}, () => {
+        stompClient.value.subscribe(`/topic/room.${props.roomId}`, (message) => {
+          const received = JSON.parse(message.body);
+          messages.value.push(received);
+          scrollToBottom();
+        });
+      });
     };
 
-    const handleFileSelect = async (event) => {
-      selectedFile.value = event.target.files[0];
-      if (!selectedFile.value) return;
+    const sendMessage = () => {
+      if (!newMessage.value.trim()) return;
 
-      // 파일 크기 제한 (1MB 이하)
-      const maxFileSize = 1 * 1024 * 1024; // 1MB
-      if (selectedFile.value.size > maxFileSize) {
-        alert('파일 크기는 1MB를 초과할 수 없습니다.');
-        return;
-      }
+      const payload = {
+        chatRoomId: props.roomId,
+        senderId: loggedInUserId,
+        content: newMessage.value,
+        messageType: 'TEXT',
+      };
 
-      // Firebase에 파일 업로드
-      const file = selectedFile.value;
-      const storagePath = `chatFiles/${file.name}`;
-      const storageRef = firebaseRef(firebaseStorage, storagePath);
-
-      try {
-        await uploadBytes(storageRef, file);
-        const fileUrl = await getDownloadURL(storageRef);
-        console.log('File uploaded to:', fileUrl);
-
-        // 파일 URL을 메시지로 전송
-        await sendFileMessage(
-          fileUrl,
-          file.type.includes('video') ? 'VIDEO' : 'IMAGE'
-        );
-      } catch (error) {
-        console.error('File upload failed:', error);
-      }
+      stompClient.value.send('/app/chat.send', {}, JSON.stringify(payload));
+      newMessage.value = '';
     };
 
     const sendFileMessage = async (fileUrl, messageType) => {
@@ -169,105 +130,31 @@ export default {
         messageType,
       };
 
-      try {
-        const token = localStorage.getItem('accessToken');
-        await axios.post('/api/v1/chat/message', payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        fetchMessages(); // 메시지 목록 갱신
-      } catch (error) {
-        console.error('Error sending file message:', error);
-      }
+      stompClient.value.send('/app/chat.send', {}, JSON.stringify(payload));
     };
 
-    //채팅아바타
-    const getAvatarColor = (userId) => {
-      const colors = [
-        '#6b48c6',
-        '#c3aff8',
-        '#7350cd',
-        '#b9a0f4',
-        '#7f56d9',
-        '#af91f0',
-        '#8c67e0',
-        '#a483eb',
-        '#9875e6',
-        '#d1c2fb',
-      ];
-      const index = Math.abs(hashCode(userId)) % colors.length;
-      return colors[index];
-    };
+    const triggerFileUpload = () => fileInput.value.click();
 
-    // 해시 함수: 사용자 ID를 정수값으로 변환
-    const hashCode = (str) => {
-      let hash = 0;
-      const stringified = String(str); // 문자열로 변환
-      for (let i = 0; i < stringified.length; i++) {
-        const char = stringified.charCodeAt(i);
-        hash = (hash << 5) - hash + char;
-        hash &= hash; // 정수값 유지
-      }
-      return hash;
-    };
-    //채팅 날짜
-    const formatTimestamp = (timestamp) => {
-      const date = new Date(timestamp);
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${month}.${day} ${hours}:${minutes}`;
-    };
+    const handleFileSelect = async (event) => {
+      selectedFile.value = event.target.files[0];
+      if (!selectedFile.value) return;
 
-    const fetchMessages = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(
-          `/api/v1/chat/rooms/${props.roomId}/poll-messages`,
-          {
-            params: { lastMessageId: lastMessageId.value },
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (response.data.length > 0) {
-          const newMessages = response.data.filter(
-            (message) => !messages.value.some((m) => m.id === message.id)
-          );
-          messages.value.push(...newMessages);
-
-          if (newMessages.length > 0) {
-            lastMessageId.value = newMessages[newMessages.length - 1].id;
-            scrollToBottom();
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching messages:', error);
-      }
-    };
-
-    const sendMessage = async () => {
-      if (!newMessage.value.trim()) {
-        newMessage.value = '';
+      const maxFileSize = 1 * 1024 * 1024;
+      if (selectedFile.value.size > maxFileSize) {
+        alert('파일 크기는 1MB를 초과할 수 없습니다.');
         return;
       }
 
-      const payload = {
-        chatRoomId: props.roomId,
-        senderId: loggedInUserId,
-        content: newMessage.value,
-        messageType: 'TEXT',
-      };
+      const file = selectedFile.value;
+      const storagePath = `chatFiles/${file.name}`;
+      const storageRef = firebaseRef(firebaseStorage, storagePath);
 
       try {
-        const token = localStorage.getItem('accessToken');
-        await axios.post('/api/v1/chat/message', payload, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        newMessage.value = '';
-        fetchMessages();
+        await uploadBytes(storageRef, file);
+        const fileUrl = await getDownloadURL(storageRef);
+        await sendFileMessage(fileUrl, file.type.includes('video') ? 'VIDEO' : 'IMAGE');
       } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('파일 업로드 실패:', error);
       }
     };
 
@@ -288,54 +175,62 @@ export default {
       });
     };
 
-    const startPolling = () => {
-      pollingInterval.value = setInterval(fetchMessages, 1000);
+    const getAvatarColor = (userId) => {
+      const colors = ['#6b48c6', '#c3aff8', '#7350cd', '#b9a0f4', '#7f56d9'];
+      const index = Math.abs(hashCode(userId)) % colors.length;
+      return colors[index];
     };
 
-    const stopPolling = () => {
-      clearInterval(pollingInterval.value);
+    const hashCode = (str) => {
+      let hash = 0;
+      const s = String(str);
+      for (let i = 0; i < s.length; i++) {
+        hash = (hash << 5) - hash + s.charCodeAt(i);
+        hash |= 0;
+      }
+      return hash;
     };
 
-    // Lifecycle hooks
+    const formatTimestamp = (timestamp) => {
+      const date = new Date(timestamp);
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${month}.${day} ${hours}:${minutes}`;
+    };
+
     onMounted(() => {
-      console.log('ChatView loaded with roomId:', props.roomId);
-      fetchMessages();
-      startPolling();
-      scrollToBottom();
+      connectWebSocket();
     });
 
     onBeforeUnmount(() => {
-      stopPolling();
+      if (stompClient.value?.connected) {
+        stompClient.value.disconnect();
+      }
     });
 
-    watch(
-      () => props.roomId,
-      (newRoomId) => {
-        console.log('Room changed:', newRoomId);
-        fetchMessages();
-      }
-    );
-
     return {
-      formatTimestamp,
-      getAvatarColor,
       messages,
       newMessage,
-      showEmojiPicker,
-      chatContainer,
       sendMessage,
+      showEmojiPicker,
       toggleEmojiPicker,
       onSelectEmoji,
-      loggedInUserId,
+      getAvatarColor,
+      formatTimestamp,
+      chatContainer,
       triggerFileUpload,
       handleFileSelect,
       fileInput,
+      loggedInUserId,
     };
   },
 };
 </script>
 
 <style scoped>
+/* 스타일은 기존과 동일 */
 .chat-container {
   display: flex;
   flex-direction: column;
@@ -347,24 +242,20 @@ export default {
   overflow: hidden;
   background-color: #f9f9f9;
 }
-
 .chat-messages {
   flex: 1;
   overflow: auto;
   padding: 10px;
   background-color: #f0f0f0;
 }
-
 .message {
   display: flex;
   margin-bottom: 15px;
   align-items: flex-start;
 }
-
 .message.user {
   flex-direction: row-reverse;
 }
-
 .message-content {
   max-width: 70%;
   padding: 10px;
@@ -373,20 +264,16 @@ export default {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin: 0 10px;
 }
-
 .user .message-content {
   background-color: #e3f2fd;
 }
-
 .message-content p {
   margin: 0 0 5px 0;
 }
-
 .message-content small {
   font-size: 0.8em;
   color: #888;
 }
-
 .chat-input {
   display: flex;
   align-items: center;
@@ -394,12 +281,10 @@ export default {
   background-color: #fff;
   border-top: 1px solid #ccc;
 }
-
 .chat-input .p-inputtext {
   flex: 1;
   margin-right: 10px;
 }
-
 .p-avatar {
   width: 32px;
   height: 32px;
@@ -411,7 +296,6 @@ export default {
 .emoji-button {
   margin-left: 10px;
 }
-
 .emoji-picker-container {
   position: absolute;
   bottom: 60px;
