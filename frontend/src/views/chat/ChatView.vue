@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import SockJS from 'sockjs-client';
 import { Stomp } from '@stomp/stompjs';
 import axios from 'axios';
@@ -78,8 +78,7 @@ import { firebaseStorage } from '@/firebase/firebaseConfig';
 
 export default {
   props: {
-    components: { EmojiPicker },
-    roomId: { type: String, required: true },
+    roomId: { type: [String, Number], required: true },
   },
   setup(props) {
     const authStore = useAuthStore();
@@ -95,16 +94,34 @@ export default {
     const socket = ref(null);
 
     const connectWebSocket = () => {
-      socket.value = new SockJS('http://localhost:8080/ws-chat');
-      stompClient.value = Stomp.over(socket.value);
+      stompClient.value = Stomp.over(() => new SockJS('http://localhost:8088/ws-chat'));
 
-      stompClient.value.connect({}, () => {
-        stompClient.value.subscribe(`/topic/room.${props.roomId}`, (message) => {
-          const received = JSON.parse(message.body);
-          messages.value.push(received);
-          scrollToBottom();
+      const token = authStore.accessToken;
+
+      stompClient.value.connect(
+        { Authorization: `Bearer ${token}` }, // ✅ 토큰을 헤더로 전달
+        () => {
+          console.log('WebSocket 연결 성공');
+          stompClient.value.subscribe(`/topic/room.${props.roomId}`, (message) => {
+            const received = JSON.parse(message.body);
+            messages.value.push(received);
+            scrollToBottom();
+          });
+        },
+        (error) => {
+          console.error('WebSocket 연결 실패:', error);
+        }
+      );
+
+    };
+
+
+    const disconnectWebSocket = () => {
+      if (stompClient.value?.connected) {
+        stompClient.value.disconnect(() => {
+          console.log('WebSocket 연결 종료됨');
         });
-      });
+      }
     };
 
     const sendMessage = () => {
@@ -117,7 +134,11 @@ export default {
         messageType: 'TEXT',
       };
 
-      stompClient.value.send('/app/chat.send', {}, JSON.stringify(payload));
+      if (stompClient.value && stompClient.value.connected) {
+        stompClient.value.send('/app/chat.send', {}, JSON.stringify(payload));
+      } else {
+        console.warn('STOMP 연결되지 않았습니다. 메시지 전송 취소');
+      }
       newMessage.value = '';
     };
 
@@ -205,8 +226,19 @@ export default {
     });
 
     onBeforeUnmount(() => {
+      disconnectWebSocket();
+    });
+
+    // 방 전환 시 WebSocket 재연결
+    watch(() => props.roomId, (newRoomId, oldRoomId) => {
       if (stompClient.value?.connected) {
-        stompClient.value.disconnect();
+        stompClient.value.disconnect(() => {
+          console.log('채팅방 변경됨, 재연결 중...');
+          messages.value = [];
+          connectWebSocket();
+        });
+      } else {
+        connectWebSocket();
       }
     });
 
@@ -230,7 +262,6 @@ export default {
 </script>
 
 <style scoped>
-/* 스타일은 기존과 동일 */
 .chat-container {
   display: flex;
   flex-direction: column;

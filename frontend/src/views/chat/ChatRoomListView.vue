@@ -194,6 +194,7 @@ export default {
           return;
         }
 
+        console.log('token', token); // 확인용 로그
         const response = await axios.get(`/api/v1/chat/rooms`, {
           headers: {
             Authorization: `Bearer ${token}`,
