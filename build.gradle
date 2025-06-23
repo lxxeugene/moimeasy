@@ -60,7 +60,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.2.6' // Jackson JSON 직렬화 (RefreshToken을 JSON으로 저장하기 위함)
 	implementation 'com.fasterxml.jackson.core:jackson-databind' // JSON 직렬화/역직렬화용
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-
+	testImplementation 'org.springframework:spring-messaging'
 }
 
 tasks.named('test') {
